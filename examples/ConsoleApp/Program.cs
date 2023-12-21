@@ -7,7 +7,6 @@ public class DynamicProtoLoader
 {
     public static void Main()
     {
-        // Your .proto definition as a string
         var protoDefinition = File.ReadAllText("greet.proto");
 
         var bytes = Convert.FromBase64String("CgRzdGVm");
