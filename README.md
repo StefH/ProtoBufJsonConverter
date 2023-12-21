@@ -1,11 +1,12 @@
 # ProtoBufJsonConverter
 Convert a protobuf message to a JSON string using the proto definition file.
 
-# Usage
+## NuGet
+[![NuGet Badge](https://buildstats.info/nuget/ProtoBufJsonConverter)](https://www.nuget.org/packages/ProtoBufJsonConverter) 
 
-## :one: Convert ProtoBuf `byte[]` to a JSON `string`
+## Usage
 
-### Proto Definition
+### Proto
 ``` proto
 syntax = "proto3";
 
@@ -28,7 +29,9 @@ message HelloReply {
 }
 ```
 
-### Code
+### :one: Convert ProtoBuf `byte[]` to a JSON `string`
+
+#### Code
 ``` csharp
 var protoDefinition = "...".
 
@@ -41,13 +44,13 @@ var converter = new Converter();
 var json = converter.ConvertToJson(convertToJsonRequest);
 ```
 
-### JSON
+#### JSON
 ``` json
 {"name":"stef"}
 ```
 
-## :two: Convert JSON `string` to a ProtoBuf `byte[]`
-### Code
+### :two: Convert JSON `string` to a ProtoBuf `byte[]`
+#### Code
 ``` csharp
 var protoDefinition = "...".
 
@@ -56,9 +59,4 @@ var json = @"{""name"":""stef""}";
 var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, json, "greet.Greeter.SayHello");
 
 var protobuf = converter.ConvertToProtoBuf(convertToProtoBufRequest);
-```
-
-### ProtoBuf
-``` json
-{"name":"stef"}
 ```
