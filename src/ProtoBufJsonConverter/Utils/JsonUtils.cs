@@ -32,7 +32,7 @@ internal static class JsonUtils
         var type = assembly.GetType(inputTypeFullName);
         if (type == null)
         {
-            throw new ArgumentException($"The type {type} cannot be found in the assembly.");
+            throw new ArgumentException($"The type '{type}' cannot be found in the assembly.");
         }
 
         return type;
