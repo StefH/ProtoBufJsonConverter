@@ -1,5 +1,4 @@
-﻿using JsonConverter.Abstractions;
-using ProtoBufJsonConverter;
+﻿using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
 
 namespace ConsoleApp;
