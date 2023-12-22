@@ -8,8 +8,13 @@ public class ConvertToProtoBufRequest : ConvertRequest
 {
     public string Json { get; }
 
-    /// <inheritdoc />
-    public ConvertToProtoBufRequest(string protoDefinition, string json, string method) : base(protoDefinition, method)
+    /// <summary>
+    /// Create a ConvertToProtoBufRequest.
+    /// </summary>
+    /// <param name="protoDefinition">The proto definition as a string.</param>
+    /// <param name="method">The method which is called on service. Format is {package-name}.{service-name}-{method-name}</param>
+    /// <param name="json">The JSON string to convert.</param>
+    public ConvertToProtoBufRequest(string protoDefinition, string method, string json) : base(protoDefinition, method)
     {
         Json = Guard.NotNullOrEmpty(json);
     }
