@@ -25,8 +25,11 @@ public class DynamicProtoLoader
         var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, method, bytes);
         var instance = converter.ConvertToObject(convertToObjectRequest);
 
-        var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", json1);
-        var protobuf = converter.ConvertToProtoBuf(convertToProtoBufRequest);
+        var convertToProtoBufRequest1 = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", json1);
+        var protobuf1 = converter.ConvertToProtoBuf(convertToProtoBufRequest1);
+
+        var convertToProtoBufRequest2 = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", instance);
+        var protobuf2 = converter.ConvertToProtoBuf(convertToProtoBufRequest2);
 
         int x = 9;
     }

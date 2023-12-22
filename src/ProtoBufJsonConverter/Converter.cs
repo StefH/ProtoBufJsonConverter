@@ -47,7 +47,9 @@ public class Converter : IConverter
 
         var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return JsonUtils.Deserialize(assembly, inputTypeFullName, request);
+        return request.Input.IsFirst ?
+            JsonUtils.Deserialize(assembly, inputTypeFullName, request) :
+            ProtoBufUtils.Serialize(request.Input.Second);
     }
 
     private static (Assembly Assembly, string inputTypeFullName) Parse(ConvertRequest request, CancellationToken cancellationToken)

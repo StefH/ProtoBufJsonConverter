@@ -21,7 +21,7 @@ internal static class JsonUtils
     {
         var type = AssemblyUtils.GetType(assembly, inputTypeFullName);
 
-        var instance = (request.JsonConverter ?? DefaultJsonConverter.Value).Deserialize(request.Json, type);
+        var instance = (request.JsonConverter ?? DefaultJsonConverter.Value).Deserialize(request.Input.First, type);
 
         using var memoryStream = new MemoryStream();
         Serializer.Serialize(memoryStream, instance);
