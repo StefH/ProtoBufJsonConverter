@@ -15,14 +15,14 @@ public class DynamicProtoLoader
         
         var converter = new Converter();
 
-        var convertToJsonRequest1 = new ConvertToJsonRequest(protoDefinition, bytes, method);
+        var convertToJsonRequest1 = new ConvertToJsonRequest(protoDefinition, method, bytes);
         var json1 = converter.ConvertToJson(convertToJsonRequest1);
         
-        var convertToJsonRequest2 = new ConvertToJsonRequest(protoDefinition, bytes, method)
+        var convertToJsonRequest2 = new ConvertToJsonRequest(protoDefinition, method, bytes)
             .WithJsonConverterOptions(o => o.WriteIndented = true);
         var json2 = converter.ConvertToJson(convertToJsonRequest2);
 
-        var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, json1, "greet.Greeter.SayHello");
+        var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", json1);
         var protobuf = converter.ConvertToProtoBuf(convertToProtoBufRequest);
 
         int x = 9;

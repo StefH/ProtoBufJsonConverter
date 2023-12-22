@@ -40,7 +40,7 @@ var protoDefinition = "...". // See above
 
 var bytes = Convert.FromBase64String("CgRzdGVm");
 
-var convertToJsonRequest = new ConvertToJsonRequest(protoDefinition, bytes, "greet.Greeter.SayHello");
+var convertToJsonRequest = new ConvertToJsonRequest(protoDefinition, "greet.Greeter.SayHello", bytes);
 
 var converter = new Converter();
 
@@ -59,7 +59,7 @@ var protoDefinition = "...". // See above
 
 var json = @"{""name"":""stef""}";
 
-var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, json, "greet.Greeter.SayHello");
+var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", json);
 
 var converter = new Converter();
 
