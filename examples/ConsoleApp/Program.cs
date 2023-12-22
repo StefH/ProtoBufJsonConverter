@@ -22,6 +22,9 @@ public class DynamicProtoLoader
             .WithJsonConverterOptions(o => o.WriteIndented = true);
         var json2 = converter.ConvertToJson(convertToJsonRequest2);
 
+        var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, method, bytes);
+        var instance = converter.ConvertToObject(convertToObjectRequest);
+
         var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", json1);
         var protobuf = converter.ConvertToProtoBuf(convertToProtoBufRequest);
 

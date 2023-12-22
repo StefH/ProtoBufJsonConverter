@@ -7,7 +7,7 @@ namespace ProtoBufJsonConverter.Utils;
 
 internal static class AssemblyUtils
 {
-    public static Assembly CompileCodeToAssembly(string code, CancellationToken cancellationToken)
+    internal static Assembly CompileCodeToAssembly(string code, CancellationToken cancellationToken)
     {
         // Specify the assembly name
         var assemblyName = Path.GetRandomFileName();
@@ -52,5 +52,16 @@ internal static class AssemblyUtils
 
         // Load assembly
         return Assembly.Load(stream.ToArray());
+    }
+
+    internal static Type GetType(Assembly assembly, string inputTypeFullName)
+    {
+        var type = assembly.GetType(inputTypeFullName);
+        if (type == null)
+        {
+            throw new ArgumentException($"The type '{type}' cannot be found in the assembly.");
+        }
+
+        return type;
     }
 }

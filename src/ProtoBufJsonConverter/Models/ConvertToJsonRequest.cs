@@ -7,6 +7,8 @@ namespace ProtoBufJsonConverter.Models;
 public class ConvertToJsonRequest : ConvertRequest
 {
     public byte[] ProtoBufBytes { get; }
+    
+    public IJsonConverter? JsonConverter { get; protected set; }
 
     public JsonConverterOptions? JsonConverterOptions { get; private set; }
 

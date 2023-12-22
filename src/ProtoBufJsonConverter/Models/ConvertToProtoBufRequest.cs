@@ -6,6 +6,8 @@ namespace ProtoBufJsonConverter.Models;
 
 public class ConvertToProtoBufRequest : ConvertRequest
 {
+    public IJsonConverter? JsonConverter { get; protected set; }
+
     public string Json { get; }
 
     /// <summary>
