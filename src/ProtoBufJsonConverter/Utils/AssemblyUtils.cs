@@ -43,7 +43,8 @@ internal static class AssemblyUtils
 
         if (!result.Success)
         {
-            var failures = result.Diagnostics
+            var failures = result
+                .Diagnostics
                 .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
 
             throw new InvalidOperationException($"Unable to compile the code. Errors: {string.Join(",", failures.Select(f => $"{f.Id}-{f.GetMessage()}"))}");

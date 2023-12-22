@@ -2,9 +2,6 @@
 - Convert a protobuf message to a JSON string using the proto definition file.
 - Convert a JOSNstring to a protobuf message using the proto definition file.
 
-## NuGet
-[![NuGet Badge](https://buildstats.info/nuget/ProtoBufJsonConverter)](https://www.nuget.org/packages/ProtoBufJsonConverter) 
-
 ## Usage
 
 ### Proto Definition

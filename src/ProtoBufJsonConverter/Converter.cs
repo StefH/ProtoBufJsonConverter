@@ -9,6 +9,9 @@ using Stef.Validation;
 
 namespace ProtoBufJsonConverter;
 
+/// <summary>
+/// The Converter
+/// </summary>
 public class Converter : IConverter
 {
     private static readonly Dictionary<string, string> CodeGenerateOptions = new()
@@ -18,6 +21,7 @@ public class Converter : IConverter
 
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
+    /// <inheritdoc />
     public string ConvertToJson(ConvertToJsonRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
@@ -27,6 +31,7 @@ public class Converter : IConverter
         return JsonUtils.Serialize(assembly, inputTypeFullName, request);
     }
 
+    /// <inheritdoc />
     public byte[] ConvertToProtoBuf(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
