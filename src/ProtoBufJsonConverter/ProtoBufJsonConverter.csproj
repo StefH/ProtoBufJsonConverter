@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="../../version.xml" />
+
+	<PropertyGroup>
+		<Version>0.0.$(PatchVersion)</Version>
+		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>12</LangVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="../../resources/icon-128x128.png" Pack="true" PackagePath="" />
+		<None Include="../../PackageReadme.md" Pack="true" PackagePath=""/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="8.0.0" />
+		<PackageReference Include="JsonConverter.Newtonsoft.Json" Version="0.5.0" />
+		<PackageReference Include="protobuf-net" Version="3.2.30" />
+		<PackageReference Include="protobuf-net.Reflection" Version="3.2.12" />
+		<PackageReference Include="Stef.Validation" Version="0.1.1" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+	</ItemGroup>
+
+</Project>

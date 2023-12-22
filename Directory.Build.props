@@ -1,0 +1,16 @@
+<Project>
+	<PropertyGroup>
+		<Copyright>Copyright © 2023 Stef Heyenrath</Copyright>
+		<Authors>Stef Heyenrath</Authors>
+		<PackageIcon>icon-128x128.png</PackageIcon>
+		<PackageReleaseNotes>See CHANGELOG.md</PackageReleaseNotes>
+		<PackageProjectUrl>https://github.com/StefH/https://github.com/StefH/ProtoBufJsonConverter</PackageProjectUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/StefH/https://github.com/StefH/ProtoBufJsonConverter</RepositoryUrl>
+		<ApplicationIcon>../../resources/icon.ico</ApplicationIcon>
+		<PackageTags>protobuf;protobuf-net;grpc;json;convert;serialize;deserialize</PackageTags>
+		<Description>Convert a protobuf message to a JSON string (and back) using the proto definition file.</Description>
+		<PackageReadmeFile>PackageReadme.md</PackageReadmeFile>
+	</PropertyGroup>
+</Project>
