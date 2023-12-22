@@ -1,5 +1,4 @@
 ﻿using JsonConverter.Abstractions;
-using JsonConverter.Newtonsoft.Json;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Models;
@@ -10,7 +9,7 @@ public abstract class ConvertRequest
 
     public string Method { get; }
 
-    public IJsonConverter JsonConverter { get; protected set; } = new NewtonsoftJsonConverter();
+    public IJsonConverter? JsonConverter { get; protected set; }
 
     /// <summary>
     /// Create a ConvertRequest

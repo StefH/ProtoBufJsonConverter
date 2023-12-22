@@ -1,4 +1,6 @@
 # ProtoBufJsonConverter
+
+## This project uses [protobuf-net](https://github.com/protobuf-net/protobuf-net) to:
 - Convert a protobuf message to a JSON string using the proto definition file.
 - Convert a JOSNstring to a protobuf message using the proto definition file.
 
@@ -58,6 +60,8 @@ var protoDefinition = "...". // See above
 var json = @"{""name"":""stef""}";
 
 var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, json, "greet.Greeter.SayHello");
+
+var converter = new Converter();
 
 var protobuf = converter.ConvertToProtoBuf(convertToProtoBufRequest);
 ```

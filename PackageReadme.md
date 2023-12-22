@@ -56,5 +56,7 @@ var json = @"{""name"":""stef""}";
 
 var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, json, "greet.Greeter.SayHello");
 
+var converter = new Converter();
+
 var protobuf = converter.ConvertToProtoBuf(convertToProtoBufRequest);
 ```
