@@ -22,37 +22,37 @@ public class Converter : IConverter
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request.ProtoDefinition, request.Method, cancellationToken);
+        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return JsonUtils.Serialize(assembly, inputTypeFullName, request.JsonConverter, request.ProtobufBytes);
+        return JsonUtils.Serialize(assembly, inputTypeFullName, request);
     }
 
     public byte[] ConvertToProtoBuf(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request.ProtoDefinition, request.Method, cancellationToken);
+        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return JsonUtils.Deserialize(assembly, inputTypeFullName, request.JsonConverter, request.Json);
+        return JsonUtils.Deserialize(assembly, inputTypeFullName, request);
     }
 
-    private static (Assembly Assembly, string inputTypeFullName) Parse(string protoDefinition, string method, CancellationToken cancellationToken)
+    private static (Assembly Assembly, string inputTypeFullName) Parse(ConvertRequest request, CancellationToken cancellationToken)
     {
-        var data = GetCachedFileDescriptorSet(protoDefinition, cancellationToken);
+        var data = GetCachedFileDescriptorSet(request.ProtoDefinition, cancellationToken);
 
-        var inputTypeFullName = GetInputType(data.Set, method);
+        var inputTypeFullName = GetInputType(data.Set, request.Method);
 
         return (data.Assembly, inputTypeFullName);
     }
 
     private static Data GetCachedFileDescriptorSet(string protoDefinition, CancellationToken cancellationToken)
     {
-        var hashcode = protoDefinition.GetDeterministicHashCode();
+        var protoDefinitionHashCode = protoDefinition.GetDeterministicHashCode();
 
-        return DataDictionary.GetOrAdd(hashcode, hc =>
+        return DataDictionary.GetOrAdd(protoDefinitionHashCode, hashCode =>
         {
             var set = new FileDescriptorSet();
-            set.Add($"{hc}.proto", true, new StringReader(protoDefinition));
+            set.Add($"{hashCode}.proto", true, new StringReader(protoDefinition));
             set.Process();
 
             var errors = set.GetErrors();
@@ -65,7 +65,7 @@ public class Converter : IConverter
 
             return new Data
             {
-                HashCode = hc,
+                HashCode = hashCode,
                 Set = set,
                 Assembly = AssemblyUtils.CompileCodeToAssembly(code, cancellationToken)
             };
@@ -115,7 +115,7 @@ public class Converter : IConverter
             throw new ArgumentException($"The method '{methodName}' is not found in the proto definition.");
         }
 
-        return methodDescriptorProto.InputType.Trim('.');
+        return methodDescriptorProto.InputType.TrimStart('.');
     }
 
     private static string GenerateCSharpCode(FileDescriptorSet set)

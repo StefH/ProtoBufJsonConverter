@@ -1,25 +1,26 @@
 ﻿using System.Reflection;
-using JsonConverter.Abstractions;
 using ProtoBuf;
+using ProtoBufJsonConverter.Models;
 
 namespace ProtoBufJsonConverter.Utils;
 
 internal static class JsonUtils
 {
-    public static string Serialize(Assembly assembly, string inputTypeFullName, IJsonConverter jsonConverter, byte[] protoBufBytes)
+    public static string Serialize(Assembly assembly, string inputTypeFullName, ConvertToJsonRequest request)
     {
         var type = GetType(assembly, inputTypeFullName);
 
-        var value = Serializer.Deserialize(type, new MemoryStream(protoBufBytes));
+        using var memoryStream = new MemoryStream(request.ProtoBufBytes);
+        var value = Serializer.Deserialize(type, memoryStream);
 
-        return jsonConverter.Serialize(value);
+        return request.JsonConverter.Serialize(value, request.JsonConverterOptions);
     }
 
-    public static byte[] Deserialize(Assembly assembly, string inputTypeFullName, IJsonConverter jsonConverter, string json)
+    public static byte[] Deserialize(Assembly assembly, string inputTypeFullName, ConvertToProtoBufRequest request)
     {
         var type = GetType(assembly, inputTypeFullName);
 
-        var instance = jsonConverter.Deserialize(json, type);
+        var instance = request.JsonConverter.Deserialize(request.Json, type);
 
         using var memoryStream = new MemoryStream();
         Serializer.Serialize(memoryStream, instance);
