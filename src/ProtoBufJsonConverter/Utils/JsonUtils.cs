@@ -10,14 +10,14 @@ internal static class JsonUtils
 {
     private static readonly Lazy<IJsonConverter> DefaultJsonConverter = new(() => new NewtonsoftJsonConverter());
 
-    public static string Serialize(Assembly assembly, string inputTypeFullName, ConvertToJsonRequest request)
+    internal static string Serialize(Assembly assembly, string inputTypeFullName, ConvertToJsonRequest request)
     {
         var value = ProtoBufUtils.Deserialize(assembly, inputTypeFullName, request.ProtoBufBytes);
 
         return (request.JsonConverter ?? DefaultJsonConverter.Value).Serialize(value, request.JsonConverterOptions);
     }
 
-    public static byte[] Deserialize(Assembly assembly, string inputTypeFullName, ConvertToProtoBufRequest request)
+    internal static byte[] Deserialize(Assembly assembly, string inputTypeFullName, ConvertToProtoBufRequest request)
     {
         var type = AssemblyUtils.GetType(assembly, inputTypeFullName);
 

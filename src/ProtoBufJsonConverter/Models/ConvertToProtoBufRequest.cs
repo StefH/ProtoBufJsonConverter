@@ -1,4 +1,5 @@
-﻿using JsonConverter.Abstractions;
+﻿using AnyOfTypes;
+using JsonConverter.Abstractions;
 using JsonConverter.Newtonsoft.Json;
 using Stef.Validation;
 
@@ -8,17 +9,17 @@ public class ConvertToProtoBufRequest : ConvertRequest
 {
     public IJsonConverter? JsonConverter { get; protected set; }
 
-    public string Json { get; }
+    public AnyOf<string, object> Input { get; }
 
     /// <summary>
     /// Create a ConvertToProtoBufRequest.
     /// </summary>
     /// <param name="protoDefinition">The proto definition as a string.</param>
     /// <param name="method">The method which is called on service. Format is {package-name}.{service-name}-{method-name}</param>
-    /// <param name="json">The JSON string to convert.</param>
-    public ConvertToProtoBufRequest(string protoDefinition, string method, string json) : base(protoDefinition, method)
+    /// <param name="input">The JSON string or Object to convert.</param>
+    public ConvertToProtoBufRequest(string protoDefinition, string method, AnyOf<string, object> input) : base(protoDefinition, method)
     {
-        Json = Guard.NotNullOrEmpty(json);
+        Input = Guard.NotNull(input.CurrentValue);
     }
 
     /// <summary>

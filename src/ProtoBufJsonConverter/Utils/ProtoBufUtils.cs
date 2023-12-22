@@ -13,7 +13,7 @@ internal static class ProtoBufUtils
         return Serializer.Deserialize(type, memoryStream);
     }
 
-    internal static byte[] Serialize(string inputTypeFullName, object instance)
+    internal static byte[] Serialize(object instance)
     {
         using var memoryStream = new MemoryStream();
         Serializer.Serialize(memoryStream, instance);
