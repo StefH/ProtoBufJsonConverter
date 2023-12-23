@@ -53,7 +53,22 @@ var json = converter.ConvertToJson(convertToJsonRequest);
 {"name":"stef"}
 ```
 
-### :two: Convert JSON `string` to a ProtoBuf `byte[]`
+### :one: Convert ProtoBuf `byte[]` to an object
+
+#### Code
+``` csharp
+var protoDefinition = "...". // See above
+
+var bytes = Convert.FromBase64String("CgRzdGVm");
+
+var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, "greet.Greeter.SayHello", bytes);
+
+var converter = new Converter();
+
+var @object = converter.ConvertToJson(convertToObjectRequest);
+```
+
+### :three: Convert JSON `string` to a ProtoBuf `byte[]`
 #### Code
 ``` csharp
 var protoDefinition = "...". // See above
