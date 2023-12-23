@@ -2,6 +2,7 @@
 
 ## This project uses [protobuf-net](https://github.com/protobuf-net/protobuf-net) to:
 - Convert a protobuf message to a JSON string using the proto definition file.
+- Convert a protobuf message to an object using the proto definition file.
 - Convert a JSON string to a protobuf message using the proto definition file.
 
 ## NuGet
@@ -52,7 +53,22 @@ var json = converter.ConvertToJson(convertToJsonRequest);
 {"name":"stef"}
 ```
 
-### :two: Convert JSON `string` to a ProtoBuf `byte[]`
+### :one: Convert ProtoBuf `byte[]` to an object
+
+#### Code
+``` csharp
+var protoDefinition = "...". // See above
+
+var bytes = Convert.FromBase64String("CgRzdGVm");
+
+var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, "greet.Greeter.SayHello", bytes);
+
+var converter = new Converter();
+
+var @object = converter.ConvertToJson(convertToObjectRequest);
+```
+
+### :three: Convert JSON `string` to a ProtoBuf `byte[]`
 #### Code
 ``` csharp
 var protoDefinition = "...". // See above

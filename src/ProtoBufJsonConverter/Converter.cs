@@ -31,6 +31,15 @@ public class Converter : IConverter
         return JsonUtils.Serialize(assembly, inputTypeFullName, request);
     }
 
+    public object ConvertToObject(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
+    {
+        Guard.NotNull(request);
+
+        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
+
+        return ProtoBufUtils.Deserialize(assembly, inputTypeFullName, request.ProtoBufBytes);
+    }
+
     /// <inheritdoc />
     public byte[] ConvertToProtoBuf(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
     {
@@ -38,7 +47,9 @@ public class Converter : IConverter
 
         var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return JsonUtils.Deserialize(assembly, inputTypeFullName, request);
+        return request.Input.IsFirst ?
+            JsonUtils.Deserialize(assembly, inputTypeFullName, request) :
+            ProtoBufUtils.Serialize(request.Input.Second);
     }
 
     private static (Assembly Assembly, string inputTypeFullName) Parse(ConvertRequest request, CancellationToken cancellationToken)

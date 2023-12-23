@@ -10,7 +10,7 @@
 		<RepositoryUrl>https://github.com/StefH/https://github.com/StefH/ProtoBufJsonConverter</RepositoryUrl>
 		<ApplicationIcon>../../resources/icon.ico</ApplicationIcon>
 		<PackageTags>protobuf;protobuf-net;grpc;json;convert;serialize;deserialize</PackageTags>
-		<Description>Convert a protobuf message to a JSON string (and back) using the proto definition file.</Description>
+		<Description>Convert a protobuf message to a JSON string or object (and back) using the proto definition file.</Description>
 		<PackageReadmeFile>PackageReadme.md</PackageReadmeFile>
 	</PropertyGroup>
 </Project>
