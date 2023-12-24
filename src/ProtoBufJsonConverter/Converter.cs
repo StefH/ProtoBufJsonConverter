@@ -26,7 +26,7 @@ public class Converter : IConverter
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
+        var (assembly, inputTypeFullName) = Parse(request.ProtoDefinition, request.Method, cancellationToken);
 
         return JsonUtils.Serialize(assembly, inputTypeFullName, request);
     }
@@ -35,7 +35,7 @@ public class Converter : IConverter
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
+        var (assembly, inputTypeFullName) = Parse(request.ProtoDefinition, request.Method, cancellationToken);
 
         return ProtoBufUtils.Deserialize(assembly, inputTypeFullName, request.ProtoBufBytes);
     }
@@ -45,18 +45,20 @@ public class Converter : IConverter
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
+        if (request.Input.IsFirst)
+        {
+            var (assembly, inputTypeFullName) = Parse(request.ProtoDefinition!, request.Method!, cancellationToken);
+            return JsonUtils.Deserialize(assembly, inputTypeFullName, request);
+        }
 
-        return request.Input.IsFirst ?
-            JsonUtils.Deserialize(assembly, inputTypeFullName, request) :
-            ProtoBufUtils.Serialize(request.Input.Second);
+        return ProtoBufUtils.Serialize(request.Input.Second);
     }
 
-    private static (Assembly Assembly, string inputTypeFullName) Parse(ConvertRequest request, CancellationToken cancellationToken)
+    private static (Assembly Assembly, string inputTypeFullName) Parse(string protoDefinition, string method, CancellationToken cancellationToken)
     {
-        var data = GetCachedFileDescriptorSet(request.ProtoDefinition, cancellationToken);
+        var data = GetCachedFileDescriptorSet(protoDefinition, cancellationToken);
 
-        var inputTypeFullName = GetInputType(data.Set, request.Method);
+        var inputTypeFullName = GetInputType(data.Set, method);
 
         return (data.Assembly, inputTypeFullName);
     }
