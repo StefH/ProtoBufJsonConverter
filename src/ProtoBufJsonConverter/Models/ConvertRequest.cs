@@ -12,7 +12,7 @@ public abstract class ConvertRequest
     /// Create a ConvertRequest.
     /// </summary>
     /// <param name="protoDefinition">The proto definition as a string.</param>
-    /// <param name="messageType">The full type of the protobuf (request/response) object. Format is "{package-name}.{type-name}".</param>
+    /// <param name="messageType">The full type of the protobuf (request/response) message object. Format is "{package-name}.{type-name}".</param>
     protected ConvertRequest(string protoDefinition, string messageType)
     {
         ProtoDefinition = Guard.NotNullOrWhiteSpace(protoDefinition);
