@@ -26,18 +26,18 @@ public class Converter : IConverter
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request.ProtoDefinition, request.Method, cancellationToken);
+        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return JsonUtils.Serialize(assembly, inputTypeFullName, request);
+        return SerializeUtils.ConvertProtoBufToJson(assembly, inputTypeFullName, request);
     }
 
     public object ConvertToObject(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request.ProtoDefinition, request.Method, cancellationToken);
+        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return ProtoBufUtils.Deserialize(assembly, inputTypeFullName, request.ProtoBufBytes);
+        return SerializeUtils.ConvertProtoBufToObject(assembly, inputTypeFullName, request.ProtoBufBytes);
     }
 
     /// <inheritdoc />
@@ -45,20 +45,18 @@ public class Converter : IConverter
     {
         Guard.NotNull(request);
 
-        if (request.Input.IsFirst)
-        {
-            var (assembly, inputTypeFullName) = Parse(request.ProtoDefinition!, request.Method!, cancellationToken);
-            return JsonUtils.Deserialize(assembly, inputTypeFullName, request);
-        }
+        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return ProtoBufUtils.Serialize(request.Input.Second);
+        var json = request.Input.IsFirst ? request.Input.First : SerializeUtils.ConvertObjectToJson(request);
+
+        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.JsonConverter);
     }
 
-    private static (Assembly Assembly, string inputTypeFullName) Parse(string protoDefinition, string method, CancellationToken cancellationToken)
+    private static (Assembly Assembly, string inputTypeFullName) Parse(ConvertRequest request, CancellationToken cancellationToken)
     {
-        var data = GetCachedFileDescriptorSet(protoDefinition, cancellationToken);
+        var data = GetCachedFileDescriptorSet(request.ProtoDefinition, cancellationToken);
 
-        var inputTypeFullName = GetInputType(data.Set, method);
+        var inputTypeFullName = GetInputType(data.Set, request.Method);
 
         return (data.Assembly, inputTypeFullName);
     }
