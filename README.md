@@ -82,17 +82,17 @@ var converter = new Converter();
 var protobuf = converter.ConvertToProtoBuf(convertToProtoBufRequest);
 ```
 
-### :four: Convert object to a ProtoBuf `byte[]`
+### :four: Convert any `object` to a ProtoBuf `byte[]`
 #### Code
 ``` csharp
 var protoDefinition = "...". // See above
 
-var instance = new
+var obj = new
 {
     name = "stef"
 };
 
-var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", instance);
+var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", obj);
 
 var converter = new Converter();
 
