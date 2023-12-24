@@ -22,7 +22,7 @@ public class Converter : IConverter
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
     /// <inheritdoc />
-    public string ConvertToJson(ConvertToJsonRequest request, CancellationToken cancellationToken = default)
+    public string Convert(ConvertToJsonRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
@@ -31,7 +31,7 @@ public class Converter : IConverter
         return SerializeUtils.ConvertProtoBufToJson(assembly, inputTypeFullName, request);
     }
 
-    public object ConvertToObject(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
+    public object Convert(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
@@ -41,7 +41,7 @@ public class Converter : IConverter
     }
 
     /// <inheritdoc />
-    public byte[] ConvertToProtoBuf(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
+    public byte[] Convert(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
