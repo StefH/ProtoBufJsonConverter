@@ -7,7 +7,7 @@ internal static class FileDescriptorSetExtensions
     {
         var parts = messageType.Split('.');
 
-        string packageName = string.Empty;
+        string packageName;
         string typeName;
         switch (parts.Length)
         {
@@ -17,6 +17,7 @@ internal static class FileDescriptorSetExtensions
                 break;
 
             case 1:
+                packageName = string.Empty;
                 typeName = parts[0];
                 break;
 
@@ -43,7 +44,7 @@ internal static class FileDescriptorSetExtensions
     {
         var parts = method.Split('.');
 
-        string packageName = string.Empty;
+        string packageName;
         string serviceName;
         string methodName;
         switch (parts.Length)
@@ -55,6 +56,7 @@ internal static class FileDescriptorSetExtensions
                 break;
 
             case 2:
+                packageName = string.Empty;
                 serviceName = parts[0];
                 methodName = parts[1];
                 break;

@@ -31,6 +31,7 @@ public class Converter : IConverter
         return SerializeUtils.ConvertProtoBufToJson(assembly, inputTypeFullName, request);
     }
 
+    /// <inheritdoc />
     public object Convert(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
