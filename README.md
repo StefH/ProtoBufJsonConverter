@@ -41,11 +41,11 @@ var protoDefinition = "...". // See above
 
 var bytes = Convert.FromBase64String("CgRzdGVm");
 
-var convertToJsonRequest = new ConvertToJsonRequest(protoDefinition, "greet.HelloRequest", bytes);
+var request = new ConvertToJsonRequest(protoDefinition, "greet.HelloRequest", bytes);
 
 var converter = new Converter();
 
-var json = converter.ConvertToJson(convertToJsonRequest);
+var json = converter.Convert(request);
 ```
 
 #### JSON
@@ -61,11 +61,11 @@ var protoDefinition = "...". // See above
 
 var bytes = Convert.FromBase64String("CgRzdGVm");
 
-var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, "greet.HelloRequest", bytes);
+var request = new ConvertToObjectRequest(protoDefinition, "greet.HelloRequest", bytes);
 
 var converter = new Converter();
 
-var @object = converter.Convert(convertToObjectRequest);
+var @object = converter.Convert(request);
 ```
 
 ### :three: Convert JSON `string` to a ProtoBuf `byte[]`
@@ -75,11 +75,11 @@ var protoDefinition = "...". // See above
 
 var json = @"{""name"":""stef""}";
 
-var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest", json);
+var request = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest", json);
 
 var converter = new Converter();
 
-var protobuf = converter.Convert(convertToProtoBufRequest);
+var protobuf = converter.Convert(request);
 ```
 
 ### :four: Convert any `object` to a ProtoBuf `byte[]`
@@ -92,9 +92,9 @@ var obj = new
     name = "stef"
 };
 
-var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest", obj);
+var request = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest", obj);
 
 var converter = new Converter();
 
-var protobuf = converter.Convert(convertToProtoBufRequest);
+var protobuf = converter.Convert(request);
 ```
