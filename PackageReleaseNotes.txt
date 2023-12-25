@@ -1,4 +1,4 @@
-# 0.0.2 (22 December 2023)
-- #2 Refactor interface [enhancement]
+# 0.0.4 (25 December 2023)
+- #4 Convert Object to ProtoBuf [enhancement]
 
 The full release notes can be found here: https://github.com/StefH/ProtoBufJsonConverter/blob/main/ReleaseNotes.md

@@ -1,3 +1,9 @@
+# 0.0.4 (25 December 2023)
+- [#4](https://github.com/StefH/ProtoBufJsonConverter/pull/4) - Convert Object to ProtoBuf [enhancement] contributed by [StefH](https://github.com/StefH)
+
+# 0.0.3 (23 December 2023)
+- [#3](https://github.com/StefH/ProtoBufJsonConverter/pull/3) - ConvertToObject [enhancement] contributed by [StefH](https://github.com/StefH)
+
 # 0.0.2 (22 December 2023)
 - [#2](https://github.com/StefH/ProtoBufJsonConverter/pull/2) - Refactor interface [enhancement] contributed by [StefH](https://github.com/StefH)
 
