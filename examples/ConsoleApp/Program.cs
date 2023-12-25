@@ -11,25 +11,32 @@ public class DynamicProtoLoader
 
         var bytes = Convert.FromBase64String("CgRzdGVm");
 
-        var method = "greet.Greeter.SayHello";
-        
+        var messageType = "greet.HelloRequest";
+
         var converter = new Converter();
 
-        var convertToJsonRequest1 = new ConvertToJsonRequest(protoDefinition, method, bytes);
-        var json1 = converter.ConvertToJson(convertToJsonRequest1);
-        
-        var convertToJsonRequest2 = new ConvertToJsonRequest(protoDefinition, method, bytes)
+        var convertToJsonRequest1 = new ConvertToJsonRequest(protoDefinition, messageType, bytes);
+        var json1 = converter.Convert(convertToJsonRequest1);
+
+        var convertToJsonRequest2 = new ConvertToJsonRequest(protoDefinition, messageType, bytes)
             .WithJsonConverterOptions(o => o.WriteIndented = true);
-        var json2 = converter.ConvertToJson(convertToJsonRequest2);
+        var json2 = converter.Convert(convertToJsonRequest2);
 
-        var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, method, bytes);
-        var instance = converter.ConvertToObject(convertToObjectRequest);
+        var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, messageType, bytes);
+        var instance = converter.Convert(convertToObjectRequest);
 
-        var convertToProtoBufRequest1 = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", json1);
-        var protobuf1 = converter.ConvertToProtoBuf(convertToProtoBufRequest1);
+        var convertToProtoBufRequest1 = new ConvertToProtoBufRequest(protoDefinition, messageType, json1);
+        var protobuf1 = converter.Convert(convertToProtoBufRequest1);
 
-        var convertToProtoBufRequest2 = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", instance);
-        var protobuf2 = converter.ConvertToProtoBuf(convertToProtoBufRequest2);
+        var convertToProtoBufRequest2 = new ConvertToProtoBufRequest(protoDefinition, messageType, instance);
+        var protobuf2 = converter.Convert(convertToProtoBufRequest2);
+
+        var testMessage = new
+        {
+            Name = "hello"
+        };
+        var convertToProtoBufRequest3 = new ConvertToProtoBufRequest(protoDefinition, messageType, testMessage);
+        var protobuf3 = converter.Convert(convertToProtoBufRequest3);
 
         int x = 9;
     }

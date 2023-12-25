@@ -19,6 +19,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AnyOf" Version="0.3.0" />
+		<!--<PackageReference Include="Meziantou.Framework.StronglyTypedId" Version="2.1.0" />-->
 		<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="8.0.0" />
 		<PackageReference Include="JsonConverter.Newtonsoft.Json" Version="0.5.0" />
 		<PackageReference Include="protobuf-net" Version="3.2.30" />

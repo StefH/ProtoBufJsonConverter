@@ -22,41 +22,42 @@ public class Converter : IConverter
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
     /// <inheritdoc />
-    public string ConvertToJson(ConvertToJsonRequest request, CancellationToken cancellationToken = default)
+    public string Convert(ConvertToJsonRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
         var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return JsonUtils.Serialize(assembly, inputTypeFullName, request);
-    }
-
-    public object ConvertToObject(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
-    {
-        Guard.NotNull(request);
-
-        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
-
-        return ProtoBufUtils.Deserialize(assembly, inputTypeFullName, request.ProtoBufBytes);
+        return SerializeUtils.ConvertProtoBufToJson(assembly, inputTypeFullName, request);
     }
 
     /// <inheritdoc />
-    public byte[] ConvertToProtoBuf(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
+    public object Convert(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
         var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return request.Input.IsFirst ?
-            JsonUtils.Deserialize(assembly, inputTypeFullName, request) :
-            ProtoBufUtils.Serialize(request.Input.Second);
+        return SerializeUtils.ConvertProtoBufToObject(assembly, inputTypeFullName, request.ProtoBufBytes);
+    }
+
+    /// <inheritdoc />
+    public byte[] Convert(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
+    {
+        Guard.NotNull(request);
+
+        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
+
+        var json = request.Input.IsFirst ? request.Input.First : SerializeUtils.ConvertObjectToJson(request);
+
+        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.JsonConverter);
     }
 
     private static (Assembly Assembly, string inputTypeFullName) Parse(ConvertRequest request, CancellationToken cancellationToken)
     {
         var data = GetCachedFileDescriptorSet(request.ProtoDefinition, cancellationToken);
 
-        var inputTypeFullName = GetInputType(data.Set, request.Method);
+        var inputTypeFullName = data.Set.GetInputTypeFromMessageType(request.MessageType);
 
         return (data.Assembly, inputTypeFullName);
     }
@@ -86,52 +87,6 @@ public class Converter : IConverter
                 Assembly = AssemblyUtils.CompileCodeToAssembly(code, cancellationToken)
             };
         });
-    }
-
-    private static string GetInputType(FileDescriptorSet set, string method)
-    {
-        var parts = method.Split('.');
-
-        string packageName = string.Empty;
-        string serviceName;
-        string methodName;
-        switch (parts.Length)
-        {
-            case 3:
-                packageName = parts[0];
-                serviceName = parts[1];
-                methodName = parts[2];
-                break;
-
-            case 2:
-                serviceName = parts[0];
-                methodName = parts[1];
-                break;
-
-            default:
-                throw new ArgumentException($"The method '{method}' is not valid.");
-        }
-
-        var fileDescriptorProto = set.Files.FirstOrDefault(f => f.Package == packageName);
-        if (fileDescriptorProto == null)
-        {
-            throw new ArgumentException($"The package '{packageName}' is not found in the proto definition.");
-        }
-
-
-        var serviceDescriptorProto = fileDescriptorProto.Services.FirstOrDefault(s => s.Name == serviceName);
-        if (serviceDescriptorProto == null)
-        {
-            throw new ArgumentException($"The service '{serviceName}' is not found in the proto definition.");
-        }
-
-        var methodDescriptorProto = serviceDescriptorProto.Methods.FirstOrDefault(m => m.Name == methodName);
-        if (methodDescriptorProto == null)
-        {
-            throw new ArgumentException($"The method '{methodName}' is not found in the proto definition.");
-        }
-
-        return methodDescriptorProto.InputType.TrimStart('.');
     }
 
     private static string GenerateCSharpCode(FileDescriptorSet set)

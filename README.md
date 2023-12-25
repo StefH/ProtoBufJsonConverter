@@ -3,7 +3,7 @@
 ## This project uses [protobuf-net](https://github.com/protobuf-net/protobuf-net) to:
 - Convert a protobuf message to a JSON string using the proto definition file.
 - Convert a protobuf message to an object using the proto definition file.
-- Convert a JSON string to a protobuf message using the proto definition file.
+- Convert a JSON string or an object to a protobuf message using the proto definition file.
 
 ## NuGet
 [![NuGet Badge](https://buildstats.info/nuget/ProtoBufJsonConverter)](https://www.nuget.org/packages/ProtoBufJsonConverter) 
@@ -41,7 +41,7 @@ var protoDefinition = "...". // See above
 
 var bytes = Convert.FromBase64String("CgRzdGVm");
 
-var convertToJsonRequest = new ConvertToJsonRequest(protoDefinition, "greet.Greeter.SayHello", bytes);
+var convertToJsonRequest = new ConvertToJsonRequest(protoDefinition, "greet.HelloRequest", bytes);
 
 var converter = new Converter();
 
@@ -61,11 +61,11 @@ var protoDefinition = "...". // See above
 
 var bytes = Convert.FromBase64String("CgRzdGVm");
 
-var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, "greet.Greeter.SayHello", bytes);
+var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, "greet.HelloRequest", bytes);
 
 var converter = new Converter();
 
-var @object = converter.ConvertToJson(convertToObjectRequest);
+var @object = converter.Convert(convertToObjectRequest);
 ```
 
 ### :three: Convert JSON `string` to a ProtoBuf `byte[]`
@@ -75,9 +75,26 @@ var protoDefinition = "...". // See above
 
 var json = @"{""name"":""stef""}";
 
-var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.Greeter.SayHello", json);
+var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest", json);
 
 var converter = new Converter();
 
-var protobuf = converter.ConvertToProtoBuf(convertToProtoBufRequest);
+var protobuf = converter.Convert(convertToProtoBufRequest);
+```
+
+### :four: Convert any `object` to a ProtoBuf `byte[]`
+#### Code
+``` csharp
+var protoDefinition = "...". // See above
+
+var obj = new
+{
+    name = "stef"
+};
+
+var convertToProtoBufRequest = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest", obj);
+
+var converter = new Converter();
+
+var protobuf = converter.Convert(convertToProtoBufRequest);
 ```
