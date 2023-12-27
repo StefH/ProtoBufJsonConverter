@@ -17,9 +17,9 @@ public class ConvertToProtoBufRequest : ConvertRequest
     /// Create a ConvertToProtoBufRequest to convert a JSON string or object to a ProtoPuf byte array.
     /// </summary>
     /// <param name="protoDefinition">The proto definition as a string.</param>
-    /// <param name="method">The method which is called on service. Format is "{package-name}.{service-name}-{method-name}".</param>
+    /// <param name="messageType">The full type of the protobuf (request/response) message object. Format is "{package-name}.{type-name}".</param>
     /// <param name="input">The JSON string or Object to convert.</param>
-    public ConvertToProtoBufRequest(string protoDefinition, string method, AnyOf<string, object> input) : base(protoDefinition, method)
+    public ConvertToProtoBufRequest(string protoDefinition, string messageType, AnyOf<string, object> input) : base(protoDefinition, messageType)
     {
         Input = Guard.NotNull(input);
     }
