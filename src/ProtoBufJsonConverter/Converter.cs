@@ -38,7 +38,7 @@ public class Converter : IConverter
 
         var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
 
-        return SerializeUtils.ConvertProtoBufToObject(assembly, inputTypeFullName, request.ProtoBufBytes);
+        return SerializeUtils.ConvertProtoBufToObject(assembly, inputTypeFullName, request.ProtoBufBytes, request.SkipGrpcHeader);
     }
 
     /// <inheritdoc />

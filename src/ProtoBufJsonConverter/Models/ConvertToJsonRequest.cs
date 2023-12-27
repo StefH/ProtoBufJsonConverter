@@ -7,7 +7,9 @@ namespace ProtoBufJsonConverter.Models;
 public class ConvertToJsonRequest : ConvertRequest
 {
     public byte[] ProtoBufBytes { get; }
-    
+
+    public bool SkipGrpcHeader { get; }
+
     public IJsonConverter? JsonConverter { get; protected set; }
 
     public JsonConverterOptions? JsonConverterOptions { get; private set; }
@@ -16,11 +18,18 @@ public class ConvertToJsonRequest : ConvertRequest
     /// Create a ConvertToJsonRequest.
     /// </summary>
     /// <param name="protoDefinition">The proto definition as a string.</param>
-    /// <param name="method">The method which is called on service. Format is "{package-name}.{service-name}-{method-name}".</param>
+    /// <param name="messageType">The full type of the protobuf (request/response) message object. Format is "{package-name}.{type-name}".</param>
     /// <param name="protoBufBytes">The ProtoBuf byte array to convert.</param>
-    public ConvertToJsonRequest(string protoDefinition, string method, byte[] protoBufBytes) : base(protoDefinition, method)
+    /// <param name="skipGrpcHeader">Skip the Grpc Header bytes [default value is true].</param>
+    public ConvertToJsonRequest(
+        string protoDefinition, 
+        string messageType, 
+        byte[] protoBufBytes,
+        bool skipGrpcHeader = true
+    ) : base(protoDefinition, messageType)
     {
         ProtoBufBytes = Guard.NotNull(protoBufBytes);
+        SkipGrpcHeader = skipGrpcHeader;
     }
 
     /// <summary>
