@@ -1,4 +1,4 @@
-# 0.0.4 (25 December 2023)
-- #4 Convert Object to ProtoBuf [enhancement]
+# 0.0.5 (27 December 2023)
+- #5 Add SkipGrpcHeader [enhancement]
 
 The full release notes can be found here: https://github.com/StefH/ProtoBufJsonConverter/blob/main/ReleaseNotes.md

@@ -1,3 +1,6 @@
+# 0.0.5 (27 December 2023)
+- [#5](https://github.com/StefH/ProtoBufJsonConverter/pull/5) - Add SkipGrpcHeader [enhancement] contributed by [StefH](https://github.com/StefH)
+
 # 0.0.4 (25 December 2023)
 - [#4](https://github.com/StefH/ProtoBufJsonConverter/pull/4) - Convert Object to ProtoBuf [enhancement] contributed by [StefH](https://github.com/StefH)
 
