@@ -17,16 +17,17 @@ internal static class SerializeUtils
 
     internal static string ConvertProtoBufToJson(Assembly assembly, string inputTypeFullName, ConvertToJsonRequest request)
     {
-        var value = ConvertProtoBufToObject(assembly, inputTypeFullName, request.ProtoBufBytes);
+        var value = ConvertProtoBufToObject(assembly, inputTypeFullName, request.ProtoBufBytes, request.SkipGrpcHeader);
 
         return (request.JsonConverter ?? DefaultJsonConverter.Value).Serialize(value, request.JsonConverterOptions);
     }
 
-    internal static object ConvertProtoBufToObject(Assembly assembly, string inputTypeFullName, byte[] protoBufBytes)
+    internal static object ConvertProtoBufToObject(Assembly assembly, string inputTypeFullName, byte[] protoBufBytes, bool skipGrpcHeader)
     {
         var type = AssemblyUtils.GetType(assembly, inputTypeFullName);
 
-        using var memoryStream = new MemoryStream(protoBufBytes);
+        using var memoryStream = new ProtoBufUtils(protoBufBytes).GetMemoryStream(skipGrpcHeader);
+
         return Serializer.Deserialize(type, memoryStream);
     }
 
