@@ -1,3 +1,6 @@
+# 0.0.6 (28 December 2023)
+- [#6](https://github.com/StefH/ProtoBufJsonConverter/pull/6) - Add logic to add a GrpcHeader to the protobuf byte-array [enhancement] contributed by [StefH](https://github.com/StefH)
+
 # 0.0.5 (27 December 2023)
 - [#5](https://github.com/StefH/ProtoBufJsonConverter/pull/5) - Add SkipGrpcHeader [enhancement] contributed by [StefH](https://github.com/StefH)
 

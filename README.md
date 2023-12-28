@@ -98,3 +98,21 @@ var converter = new Converter();
 
 var protobuf = converter.Convert(request);
 ```
+
+### :five: Convert any `object` to a ProtoBuf `byte[]` including the Grpc Header
+#### Code
+``` csharp
+var protoDefinition = "...". // See above
+
+var obj = new
+{
+    name = "stef"
+};
+
+var request = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest", obj)
+    .WithGrpcHeader();
+
+var converter = new Converter();
+
+var protobufWithGrpcHeader = converter.Convert(request);
+```
