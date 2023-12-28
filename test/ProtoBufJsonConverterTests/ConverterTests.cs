@@ -34,16 +34,18 @@ message HelloReply
         _sut = new Converter();
     }
 
-    [Fact]
-    public void ConvertToJsonRequest_WithGrpcHeader()
+    [Theory]
+    [InlineData("AAAAAAYKBHN0ZWY=")]
+    [InlineData("CgRzdGVm")]
+    public void ConvertToJsonRequest_SkipGrpcHeader_IsTrue(string data)
     {
         // Arrange
-        var messageType = "greet.HelloRequest";
+        const string messageType = "greet.HelloRequest";
 
-        var bytes = Convert.FromBase64String("AAAAAAYKBHN0ZWY=");
-        
+        var bytes = Convert.FromBase64String(data);
+
         var request = new ConvertToJsonRequest(ProtoDefinition, messageType, bytes);
-        
+
         // Act
         var json = _sut.Convert(request);
 
@@ -51,20 +53,22 @@ message HelloReply
         json.Should().Be(@"{""name"":""stef""}");
     }
 
-    [Fact]
-    public void ConvertToJsonRequest_WithoutGrpcHeader()
+    [Theory]
+    [InlineData(true, "AAAAAAYKBHN0ZWY=")]
+    [InlineData(false, "CgRzdGVm")]
+    public void ConvertToProtoBufRequest(bool addGrpcHeader, string expectedBytes)
     {
         // Arrange
-        var messageType = "greet.HelloRequest";
+        const string messageType = "greet.HelloRequest";
 
-        var bytes = Convert.FromBase64String("CgRzdGVm");
+        const string json = @"{""name"":""stef""}";
 
-        var request = new ConvertToJsonRequest(ProtoDefinition, messageType, bytes);
+        var request = new ConvertToProtoBufRequest(ProtoDefinition, messageType, json, addGrpcHeader);
 
         // Act
-        var json = _sut.Convert(request);
+        var bytes = _sut.Convert(request);
 
         // Assert
-        json.Should().Be(@"{""name"":""stef""}");
+        Convert.ToBase64String(bytes).Should().Be(expectedBytes);
     }
 }

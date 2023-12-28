@@ -41,6 +41,9 @@ public class DynamicProtoLoader
         var convertToProtoBufRequest3 = new ConvertToProtoBufRequest(protoDefinition, messageType, testMessage);
         var protobuf3 = converter.Convert(convertToProtoBufRequest3);
 
+        var convertToProtoBufRequestWithGrpcHeader = new ConvertToProtoBufRequest(protoDefinition, messageType, testMessage, true);
+        var protobuf4WithGrpcHeader = converter.Convert(convertToProtoBufRequestWithGrpcHeader);
+
         int x = 9;
     }
 }

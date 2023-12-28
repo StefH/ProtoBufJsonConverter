@@ -10,7 +10,7 @@ public class ConvertToJsonRequest : ConvertRequest
 
     public bool SkipGrpcHeader { get; }
 
-    public IJsonConverter? JsonConverter { get; protected set; }
+    public IJsonConverter? JsonConverter { get; private set; }
 
     public JsonConverterOptions? JsonConverterOptions { get; private set; }
 

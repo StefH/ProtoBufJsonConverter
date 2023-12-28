@@ -1,4 +1,4 @@
-﻿using Stef.Validation;
+﻿using System.Buffers.Binary;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -7,55 +7,81 @@ namespace ProtoBufJsonConverter.Utils;
 /// </summary>
 internal class ProtoBufUtils
 {
-    private const int SizeOfInt32 = 4;
-
-    private readonly byte[] _buffer;
-    private int _offset;
-
-    internal ProtoBufUtils(byte[] buffer)
+    private const int SizeOfUInt32 = 4;
+    private const int HeaderSize = 1 + SizeOfUInt32; // 1 (Compression flag) + 4 (UInt32)
+    
+    internal static MemoryStream GetMemoryStreamFromBytes(byte[] buffer, bool skipGrpcHeader)
     {
-        _buffer = Guard.NotNull(buffer);
-    }
+        var offset = 0;
 
-    internal MemoryStream GetMemoryStream(bool skipGrpcHeader)
-    {
-        var backupOffset = _offset;
-
-        if (skipGrpcHeader && _buffer[_offset] == 0 && BytesLeftInBuffer() >= 1 + SizeOfInt32)
+        if (skipGrpcHeader && buffer[offset] == 0 && BytesLeftInBuffer(buffer, offset) >= HeaderSize)
         {
-            _offset++;
-            var length = ReadInt32BE(_buffer, _offset);
-            _offset += SizeOfInt32;
+            offset++; // Compression flag
 
-            if (length > BytesLeftInBuffer())
+            var length = ReadUInt32BE(buffer, offset);
+
+            offset += SizeOfUInt32; // Message length
+
+            if (length > BytesLeftInBuffer(buffer, offset))
             {
                 // Something is wrong, revert
-                _offset = backupOffset;
+                offset = 0;
             }
         }
 
-        var memoryStream = new MemoryStream(_buffer);
-        memoryStream.Position = _offset;
+        var memoryStream = new MemoryStream(buffer);
+        memoryStream.Position = offset;
         return memoryStream;
     }
 
-    internal int BytesLeftInBuffer()
+    internal static byte[] Serialize(Action<MemoryStream> action, bool addGrpcHeader)
     {
-        return _buffer.Length - _offset;
+        using var memoryStream = new MemoryStream();
+
+        if (addGrpcHeader)
+        {
+            memoryStream.Position = HeaderSize;
+        }
+
+        action(memoryStream);
+
+        var bytes = memoryStream.ToArray();
+
+        if (addGrpcHeader)
+        {
+            var length = bytes.Length - HeaderSize;
+            WriteHeader(bytes, length);
+        }
+
+        return bytes;
     }
 
-    private static int ReadInt32BE(byte[] buffer, int offset)
+    private static void WriteHeader(Span<byte> headerData, int length)
+    {
+        // Compression flag
+        headerData[0] = 0;
+
+        // Message length
+        BinaryPrimitives.WriteUInt32BigEndian(headerData.Slice(1), (uint)length);
+    }
+
+    private static int BytesLeftInBuffer(Span<byte> buffer, int offset)
+    {
+        return buffer.Length - offset;
+    }
+
+    private static uint ReadUInt32BE(byte[] buffer, int offset)
     {
         // If the system architecture is little-endian, reverse the byte order
         if (BitConverter.IsLittleEndian)
         {
-            return (buffer[offset] << 24) |
-                   (buffer[offset + 1] << 16) |
-                   (buffer[offset + 2] << 8) |
-                   (buffer[offset + 3]);
+            return ((uint)buffer[offset] << 24) |
+                   ((uint)buffer[offset + 1] << 16) |
+                   ((uint)buffer[offset + 2] << 8) |
+                   buffer[offset + 3];
         }
 
         // If the system is already big-endian, read the bytes in order
-        return BitConverter.ToInt32(buffer, offset);
+        return BitConverter.ToUInt32(buffer, offset);
     }
 }

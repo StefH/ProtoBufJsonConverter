@@ -3,7 +3,7 @@ namespace Google.Protobuf.Reflection;
 
 internal static class FileDescriptorSetExtensions
 {
-    public static string GetInputTypeFromMessageType(this FileDescriptorSet set, string messageType)
+    internal static string GetInputTypeFromMessageType(this FileDescriptorSet set, string messageType)
     {
         var parts = messageType.Split('.');
 
@@ -40,7 +40,7 @@ internal static class FileDescriptorSetExtensions
         return messageType;
     }
 
-    public static string GetInputTypeFromServiceMethod(this FileDescriptorSet set, string method)
+    internal static string GetInputTypeFromServiceMethod(this FileDescriptorSet set, string method)
     {
         var parts = method.Split('.');
 
