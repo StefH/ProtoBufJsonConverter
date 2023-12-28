@@ -13,15 +13,19 @@ public class ConvertToProtoBufRequest : ConvertRequest
 
     public AnyOf<string, object> Input { get; }
 
+    public bool AddGrpcHeader { get; private set; }
+
     /// <summary>
     /// Create a ConvertToProtoBufRequest to convert a JSON string or object to a ProtoPuf byte array.
     /// </summary>
     /// <param name="protoDefinition">The proto definition as a string.</param>
     /// <param name="messageType">The full type of the protobuf (request/response) message object. Format is "{package-name}.{type-name}".</param>
     /// <param name="input">The JSON string or Object to convert.</param>
-    public ConvertToProtoBufRequest(string protoDefinition, string messageType, AnyOf<string, object> input) : base(protoDefinition, messageType)
+    /// <param name="addGrpcHeader">Add the Grpc Header bytes [default value is false].</param>
+    public ConvertToProtoBufRequest(string protoDefinition, string messageType, AnyOf<string, object> input, bool addGrpcHeader = false) : base(protoDefinition, messageType)
     {
         Input = Guard.NotNull(input);
+        AddGrpcHeader = addGrpcHeader;
     }
 
     /// <summary>
@@ -41,6 +45,15 @@ public class ConvertToProtoBufRequest : ConvertRequest
     public ConvertToProtoBufRequest WithJsonConverterOptions(JsonConverterOptions jsonConverterOptions)
     {
         JsonConverterOptions = Guard.NotNull(jsonConverterOptions);
+        return this;
+    }
+
+    /// <summary>
+    /// Add the Grpc Header.
+    /// </summary>
+    public ConvertToProtoBufRequest WithGrpcHeader()
+    {
+        AddGrpcHeader = true;
         return this;
     }
 }

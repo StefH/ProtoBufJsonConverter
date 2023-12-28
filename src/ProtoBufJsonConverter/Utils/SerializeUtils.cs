@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Buffers.Binary;
+using System.Reflection;
 using JsonConverter.Abstractions;
 using JsonConverter.Newtonsoft.Json;
 using ProtoBuf;
@@ -26,7 +27,7 @@ internal static class SerializeUtils
     {
         var type = AssemblyUtils.GetType(assembly, inputTypeFullName);
 
-        using var memoryStream = new ProtoBufUtils(protoBufBytes).GetMemoryStream(skipGrpcHeader);
+        using var memoryStream = ProtoBufUtils.GetMemoryStreamFromBytes(protoBufBytes, skipGrpcHeader);
 
         return Serializer.Deserialize(type, memoryStream);
     }
@@ -35,6 +36,7 @@ internal static class SerializeUtils
         Assembly assembly,
         string inputTypeFullName,
         string json,
+        bool addGrpcHeader,
         IJsonConverter? jsonConverter
     )
     {
@@ -42,9 +44,6 @@ internal static class SerializeUtils
 
         var instance = (jsonConverter ?? DefaultJsonConverter.Value).Deserialize(json, type);
 
-        using var memoryStream = new MemoryStream();
-        Serializer.Serialize(memoryStream, instance);
-
-        return memoryStream.ToArray();
+        return ProtoBufUtils.Serialize((ms) => Serializer.Serialize(ms, instance), addGrpcHeader);
     }
 }

@@ -50,7 +50,7 @@ public class Converter : IConverter
 
         var json = request.Input.IsFirst ? request.Input.First : SerializeUtils.ConvertObjectToJson(request);
 
-        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.JsonConverter);
+        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.AddGrpcHeader, request.JsonConverter);
     }
 
     private static (Assembly Assembly, string inputTypeFullName) Parse(ConvertRequest request, CancellationToken cancellationToken)
