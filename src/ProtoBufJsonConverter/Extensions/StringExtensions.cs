@@ -2,7 +2,7 @@
 
 internal static class StringExtensions
 {
-    public static int GetDeterministicHashCode(this string str)
+    internal static int GetDeterministicHashCode(this string str)
     {
         unchecked
         {

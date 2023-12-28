@@ -1,5 +1,4 @@
 ﻿using System.Buffers.Binary;
-using ProtoBuf;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -21,7 +20,7 @@ internal class ProtoBufUtils
 
             var length = ReadUInt32BE(buffer, offset);
 
-            offset += SizeOfUInt32;
+            offset += SizeOfUInt32; // Message length
 
             if (length > BytesLeftInBuffer(buffer, offset))
             {
@@ -66,7 +65,7 @@ internal class ProtoBufUtils
         BinaryPrimitives.WriteUInt32BigEndian(headerData.Slice(1), (uint)length);
     }
 
-    private static int BytesLeftInBuffer(byte[] buffer, int offset)
+    private static int BytesLeftInBuffer(Span<byte> buffer, int offset)
     {
         return buffer.Length - offset;
     }

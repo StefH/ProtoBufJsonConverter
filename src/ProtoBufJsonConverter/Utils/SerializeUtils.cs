@@ -1,5 +1,4 @@
-﻿using System.Buffers.Binary;
-using System.Reflection;
+﻿using System.Reflection;
 using JsonConverter.Abstractions;
 using JsonConverter.Newtonsoft.Json;
 using ProtoBuf;
@@ -44,6 +43,6 @@ internal static class SerializeUtils
 
         var instance = (jsonConverter ?? DefaultJsonConverter.Value).Deserialize(json, type);
 
-        return ProtoBufUtils.Serialize((ms) => Serializer.Serialize(ms, instance), addGrpcHeader);
+        return ProtoBufUtils.Serialize(memoryStream => Serializer.Serialize(memoryStream, instance), addGrpcHeader);
     }
 }
