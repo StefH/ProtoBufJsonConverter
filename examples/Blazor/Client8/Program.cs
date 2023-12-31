@@ -12,7 +12,6 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services
-    // .AddBlazorDownloadFile()
     .AddBlazorise(options =>
     {
         options.Immediate = true;
@@ -20,13 +19,14 @@ builder.Services
     .AddBootstrap5Providers()
     .AddFontAwesomeIcons();
 
+builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped(_ =>
 {
     var httpClient = new HttpClient
     {
         BaseAddress = new Uri(builder.Configuration["API_Prefix"] ?? builder.HostEnvironment.BaseAddress)
     };
-    return new RestClient(httpClient).For<IProcessImageApi>();
+    return new RestClient(httpClient).For<IProtoBufConverterApi>();
 });
 
 await builder.Build().RunAsync();
