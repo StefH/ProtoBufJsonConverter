@@ -1,6 +1,7 @@
 using Blazorise;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
+using Blazorise.RichTextEdit;
 using Client8;
 using Client8.Services;
 using Microsoft.AspNetCore.Components.Web;
@@ -17,7 +18,8 @@ builder.Services
         options.Immediate = true;
     })
     .AddBootstrap5Providers()
-    .AddFontAwesomeIcons();
+    .AddFontAwesomeIcons().AddBlazoriseRichTextEdit();
+// .AddSemiDesignBlazorMonacoEditor();
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped(_ =>

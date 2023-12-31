@@ -4,17 +4,41 @@
 
 <Card>
     <CardHeader>
-        <CardTitle>???</CardTitle>
+        <CardTitle>Convert</CardTitle>
     </CardHeader>
 
     <CardBody>
-        
+        <Field>
+            <FieldLabel ColumnSize="ColumnSize.Is1">ProtoDefinition</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is11">
+                <MemoEdit @bind-Text="@_protoDefinition" Rows="30" />
+                @* <RichTextEdit @ref="richTextProtoDefinition"
+                              Theme="RichTextEditTheme.Snow"
+                              PlaceHolder="Type your post here..."
+                              SubmitOnEnter="false">
+                    <Editor>@_protoDefinition</Editor>
+                </RichTextEdit> *@
+            </FieldBody>
+        </Field>
+
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is3">ProtoBuf (Base64)</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <TextEdit @bind-Text="@_protobufAsBase64" />
+            </FieldBody>
+        </Field>
 
         <Field ColumnSize="ColumnSize.Is1">
-            <Button Clicked="@OnClick" Color="Color.Primary" Disabled="@ProcessButtonDisabled">Process</Button>
+            <Button Clicked="@OnClick" Color="Color.Primary" Disabled="@ProcessButtonDisabled">Convert</Button>
         </Field>
-        
-        @_json
+
+        <Field>
+            <FieldLabel ColumnSize="ColumnSize.Is1">Destination</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is11">
+                @* <StandaloneCodeEditor Id="Destination" ConstructionOptions="DestinationEditorConstructionOptions" /> *@
+                <MemoEdit @bind-Text="@_json" Rows="10" />
+            </FieldBody>
+        </Field>
 
     </CardBody>
 </Card>
