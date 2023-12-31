@@ -16,12 +16,13 @@ internal static class AssemblyUtils
         var syntaxTree = CSharpSyntaxTree.ParseText(code, cancellationToken: cancellationToken);
 
         // Locate the directory that contains the framework assemblies
-        var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
+        var assemblyLocation = typeof(object).Assembly.Location;
+        var assemblyPath = Path.GetDirectoryName(assemblyLocation)!;
 
         // Reference the necessary assemblies
         var references = new List<MetadataReference>
         {
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location), // System.Private.CoreLib
+            MetadataReference.CreateFromFile(assemblyLocation), // System.Private.CoreLib
             MetadataReference.CreateFromFile(typeof(ProtoContractAttribute).Assembly.Location),
             MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")),
 

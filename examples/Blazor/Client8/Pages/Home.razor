@@ -1,0 +1,90 @@
+﻿@page "/"
+
+@using Shared
+
+<PageTitle>Image Magic</PageTitle>
+
+<Card>
+    <CardHeader>
+        <CardTitle>Image Magic</CardTitle>
+    </CardHeader>
+    <CardBody>
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is1">Source image</FieldLabel>
+            <Field ColumnSize="ColumnSize.Is5">
+                <InputFile OnChange="@LoadFile" />
+            </Field>
+        </Field>
+        
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is1">Source image details</FieldLabel>
+            <Field ColumnSize="ColumnSize.Is5">
+                @(_imageDetails?.ToString() ?? "n/a")
+            </Field>
+        </Field>
+
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is1">Select type</FieldLabel>
+            <Field ColumnSize="ColumnSize.Is2">
+                <Select TValue="ProcessType" @bind-SelectedValue="@_selectedProcessType">
+                    <SelectItem Value="ProcessType.BlendMStack">mstack Blog Blend</SelectItem>
+                    <SelectItem Value="ProcessType.ProfielMStack">mstack Foto Kader</SelectItem>
+                    <SelectItem Value="ProcessType.ProfielHaystaq">haystaq Foto Kader</SelectItem>
+                    <SelectItem Value="ProcessType.ProfielGroup9">group9 Foto Kader</SelectItem>
+                    <SelectItem Value="ProcessType.ProfielAlfa1">alfa1 Foto Kader</SelectItem>
+                    <SelectItem Value="ProcessType.ProfielAdaptif">adaptif Foto Kader</SelectItem>
+                    <SelectItem Value="ProcessType.ProfielBluPoint">blupoint Foto Kader</SelectItem>
+                    <SelectItem Value="ProcessType.ProfielNabled">n-abled Foto Kader</SelectItem>
+                </Select>
+            </Field>
+        </Field>
+
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is1">Resizing</FieldLabel>
+            <Field ColumnSize="ColumnSize.Is2">
+                <Select TValue="ResizeOption" @bind-SelectedValue="@_selectedResizeOption">
+                    <SelectItem Value="ResizeOption.UseSource">Use Source</SelectItem>
+                    <SelectItem Value="ResizeOption.UseLayer">Use Layer</SelectItem>
+                    <SelectItem Value="ResizeOption.Custom">Custom Size</SelectItem>
+                </Select>
+            </Field>
+        </Field>
+
+        @if (_selectedResizeOption == ResizeOption.Custom)
+        {
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">Custom Size</FieldLabel>
+                <Field ColumnSize="ColumnSize.Is2">
+                    <NumericEdit TValue="int?" @bind-Value="@_selectedWidth" Min="128" Max="1920" />
+                </Field>
+            </Field>
+        }
+
+        <Field ColumnSize="ColumnSize.Is1">
+            <Button Clicked="@OnClick" Color="Color.Primary" Disabled="@ProcessButtonDisabled">Process</Button>
+        </Field>
+
+        <Field Horizontal="true">
+            @switch (_state)
+            {
+                case State.None:
+                    <p>Please upload an image</p>
+                    break;
+
+                case State.Processing:
+                    <p>Processing image</p>
+                    break;
+
+                case State.Error:
+                    <p>@_error</p>
+                    break;
+
+                default:
+                    <MyImage Base64Image="@_url" ImageName="@_name" />
+                    break;
+            }
+        </Field>
+
+        
+    </CardBody>
+</Card>

@@ -1,0 +1,10 @@
+﻿@if (IsDefined)
+{
+    <a href="@Base64Image" download="@ImageName">
+        <Image Source="@Base64Image" />
+    </a>
+}
+else
+{
+    <p>Loading...</p>
+}
