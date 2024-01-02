@@ -1,42 +1,94 @@
 ﻿@page "/"
 
-@using ProtoBufJsonConverter.Models
-@using JsonConverter.Abstractions
-@using ProtoBufJsonConverter.Services
+<PageTitle>ProtoBuf Converter</PageTitle>
 
-@inject HttpClient Http
-@inject IMetadataReferenceService MetadataReferenceService;
+<Card>
+    <CardHeader>
+        <CardTitle>Convert</CardTitle>
+    </CardHeader>
 
-<PageTitle>ProtoBuf</PageTitle>
+    <CardBody>
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is1">ProtoDefinition</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is11">
+                <MemoEdit @bind-Text="@_protoDefinition" Rows="30" />
+            </FieldBody>
+        </Field>
+        
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is1">Message Type</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is11">
+                <TextEdit @bind-Text="@_messageType" />
+            </FieldBody>
+        </Field>
 
-<h1>Json</h1>
-@if (_json == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <pre>@_json</pre>
-}
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is1">Select conversion</FieldLabel>
+            <Field ColumnSize="ColumnSize.Is2">
+                <Select TValue="ConvertType" @bind-SelectedValue="@_selectedConvertType">
+                    <SelectItem Value="ConvertType.ToJson">To Json</SelectItem>
+                    <SelectItem Value="ConvertType.ToProtoBuf">To ProtoBuf</SelectItem>
+                </Select>
+            </Field>
+        </Field>
 
-@code {
-    private string? _json;
-    private string _protoDefinition = string.Empty;
-    private const string _messageType = "greet.HelloRequest";
-    private const string _protobufAsBase64 = "CgRzdGVm";
+        @if (_selectedConvertType == ConvertType.ToJson)
+        {
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">ProtoBuf (Base64)</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <Validation UsePattern>
+                        <TextEdit @bind-Text="@_protobufAsBase64" Pattern="^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$" />
+                    </Validation>
+                </FieldBody>
+            </Field>
 
-    protected override async Task OnInitializedAsync()
-    {
-        _protoDefinition = await Http.GetStringAsync("greet.proto");
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">Skip Grpc Header</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <Check TValue="bool" @bind-Checked="@_skipGrpcHeader" />
+                </FieldBody>
+            </Field>
+        }
+        else
+        {
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">Json</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is11">
+                    <MemoEdit @bind-Text="@_json" Rows="10" />
+                </FieldBody>
+            </Field>
 
-        var bytes = Convert.FromBase64String(_protobufAsBase64);
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">Add Grpc Header</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <Check TValue="bool" @bind-Checked="@_addGrpcHeader" />
+                </FieldBody>
+            </Field>
+        }
 
-        var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
-            .WithSkipGrpcHeader(true)
-            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+        <Field Horizontal="true" ColumnSize="ColumnSize.Is1">
+            <Button Clicked="@OnClick" Color="Color.Primary" Disabled="@ProcessButtonDisabled">Convert</Button>
+        </Field>
+        
+        @if (_selectedConvertType == ConvertType.ToJson)
+        {
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">Json</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is11">
+                    <MemoEdit @bind-Text="@_json" Rows="10" ReadOnly="true"/>
+                </FieldBody>
+            </Field>
+        }
+        else
+        {
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">ProtoBuf (Base64)</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <TextEdit @bind-Text="@_protobufAsBase64" ReadOnly="true" />
+                </FieldBody>
+            </Field>
+        }
 
-        var converter = new Converter(MetadataReferenceService);
-
-        _json = await converter.ConvertAsync(convertToJsonRequest);
-    }
-}
+    </CardBody>
+</Card>

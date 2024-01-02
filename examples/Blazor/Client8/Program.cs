@@ -18,7 +18,8 @@ builder.Services
         options.Immediate = true;
     })
     .AddBootstrap5Providers()
-    .AddFontAwesomeIcons().AddBlazoriseRichTextEdit();
+    .AddFontAwesomeIcons()
+    .AddBlazoriseRichTextEdit();
 // .AddSemiDesignBlazorMonacoEditor();
 
 builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
