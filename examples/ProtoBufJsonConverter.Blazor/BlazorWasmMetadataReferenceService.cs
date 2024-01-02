@@ -42,6 +42,7 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
             return metadataReference;
         }
 
+        // https://learn.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?view=aspnetcore-8.0#webcil-packaging-format-for-net-assemblies
         throw new Exception("ReferenceMetadata not found. If using .NET 8, <WasmEnableWebcil>false</WasmEnableWebcil> must be set in the project .csproj file.");
     }
 }
