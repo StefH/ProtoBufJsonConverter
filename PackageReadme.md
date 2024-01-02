@@ -114,6 +114,6 @@ var converter = new Converter();
 var protobufWithGrpcHeader = await ConvertAsync.Convert(request);
 ```
 
-## Example
+## Examples
+- [Blazor WASM](https://wonderful-beach-0d16cee03.4.azurestaticapps.net/)
 - [Blazor Static Web App](https://zealous-desert-029b2f003.4.azurestaticapps.net/)
-- [Blazor WASM (todo)](todo)
