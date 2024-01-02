@@ -1,0 +1,42 @@
+﻿@page "/"
+
+@using ProtoBufJsonConverter.Models
+@using JsonConverter.Abstractions
+@using ProtoBufJsonConverter.Services
+
+@inject HttpClient Http
+@inject IMetadataReferenceService MetadataReferenceService;
+
+<PageTitle>ProtoBuf</PageTitle>
+
+<h1>Json</h1>
+@if (_json == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <pre>@_json</pre>
+}
+
+@code {
+    private string? _json;
+    private string _protoDefinition = string.Empty;
+    private const string _messageType = "greet.HelloRequest";
+    private const string _protobufAsBase64 = "CgRzdGVm";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _protoDefinition = await Http.GetStringAsync("greet.proto");
+
+        var bytes = Convert.FromBase64String(_protobufAsBase64);
+
+        var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
+            .WithSkipGrpcHeader(true)
+            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+
+        var converter = new Converter(MetadataReferenceService);
+
+        _json = await converter.ConvertAsync(convertToJsonRequest);
+    }
+}

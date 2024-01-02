@@ -42,7 +42,7 @@ var request = new ConvertToJsonRequest(protoDefinition, "greet.HelloRequest", by
 
 var converter = new Converter();
 
-var json = converter.Convert(request);
+var json = await converter.ConvertAsync(request);
 ```
 
 #### JSON
@@ -62,7 +62,7 @@ var request = new ConvertToObjectRequest(protoDefinition, "greet.HelloRequest", 
 
 var converter = new Converter();
 
-var @object = converter.Convert(request);
+var @object = await converter.ConvertAsync(request);
 ```
 
 ### :three: Convert JSON `string` to a ProtoBuf `byte[]`
@@ -76,7 +76,7 @@ var request = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest"
 
 var converter = new Converter();
 
-var protobuf = converter.Convert(request);
+var protobuf = await converter.ConvertAsync(request);
 ```
 
 ### :four: Convert any `object` to a ProtoBuf `byte[]`
@@ -93,7 +93,7 @@ var request = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest"
 
 var converter = new Converter();
 
-var protobuf = converter.Convert(request);
+var protobuf = await converter.ConvertAsync(request);
 ```
 
 ### :five: Convert any `object` to a ProtoBuf `byte[]` including the Grpc Header
@@ -111,5 +111,9 @@ var request = new ConvertToProtoBufRequest(protoDefinition, "greet.HelloRequest"
 
 var converter = new Converter();
 
-var protobufWithGrpcHeader = converter.Convert(request);
+var protobufWithGrpcHeader = await ConvertAsync.Convert(request);
 ```
+
+## Example
+- [Blazor Static Web App](https://zealous-desert-029b2f003.4.azurestaticapps.net/)
+- [Blazor WASM (todo)](todo)
