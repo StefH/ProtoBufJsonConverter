@@ -22,17 +22,19 @@ internal class ProtoBufConverterFunction
     }
 
     [Function("ConvertToJson")]
-    public async Task<string> ConvertToJsonAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req,
-        string processType,
-        string resizeOption,
-        int? width,
-        CancellationToken cancellationToken
-    )
+    public async Task<string> ConvertToJsonAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, CancellationToken cancellationToken)
     {
         var convertToJsonRequest = await GetRequestAsync<ConvertToJsonRequest>(req, cancellationToken);
 
         return _protoBufConverter.Convert(convertToJsonRequest, cancellationToken);
+    }
+
+    [Function("ConvertToProtoBuf")]
+    public async Task<byte[]> ConvertToProtoBufAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, CancellationToken cancellationToken)
+    {
+        var convertToProtoBufRequest = await GetRequestAsync<ConvertToProtoBufRequest>(req, cancellationToken);
+
+        return _protoBufConverter.Convert(convertToProtoBufRequest, cancellationToken);
     }
 
     private async Task<T> GetRequestAsync<T>(HttpRequestData req, CancellationToken cancellationToken)

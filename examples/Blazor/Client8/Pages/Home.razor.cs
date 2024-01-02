@@ -11,10 +11,10 @@ namespace Client8.Pages;
 public partial class Home
 {
     [Inject]
-    private IProtoBufConverterApi ProtoBufConverterApi { get; set; } = null!;
+    public required IProtoBufConverterApi ProtoBufConverterApi { get; set; }
 
     [Inject]
-    private HttpClient Client { get; set; } = null!;
+    public required HttpClient Client { get; set; }
 
     private State _state = State.None;
 
@@ -24,7 +24,11 @@ public partial class Home
     protected RichTextEdit richTextProtoDefinition;
 
     private string _protoDefinition = string.Empty;
+    private string _messageType = "greet.HelloRequest";
+    private ConvertType _selectedConvertType = ConvertType.ToJson;
     private string _protobufAsBase64 = "CgRzdGVm";
+    private bool _skipGrpcHeader = true;
+    private bool _addGrpcHeader = true;
     private string _json = string.Empty;
 
     private bool ProcessButtonDisabled => _state == State.Processing;
@@ -72,20 +76,18 @@ public partial class Home
 
     private async Task OnClick()
     {
-        _json = string.Empty;
-
         _state = State.Processing;
 
         try
         {
-            var bytes = Convert.FromBase64String(_protobufAsBase64);
-
-            var messageType = "greet.HelloRequest";
-            
-            var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, messageType, bytes)
-                .WithJsonConverter(new NewtonsoftJsonConverter())
-                .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
-            _json = await ProtoBufConverterApi.ConvertToJsonAsync(convertToJsonRequest);
+            if (_selectedConvertType == ConvertType.ToJson)
+            {
+                await ConvertToJsonAsync();
+            }
+            else
+            {
+                await ConvertToProtoBufAsync();
+            }
 
             _state = State.Done;
         }
@@ -97,5 +99,28 @@ public partial class Home
         {
             StateHasChanged();
         }
+    }
+
+    private async Task ConvertToJsonAsync()
+    {
+        _json = string.Empty;
+
+        var bytes = Convert.FromBase64String(_protobufAsBase64);
+
+        var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
+            .WithSkipGrpcHeader(_skipGrpcHeader)
+            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+        _json = await ProtoBufConverterApi.ConvertToJsonAsync(convertToJsonRequest);
+    }
+
+    private async Task ConvertToProtoBufAsync()
+    {
+        _protobufAsBase64 = string.Empty;
+
+        var convertToProtoBufRequest = new ConvertToProtoBufRequest(_protoDefinition, _messageType, _json)
+            .WithGrpcHeader(_addGrpcHeader);
+        var bytes = await ProtoBufConverterApi.ConvertToProtoBufAsync(convertToProtoBufRequest);
+
+        _protobufAsBase64 = Convert.ToBase64String(bytes);
     }
 }

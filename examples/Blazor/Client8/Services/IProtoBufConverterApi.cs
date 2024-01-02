@@ -8,4 +8,7 @@ public interface IProtoBufConverterApi
 {
     [Post("ConvertToJson")]
     public Task<string> ConvertToJsonAsync([Body] ConvertToJsonRequest request, CancellationToken cancellationToken = default);
+
+    [Post("ConvertToProtoBuf")]
+    public Task<byte[]> ConvertToProtoBufAsync([Body] ConvertToProtoBufRequest request, CancellationToken cancellationToken = default);
 }

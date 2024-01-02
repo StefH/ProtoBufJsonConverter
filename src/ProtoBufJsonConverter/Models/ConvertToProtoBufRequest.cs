@@ -1,17 +1,20 @@
-﻿using AnyOfTypes;
-using JsonConverter.Abstractions;
+﻿using JsonConverter.Abstractions;
 using JsonConverter.Newtonsoft.Json;
+using Newtonsoft.Json;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Models;
 
 public class ConvertToProtoBufRequest : ConvertRequest
 {
+    [JsonIgnore]
     public IJsonConverter? JsonConverter { get; private set; }
 
     public JsonConverterOptions? JsonConverterOptions { get; private set; }
 
-    public AnyOf<string, object> Input { get; }
+    public string? Json { get; }
+
+    public object? Object { get; }
 
     public bool AddGrpcHeader { get; private set; }
 
@@ -20,11 +23,24 @@ public class ConvertToProtoBufRequest : ConvertRequest
     /// </summary>
     /// <param name="protoDefinition">The proto definition as a string.</param>
     /// <param name="messageType">The full type of the protobuf (request/response) message object. Format is "{package-name}.{type-name}".</param>
-    /// <param name="input">The JSON string or Object to convert.</param>
-    /// <param name="addGrpcHeader">Add the Grpc Header bytes [default value is false].</param>
-    public ConvertToProtoBufRequest(string protoDefinition, string messageType, AnyOf<string, object> input, bool addGrpcHeader = false) : base(protoDefinition, messageType)
+    /// <param name="input">The JSON string to convert.</param>
+    /// <param name="addGrpcHeader">Add the Grpc Header bytes [default is <c>false</c>].</param>
+    public ConvertToProtoBufRequest(string protoDefinition, string messageType, string input, bool addGrpcHeader = false) : base(protoDefinition, messageType)
     {
-        Input = Guard.NotNull(input);
+        Json = Guard.NotNullOrWhiteSpace(input);
+        AddGrpcHeader = addGrpcHeader;
+    }
+
+    /// <summary>
+    /// Create a ConvertToProtoBufRequest to convert an object to a ProtoPuf byte array.
+    /// </summary>
+    /// <param name="protoDefinition">The proto definition as a string.</param>
+    /// <param name="messageType">The full type of the protobuf (request/response) message object. Format is "{package-name}.{type-name}".</param>
+    /// <param name="input">The object to convert.</param>
+    /// <param name="addGrpcHeader">Add the Grpc Header bytes [default is <c>false</c>].</param>
+    public ConvertToProtoBufRequest(string protoDefinition, string messageType, object input, bool addGrpcHeader = false) : base(protoDefinition, messageType)
+    {
+        Object = Guard.NotNull(input);
         AddGrpcHeader = addGrpcHeader;
     }
 
@@ -49,11 +65,12 @@ public class ConvertToProtoBufRequest : ConvertRequest
     }
 
     /// <summary>
-    /// Add the Grpc Header.
+    /// Set the Add Grpc Header.
+    /// <param name="addHeader">Add the Grpc Header [default is <c>false</c>]</param>
     /// </summary>
-    public ConvertToProtoBufRequest WithGrpcHeader()
+    public ConvertToProtoBufRequest WithGrpcHeader(bool addHeader = false)
     {
-        AddGrpcHeader = true;
+        AddGrpcHeader = addHeader;
         return this;
     }
 }

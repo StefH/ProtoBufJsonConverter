@@ -12,7 +12,7 @@ internal static class SerializeUtils
 
     internal static string ConvertObjectToJson(ConvertToProtoBufRequest request)
     {
-        return (request.JsonConverter ?? DefaultJsonConverter.Value).Serialize(request.Input.Second, request.JsonConverterOptions);
+        return (request.JsonConverter ?? DefaultJsonConverter.Value).Serialize(request.Object!, request.JsonConverterOptions);
     }
 
     internal static string ConvertProtoBufToJson(Assembly assembly, string inputTypeFullName, ConvertToJsonRequest request)
