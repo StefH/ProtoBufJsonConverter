@@ -117,6 +117,70 @@ var converter = new Converter();
 var protobufWithGrpcHeader = await ConvertAsync.Convert(request);
 ```
 
+---
+
+## Using in Blazor WebAssembly
+In order to use this library in a Blazor WebAssembly application, you need to provide a specific Blazor implementation for the `IMetadataReferenceService`, the [BlazorWasmMetadataReferenceService](...);
+
+
+### Convert ProtoBuf `byte[]` to a JSON `string`
+
+#### Dependency Injection
+``` csharp
+public class Program
+{
+    public static async Task Main(string[] args)
+    {
+        // ...
+
+        // Add AddSingleton registrations for the IMetadataReferenceService and IConverter
+        builder.Services.AddSingleton<IMetadataReferenceService, BlazorWasmMetadataReferenceService>();
+        builder.Services.AddSingleton<IConverter, Converter>();
+
+        await builder.Build().RunAsync();
+    }
+}
+```
+
+#### Blazor Page
+``` csharp
+public partial class Home
+{
+    [Inject]
+    public required IConverter Converter { get; set; }
+
+    private State _state = State.None;
+    private string _protoDefinition = "..."; // See above
+    private string _messageType = "greet.HelloRequest";
+    private string _protobufAsBase64 = "CgRzdGVm";
+    private bool _skipGrpcHeader = true;
+    private bool _addGrpcHeader = true;
+    private string _json = string.Empty;
+
+    private async Task OnClick()
+    {
+        await ConvertToJsonAsync();
+    }
+
+    private async Task ConvertToJsonAsync()
+    {
+        _json = string.Empty;
+
+        var bytes = Convert.FromBase64String(_protobufAsBase64);
+
+        var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
+            .WithSkipGrpcHeader(_skipGrpcHeader)
+            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+
+        _json = await Converter.ConvertAsync(convertToJsonRequest);
+    }
+}
+```
+
+For a full example, see [examples/ProtoBufJsonConverter.Blazor](https://github.com/StefH/ProtoBufJsonConverter/tree/main/examples/ProtoBufJsonConverter.Blazor).
+
+---
+
 ## Examples
 - [Blazor WASM](https://wonderful-beach-0d16cee03.4.azurestaticapps.net/)
 - [Blazor Static Web App](https://zealous-desert-029b2f003.4.azurestaticapps.net/)
