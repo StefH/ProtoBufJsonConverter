@@ -56,7 +56,7 @@ message HelloReply
     [Theory]
     [InlineData(true, "AAAAAAYKBHN0ZWY=")]
     [InlineData(false, "CgRzdGVm")]
-    public async Task ConvertAsync_ConvertToProtoBufRequest(bool addGrpcHeader, string expectedBytes)
+    public async Task ConvertAsync_ConvertJsonToProtoBufRequest(bool addGrpcHeader, string expectedBytes)
     {
         // Arrange
         const string messageType = "greet.HelloRequest";
@@ -64,6 +64,25 @@ message HelloReply
         const string json = @"{""name"":""stef""}";
 
         var request = new ConvertToProtoBufRequest(ProtoDefinition, messageType, json, addGrpcHeader);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be(expectedBytes);
+    }
+
+    [Theory]
+    [InlineData(true, "AAAAAAYKBHN0ZWY=")]
+    [InlineData(false, "CgRzdGVm")]
+    public async Task ConvertAsync_ConvertObjectToProtoBufRequest(bool addGrpcHeader, string expectedBytes)
+    {
+        // Arrange
+        const string messageType = "greet.HelloRequest";
+
+        var @object = new { name = "stef" };
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinition, messageType, @object, addGrpcHeader);
 
         // Act
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
