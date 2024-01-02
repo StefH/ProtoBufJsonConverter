@@ -24,7 +24,7 @@ public class Converter : IConverter
 
     private readonly IMetadataReferenceService _metadataReferenceService;
 
-    public Converter() : this(new CreateFromFileMetadataReferenceService())
+    public Converter() : this(new DefaultMetadataReferenceService())
     {
     }
 

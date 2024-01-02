@@ -37,7 +37,7 @@ message HelloReply
     [Theory]
     [InlineData("AAAAAAYKBHN0ZWY=")]
     [InlineData("CgRzdGVm")]
-    public void ConvertToJsonRequest_SkipGrpcHeader_IsTrue(string data)
+    public async Task ConvertAsync_ConvertToJsonRequest_SkipGrpcHeader_IsTrue(string data)
     {
         // Arrange
         const string messageType = "greet.HelloRequest";
@@ -47,7 +47,7 @@ message HelloReply
         var request = new ConvertToJsonRequest(ProtoDefinition, messageType, bytes);
 
         // Act
-        var json = _sut.Convert(request);
+        var json = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
         json.Should().Be(@"{""name"":""stef""}");
@@ -56,7 +56,7 @@ message HelloReply
     [Theory]
     [InlineData(true, "AAAAAAYKBHN0ZWY=")]
     [InlineData(false, "CgRzdGVm")]
-    public void ConvertToProtoBufRequest(bool addGrpcHeader, string expectedBytes)
+    public async Task ConvertAsync_ConvertToProtoBufRequest(bool addGrpcHeader, string expectedBytes)
     {
         // Arrange
         const string messageType = "greet.HelloRequest";
@@ -66,7 +66,7 @@ message HelloReply
         var request = new ConvertToProtoBufRequest(ProtoDefinition, messageType, json, addGrpcHeader);
 
         // Act
-        var bytes = _sut.Convert(request);
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
         Convert.ToBase64String(bytes).Should().Be(expectedBytes);

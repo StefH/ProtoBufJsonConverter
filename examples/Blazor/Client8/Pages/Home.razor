@@ -12,12 +12,6 @@
             <FieldLabel ColumnSize="ColumnSize.Is1">ProtoDefinition</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is11">
                 <MemoEdit @bind-Text="@_protoDefinition" Rows="30" />
-                @* <RichTextEdit @ref="richTextProtoDefinition"
-                Theme="RichTextEditTheme.Snow"
-                PlaceHolder="Type your post here..."
-                SubmitOnEnter="false">
-                <Editor>@_protoDefinition</Editor>
-                </RichTextEdit> *@
             </FieldBody>
         </Field>
         
@@ -61,7 +55,6 @@
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">Json</FieldLabel>
                 <FieldBody ColumnSize="ColumnSize.Is11">
-                    @* <StandaloneCodeEditor Id="Destination" ConstructionOptions="DestinationEditorConstructionOptions" /> *@
                     <MemoEdit @bind-Text="@_json" Rows="10" />
                 </FieldBody>
             </Field>
@@ -83,7 +76,6 @@
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">Json</FieldLabel>
                 <FieldBody ColumnSize="ColumnSize.Is11">
-                    @* <StandaloneCodeEditor Id="Destination" ConstructionOptions="DestinationEditorConstructionOptions" /> *@
                     <MemoEdit @bind-Text="@_json" Rows="10" ReadOnly="true"/>
                 </FieldBody>
             </Field>

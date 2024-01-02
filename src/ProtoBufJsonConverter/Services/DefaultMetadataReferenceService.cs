@@ -5,7 +5,7 @@ using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Services;
 
-internal class CreateFromFileMetadataReferenceService : IMetadataReferenceService
+internal class DefaultMetadataReferenceService : IMetadataReferenceService
 {
     private readonly ConcurrentDictionary<string, MetadataReference> _cachedMetadataReferences = new();
 

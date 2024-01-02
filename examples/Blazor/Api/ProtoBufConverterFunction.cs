@@ -27,7 +27,7 @@ internal class ProtoBufConverterFunction
     {
         var convertToJsonRequest = await GetRequestAsync<ConvertToJsonRequest>(req, cancellationToken);
 
-        return _protoBufConverter.ConvertAsync(convertToJsonRequest, cancellationToken);
+        return await _protoBufConverter.ConvertAsync(convertToJsonRequest, cancellationToken).ConfigureAwait(false);
     }
 
     [Function("ConvertToProtoBuf")]
@@ -35,7 +35,7 @@ internal class ProtoBufConverterFunction
     {
         var convertToProtoBufRequest = await GetRequestAsync<ConvertToProtoBufRequest>(req, cancellationToken);
 
-        var bytes = _protoBufConverter.ConvertAsync(convertToProtoBufRequest, cancellationToken);
+        var bytes = await _protoBufConverter.ConvertAsync(convertToProtoBufRequest, cancellationToken).ConfigureAwait(false);
 
         return Convert.ToBase64String(bytes);
     }
