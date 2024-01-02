@@ -117,7 +117,7 @@ var protobufWithGrpcHeader = await ConvertAsync.Convert(request);
 ---
 
 ## Using in Blazor WebAssembly
-In order to use this library in a Blazor WebAssembly application, you need to provide a specific Blazor implementation for the `IMetadataReferenceService`, the [BlazorWasmMetadataReferenceService](...);
+In order to use this library in a Blazor WebAssembly application, you need to provide a specific Blazor implementation for the `IMetadataReferenceService`, the [BlazorWasmMetadataReferenceService](https://github.com/StefH/ProtoBufJsonConverter/blob/main/examples/ProtoBufJsonConverter.Blazor/BlazorWasmMetadataReferenceService.cs).
 
 
 ### Convert ProtoBuf `byte[]` to a JSON `string`
