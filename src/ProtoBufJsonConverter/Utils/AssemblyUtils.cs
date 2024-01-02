@@ -2,12 +2,26 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
+using ProtoBufJsonConverter.Services;
 
 namespace ProtoBufJsonConverter.Utils;
 
 internal static class AssemblyUtils
 {
-    internal static Assembly CompileCodeToAssembly(string code, CancellationToken cancellationToken)
+    // Get and load all required assemblies to compile the SyntaxTree
+    private static readonly Lazy<Assembly[]> RequiredAssemblies = new(() =>
+    {
+        var requiredAssemblies = Assembly.GetEntryAssembly()!
+            .GetReferencedAssemblies()
+            .Select(Assembly.Load)
+            .ToList();
+        requiredAssemblies.Add(typeof(object).Assembly);
+        requiredAssemblies.Add(typeof(ProtoContractAttribute).Assembly);
+
+        return requiredAssemblies.Distinct().ToArray();
+    });
+
+    internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
         // Specify the assembly name
         var assemblyName = Path.GetRandomFileName();
@@ -15,19 +29,11 @@ internal static class AssemblyUtils
         // Parse the source code
         var syntaxTree = CSharpSyntaxTree.ParseText(code, cancellationToken: cancellationToken);
 
-        // Locate the directory that contains the framework assemblies
-        var assemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
-
-        // Reference the necessary assemblies
-        var references = new List<MetadataReference>
+        var references = new List<MetadataReference>();
+        foreach (var requiredAssembly in RequiredAssemblies.Value)
         {
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location), // System.Private.CoreLib
-            MetadataReference.CreateFromFile(typeof(ProtoContractAttribute).Assembly.Location),
-            MetadataReference.CreateFromFile(Path.Combine(assemblyPath, "System.Runtime.dll")),
-
-            // MetadataReference.CreateFromFile(typeof(CallContext).Assembly.Location), // ProtoBuf.Grpc.CallContext
-            // MetadataReference.CreateFromFile(typeof(ServiceContractAttribute).Assembly.Location) // ServiceContract
-        };
+            references.Add(await metadataReferenceService.CreateAsync(requiredAssembly, cancellationToken).ConfigureAwait(false));
+        }
 
         // Create a compilation
         var compilation = CSharpCompilation.Create(
@@ -39,7 +45,9 @@ internal static class AssemblyUtils
 
         // Compile the source code
         using var stream = new MemoryStream();
-        var result = compilation.Emit(stream, cancellationToken: cancellationToken);
+
+        // Wrap this in a task to avoid Blazor Startup Error: System.Threading.SynchronizationLockException: Cannot wait on monitors on this runtime
+        var result = await Task.Run(() => compilation.Emit(stream, cancellationToken: cancellationToken), cancellationToken);
 
         if (!result.Success)
         {

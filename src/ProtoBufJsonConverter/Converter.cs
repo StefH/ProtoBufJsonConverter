@@ -4,6 +4,7 @@ using Google.Protobuf.Reflection;
 using ProtoBuf.Reflection;
 using ProtoBufJsonConverter.Extensions;
 using ProtoBufJsonConverter.Models;
+using ProtoBufJsonConverter.Services;
 using ProtoBufJsonConverter.Utils;
 using Stef.Validation;
 
@@ -21,72 +22,87 @@ public class Converter : IConverter
 
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
+    private readonly IMetadataReferenceService _metadataReferenceService;
+
+    public Converter() : this(new DefaultMetadataReferenceService())
+    {
+    }
+
+    public Converter(IMetadataReferenceService metadataReferenceService)
+    {
+        _metadataReferenceService = Guard.NotNull(metadataReferenceService);
+    }
+
     /// <inheritdoc />
-    public string Convert(ConvertToJsonRequest request, CancellationToken cancellationToken = default)
+    public async Task<string> ConvertAsync(ConvertToJsonRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
+        var (assembly, inputTypeFullName) = await ParseAsync(request, cancellationToken).ConfigureAwait(false);
 
         return SerializeUtils.ConvertProtoBufToJson(assembly, inputTypeFullName, request);
     }
 
     /// <inheritdoc />
-    public object Convert(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
+    public async Task<object> ConvertAsync(ConvertToObjectRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
+        var (assembly, inputTypeFullName) = await ParseAsync(request, cancellationToken).ConfigureAwait(false);
 
         return SerializeUtils.ConvertProtoBufToObject(assembly, inputTypeFullName, request.ProtoBufBytes, request.SkipGrpcHeader);
     }
 
     /// <inheritdoc />
-    public byte[] Convert(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
+    public async Task<byte[]> ConvertAsync(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(request);
 
-        var (assembly, inputTypeFullName) = Parse(request, cancellationToken);
+        var (assembly, inputTypeFullName) = await ParseAsync(request, cancellationToken).ConfigureAwait(false);
 
-        var json = request.Input.IsFirst ? request.Input.First : SerializeUtils.ConvertObjectToJson(request);
+        var json = request.Input as string ?? SerializeUtils.ConvertObjectToJson(request);
 
         return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.AddGrpcHeader, request.JsonConverter);
     }
 
-    private static (Assembly Assembly, string inputTypeFullName) Parse(ConvertRequest request, CancellationToken cancellationToken)
+    private async Task<(Assembly Assembly, string inputTypeFullName)> ParseAsync(ConvertRequest request, CancellationToken cancellationToken)
     {
-        var data = GetCachedFileDescriptorSet(request.ProtoDefinition, cancellationToken);
+        var data = await GetCachedFileDescriptorSetAsync(request.ProtoDefinition, cancellationToken).ConfigureAwait(false);
 
         var inputTypeFullName = data.Set.GetInputTypeFromMessageType(request.MessageType);
 
         return (data.Assembly, inputTypeFullName);
     }
 
-    private static Data GetCachedFileDescriptorSet(string protoDefinition, CancellationToken cancellationToken)
+    private async Task<Data> GetCachedFileDescriptorSetAsync(string protoDefinition, CancellationToken cancellationToken)
     {
         var protoDefinitionHashCode = protoDefinition.GetDeterministicHashCode();
 
-        return DataDictionary.GetOrAdd(protoDefinitionHashCode, hashCode =>
+        if (DataDictionary.TryGetValue(protoDefinitionHashCode, out var data))
         {
-            var set = new FileDescriptorSet();
-            set.Add($"{hashCode}.proto", true, new StringReader(protoDefinition));
-            set.Process();
+            return data;
+        }
+        
+        var set = new FileDescriptorSet();
+        set.Add($"{protoDefinitionHashCode}.proto", true, new StringReader(protoDefinition));
+        set.Process();
 
-            var errors = set.GetErrors();
-            if (errors.Any())
-            {
-                throw new ArgumentException($"Error parsing proto definition. Errors = {string.Join(",", errors.Select(e => e.Message))}", nameof(protoDefinition));
-            }
+        var errors = set.GetErrors();
+        if (errors.Any())
+        {
+            throw new ArgumentException($"Error parsing proto definition. Errors = {string.Join(",", errors.Select(e => e.Message))}", nameof(protoDefinition));
+        }
 
-            var code = GenerateCSharpCode(set);
+        var code = GenerateCSharpCode(set);
 
-            return new Data
-            {
-                HashCode = hashCode,
-                Set = set,
-                Assembly = AssemblyUtils.CompileCodeToAssembly(code, cancellationToken)
-            };
-        });
+        data = new Data
+        {
+            HashCode = protoDefinitionHashCode,
+            Set = set,
+            Assembly = await AssemblyUtils.CompileCodeToAssemblyAsync(code, _metadataReferenceService, cancellationToken).ConfigureAwait(false)
+        };
+        DataDictionary[protoDefinitionHashCode] = data;
+        return data;
     }
 
     private static string GenerateCSharpCode(FileDescriptorSet set)

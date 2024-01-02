@@ -5,7 +5,8 @@
 		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<LangVersion>12</LangVersion>
+		<LangVersion>latest</LangVersion>
+		<ApplicationIcon>../../resources/icon.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -18,7 +19,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AnyOf" Version="0.3.0" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="8.0.0" />
 		<PackageReference Include="JsonConverter.Newtonsoft.Json" Version="0.5.0" />
 		<PackageReference Include="protobuf-net" Version="3.2.30" />

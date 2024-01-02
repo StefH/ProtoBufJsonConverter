@@ -1,5 +1,6 @@
 ﻿using JsonConverter.Abstractions;
 using JsonConverter.Newtonsoft.Json;
+using Newtonsoft.Json;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Models;
@@ -8,11 +9,12 @@ public class ConvertToJsonRequest : ConvertRequest
 {
     public byte[] ProtoBufBytes { get; }
 
-    public bool SkipGrpcHeader { get; }
+    public bool SkipGrpcHeader { get; private set; }
 
+    [JsonIgnore]
     public IJsonConverter? JsonConverter { get; private set; }
 
-    public JsonConverterOptions? JsonConverterOptions { get; private set; }
+    public JsonConverterOptions? JsonConverterOptions { get; set; }
 
     /// <summary>
     /// Create a ConvertToJsonRequest.
@@ -62,6 +64,16 @@ public class ConvertToJsonRequest : ConvertRequest
 
         JsonConverterOptions = new JsonConverterOptions();
         action(JsonConverterOptions);
+        return this;
+    }
+
+    /// <summary>
+    /// Set the SkipGrpcHeader.
+    /// </summary>
+    /// <param name="skipHeader">Skip the Grpc Header [default is <c>true</c>]</param>
+    public ConvertToJsonRequest WithSkipGrpcHeader(bool skipHeader)
+    {
+        SkipGrpcHeader = skipHeader;
         return this;
     }
 }
