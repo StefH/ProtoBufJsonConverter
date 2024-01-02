@@ -110,6 +110,7 @@ public partial class Home
         var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
             .WithSkipGrpcHeader(_skipGrpcHeader)
             .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+
         _json = await ProtoBufConverterApi.ConvertToJsonAsync(convertToJsonRequest);
     }
 
@@ -119,8 +120,7 @@ public partial class Home
 
         var convertToProtoBufRequest = new ConvertToProtoBufRequest(_protoDefinition, _messageType, _json)
             .WithGrpcHeader(_addGrpcHeader);
-        var bytes = await ProtoBufConverterApi.ConvertToProtoBufAsync(convertToProtoBufRequest);
 
-        _protobufAsBase64 = Convert.ToBase64String(bytes);
+        _protobufAsBase64 = await ProtoBufConverterApi.ConvertToProtoBufAsync(convertToProtoBufRequest);
     }
 }

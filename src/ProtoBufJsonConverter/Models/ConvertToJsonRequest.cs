@@ -14,7 +14,7 @@ public class ConvertToJsonRequest : ConvertRequest
     [JsonIgnore]
     public IJsonConverter? JsonConverter { get; private set; }
 
-    public JsonConverterOptions? JsonConverterOptions { get; private set; }
+    public JsonConverterOptions? JsonConverterOptions { get; set; }
 
     /// <summary>
     /// Create a ConvertToJsonRequest.

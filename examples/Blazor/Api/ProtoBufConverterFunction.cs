@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,11 +31,13 @@ internal class ProtoBufConverterFunction
     }
 
     [Function("ConvertToProtoBuf")]
-    public async Task<byte[]> ConvertToProtoBufAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, CancellationToken cancellationToken)
+    public async Task<string> ConvertToProtoBufAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, CancellationToken cancellationToken)
     {
         var convertToProtoBufRequest = await GetRequestAsync<ConvertToProtoBufRequest>(req, cancellationToken);
 
-        return _protoBufConverter.Convert(convertToProtoBufRequest, cancellationToken);
+        var bytes = _protoBufConverter.Convert(convertToProtoBufRequest, cancellationToken);
+
+        return Convert.ToBase64String(bytes);
     }
 
     private async Task<T> GetRequestAsync<T>(HttpRequestData req, CancellationToken cancellationToken)
