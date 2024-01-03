@@ -4,7 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<WasmEnableWebcil>false</WasmEnableWebcil>
+		<WasmEnableWebcil>true</WasmEnableWebcil>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -21,15 +21,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Update="Pages\Home.razor">
-		  <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-		</Content>
 		<Content Update="wwwroot\favicon.png">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</Content>
-		<Content Update="wwwroot\greet.proto">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Content>
 		<Content Update="wwwroot\icon-192.png">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>

@@ -34,9 +34,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "examples\Blazor\Api\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client8", "examples\Blazor\Client8\Client8.csproj", "{AACB5936-C6C8-4A53-A58A-9F7A05097BAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProtoBufJsonConverter.Blazor", "examples\ProtoBufJsonConverter.Blazor\ProtoBufJsonConverter.Blazor.csproj", "{A58F54FD-3E70-465B-9CD5-2565D7CDE069}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProtoBufJsonConverter.Blazor", "examples\ProtoBufJsonConverter.Blazor\ProtoBufJsonConverter.Blazor.csproj", "{A58F54FD-3E70-465B-9CD5-2565D7CDE069}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example - Blazor", "example - Blazor", "{F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.NET.WebAssembly.Webcil", "examples\Microsoft.NET.WebAssembly.Webcil\Microsoft.NET.WebAssembly.Webcil.csproj", "{4500FF72-60C9-40D6-9ABB-4F5A5BD6CE74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.NET.WebAssembly.Webcil.ConsoleApp", "examples\Microsoft.NET.WebAssembly.Webcil.ConsoleApp\Microsoft.NET.WebAssembly.Webcil.ConsoleApp.csproj", "{963988DD-21B7-49F6-B91F-224840886887}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,6 +76,14 @@ Global
 		{A58F54FD-3E70-465B-9CD5-2565D7CDE069}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A58F54FD-3E70-465B-9CD5-2565D7CDE069}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A58F54FD-3E70-465B-9CD5-2565D7CDE069}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4500FF72-60C9-40D6-9ABB-4F5A5BD6CE74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4500FF72-60C9-40D6-9ABB-4F5A5BD6CE74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4500FF72-60C9-40D6-9ABB-4F5A5BD6CE74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4500FF72-60C9-40D6-9ABB-4F5A5BD6CE74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{963988DD-21B7-49F6-B91F-224840886887}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{963988DD-21B7-49F6-B91F-224840886887}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{963988DD-21B7-49F6-B91F-224840886887}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{963988DD-21B7-49F6-B91F-224840886887}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,6 +96,8 @@ Global
 		{50505706-A8C1-47DC-82F5-E8B96C80E767} = {80477701-191F-4E7D-8D84-01276E9F4FB0}
 		{AACB5936-C6C8-4A53-A58A-9F7A05097BAE} = {80477701-191F-4E7D-8D84-01276E9F4FB0}
 		{A58F54FD-3E70-465B-9CD5-2565D7CDE069} = {F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}
+		{4500FF72-60C9-40D6-9ABB-4F5A5BD6CE74} = {F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}
+		{963988DD-21B7-49F6-B91F-224840886887} = {F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {45F31459-D6F5-441C-890A-F02A1328053D}

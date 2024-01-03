@@ -14,8 +14,6 @@ public partial class Home
     [Inject]
     public required IConverter Converter { get; set; }
 
-    private Button _btnClick;
-
     private State _state = State.None;
     private string _error = string.Empty;
     private string _protoDefinition = string.Empty;
