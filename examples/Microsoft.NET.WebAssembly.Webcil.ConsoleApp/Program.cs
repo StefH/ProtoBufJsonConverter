@@ -6,14 +6,25 @@ internal class Program
     {
         var s = File.OpenRead(@"c:\temp\ProtoBufJsonConverter.Blazor.wasm");
 
+        var wc = WebcilConverter.FromPortableExecutable(@"c:\temp\ProtoBufJsonConverter.Blazor.dll", @"c:\temp\wasm.wasm");
+        wc.ConvertToWebcil();
+
+
+     //   WasmFile file = WasmFile.ReadBinary(s);
+
         using WebcilReader reader = new WebcilReader(s);
 
-        
 
-//        var x = reader.ReadDebugDirectory()[0];
+
+        //        var x = reader.ReadDebugDirectory()[0];
 
         var md = reader.GetMetadataReader();
 
+        //reader.ReadPdbChecksumDebugDirectoryData()
+
+        //var mm = ModuleMetadata.CreateFromImage();
+
+        //var am = AssemblyMetadata.Create();
 
         
         //md.GetBlobBytes()
