@@ -3,15 +3,11 @@
 
 using System;
 using System.Collections.Immutable;
-using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
-
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
 namespace Microsoft.NET.WebAssembly.Webcil;
-
 
 public sealed partial class WebcilReader
 {

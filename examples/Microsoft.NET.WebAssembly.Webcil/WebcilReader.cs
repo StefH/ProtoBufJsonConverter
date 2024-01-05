@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Immutable;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Buffers.Binary;
 using System.Reflection.Metadata;
@@ -23,7 +22,7 @@ public sealed partial class WebcilReader : IDisposable
     private WebcilHeader _header;
     private DirectoryEntry _corHeaderMetadataDirectory;
     private MetadataReaderProvider? _metadataReaderProvider;
-    private ImmutableArray<WebcilSectionHeader>? _sections;
+    public ImmutableArray<WebcilSectionHeader>? _sections;
 
     private string? InputPath { get; }
 
@@ -98,9 +97,9 @@ public sealed partial class WebcilReader : IDisposable
             return false;
         }
         using var reader = new BinaryReader(_stream, System.Text.Encoding.UTF8, leaveOpen: true);
-        reader.ReadInt32(); // byte count
-        reader.ReadUInt16(); // major version
-        reader.ReadUInt16(); // minor version
+        var bc = reader.ReadInt32(); // byte count
+        var maj = reader.ReadUInt16(); // major version
+        var min = reader.ReadUInt16(); // minor version
         _corHeaderMetadataDirectory = new DirectoryEntry(reader.ReadInt32(), reader.ReadInt32());
         return true;
     }

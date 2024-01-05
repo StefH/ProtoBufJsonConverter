@@ -19,7 +19,7 @@ internal static class AssemblyUtils
         {
             Assembly.Load(assemblySystemRuntime),
             typeof(object).Assembly,
-            typeof(ProtoContractAttribute).Assembly,
+            typeof(ProtoContractAttribute).Assembly
         };
     });
 
