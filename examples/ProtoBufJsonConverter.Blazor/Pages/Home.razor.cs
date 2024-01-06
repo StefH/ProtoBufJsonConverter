@@ -1,4 +1,5 @@
-﻿using JsonConverter.Abstractions;
+﻿using Blazorise;
+using JsonConverter.Abstractions;
 using Microsoft.AspNetCore.Components;
 using ProtoBufJsonConverter.Blazor.Enums;
 using ProtoBufJsonConverter.Models;
@@ -14,15 +15,16 @@ public partial class Home
     public required IConverter Converter { get; set; }
 
     private State _state = State.None;
+    private string _error = string.Empty;
     private string _protoDefinition = string.Empty;
     private string _messageType = "greet.HelloRequest";
     private ConvertType _selectedConvertType = ConvertType.ToJson;
     private string _protobufAsBase64 = "CgRzdGVm";
     private bool _skipGrpcHeader = true;
     private bool _addGrpcHeader = true;
-    private string _json = string.Empty;
+    private string _json = "{\r\n  \"name\": \"stef\"\r\n}";
 
-    private bool ProcessButtonDisabled => _state == State.Processing;
+    private bool IsProcessing => _state == State.Processing;
 
     protected override async Task OnInitializedAsync()
     {
@@ -33,6 +35,7 @@ public partial class Home
 
     private async Task OnClick()
     {
+        _error = string.Empty;
         _state = State.Processing;
 
         try
@@ -50,6 +53,7 @@ public partial class Home
         }
         catch (Exception ex)
         {
+            _error = ex.Message;
             _state = State.Error;
         }
         finally

@@ -9,16 +9,18 @@ namespace ProtoBufJsonConverter.Utils;
 internal static class AssemblyUtils
 {
     // Get and load all required assemblies to compile the SyntaxTree
-    private static readonly Lazy<Assembly[]> RequiredAssemblies = new(() =>
+    private static readonly Lazy<IReadOnlyList<Assembly>> RequiredAssemblies = new(() =>
     {
-        var requiredAssemblies = Assembly.GetEntryAssembly()!
+        var assemblySystemRuntime = Assembly.GetEntryAssembly()!
             .GetReferencedAssemblies()
-            .Select(Assembly.Load)
-            .ToList();
-        requiredAssemblies.Add(typeof(object).Assembly);
-        requiredAssemblies.Add(typeof(ProtoContractAttribute).Assembly);
+            .First(a => a.Name == "System.Runtime");
 
-        return requiredAssemblies.Distinct().ToArray();
+        return new List<Assembly>
+        {
+            Assembly.Load(assemblySystemRuntime),
+            typeof(object).Assembly,
+            typeof(ProtoContractAttribute).Assembly
+        };
     });
 
     internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
@@ -29,17 +31,11 @@ internal static class AssemblyUtils
         // Parse the source code
         var syntaxTree = CSharpSyntaxTree.ParseText(code, cancellationToken: cancellationToken);
 
-        var references = new List<MetadataReference>();
-        foreach (var requiredAssembly in RequiredAssemblies.Value)
-        {
-            references.Add(await metadataReferenceService.CreateAsync(requiredAssembly, cancellationToken).ConfigureAwait(false));
-        }
-
         // Create a compilation
         var compilation = CSharpCompilation.Create(
             assemblyName,
             new[] { syntaxTree },
-            references,
+            await CreateMetadataReferences(metadataReferenceService, cancellationToken).ConfigureAwait(false),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
@@ -60,6 +56,17 @@ internal static class AssemblyUtils
 
         // Load assembly
         return Assembly.Load(stream.ToArray());
+    }
+
+    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferences(IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
+    {
+        var references = new List<MetadataReference>();
+        foreach (var requiredAssembly in RequiredAssemblies.Value)
+        {
+            references.Add(await metadataReferenceService.CreateAsync(requiredAssembly, cancellationToken).ConfigureAwait(false));
+        }
+
+        return references;
     }
 
     internal static Type GetType(Assembly assembly, string inputTypeFullName)

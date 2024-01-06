@@ -2,6 +2,7 @@ using Blazorise;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
 using Blazorise.RichTextEdit;
+using HighlightBlazor;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ProtoBufJsonConverter.Services;
@@ -17,6 +18,7 @@ public class Program
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
         builder.Services
+            .AddHighlight()
             .AddBlazorise(options =>
             {
                 options.Immediate = true;
