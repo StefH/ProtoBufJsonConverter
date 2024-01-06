@@ -1,3 +1,7 @@
+# 0.1.0 (06 January 2024)
+- [#7](https://github.com/StefH/ProtoBufJsonConverter/pull/7) - Change methods to Async + add Blazor examples [enhancement] contributed by [StefH](https://github.com/StefH)
+- [#8](https://github.com/StefH/ProtoBufJsonConverter/pull/8) - Run Unit Tests in CI [Test] contributed by [StefH](https://github.com/StefH)
+
 # 0.0.6 (28 December 2023)
 - [#6](https://github.com/StefH/ProtoBufJsonConverter/pull/6) - Add logic to add a GrpcHeader to the protobuf byte-array [enhancement] contributed by [StefH](https://github.com/StefH)
 

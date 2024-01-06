@@ -1,4 +1,5 @@
-# 0.0.6 (28 December 2023)
-- #6 Add logic to add a GrpcHeader to the protobuf byte-array [enhancement]
+# 0.1.0 (06 January 2024)
+- #7 Change methods to Async + add Blazor examples [enhancement]
+- #8 Run Unit Tests in CI [Test]
 
 The full release notes can be found here: https://github.com/StefH/ProtoBufJsonConverter/blob/main/ReleaseNotes.md
