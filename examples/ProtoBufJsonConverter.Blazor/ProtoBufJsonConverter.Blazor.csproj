@@ -20,15 +20,4 @@
 		<ProjectReference Include="..\..\src\ProtoBufJsonConverter\ProtoBufJsonConverter.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Content Update="wwwroot\favicon.png">
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</Content>
-		<Content Update="wwwroot\icon-192.png">
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</Content>
-	</ItemGroup>
-
 </Project>

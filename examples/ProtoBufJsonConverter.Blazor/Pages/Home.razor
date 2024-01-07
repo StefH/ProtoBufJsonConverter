@@ -11,7 +11,10 @@
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is1">ProtoDefinition</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is11">
-                <MemoEdit @bind-Text="@_protoDefinition" Rows="30" Size="Size.Small" />
+                @* <MemoEdit @bind-Text="@_protoDefinition" Rows="30" Size="Size.Small" /> *@
+                <div class="form-group flex-grow-1 h-100">
+                    <MonacoEditor @ref="_protoEditor" Language="protobuf" @bind-Content="_protoDefinition"></MonacoEditor>
+                </div>
             </FieldBody>
         </Field>
 

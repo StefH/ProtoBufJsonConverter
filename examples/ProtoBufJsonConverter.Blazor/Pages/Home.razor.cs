@@ -1,6 +1,7 @@
 ﻿using Blazorise;
 using JsonConverter.Abstractions;
 using Microsoft.AspNetCore.Components;
+using ProtoBufJsonConverter.Blazor.Components;
 using ProtoBufJsonConverter.Blazor.Enums;
 using ProtoBufJsonConverter.Models;
 
@@ -13,6 +14,8 @@ public partial class Home
 
     [Inject]
     public required IConverter Converter { get; set; }
+
+    private MonacoEditor _protoEditor = null!;
 
     private State _state = State.None;
     private string _error = string.Empty;
