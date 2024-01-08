@@ -1,0 +1,36 @@
+@namespace Skclusive.Script.Prism
+@inherits EventComponentBase
+<pre><code
+        @ref="@_codeRef"
+        class="@__Class"
+        style="@_Style"></code></pre>
+@code
+{
+    private ElementReference _codeRef;
+
+    [Parameter]
+    public string Code { set; get; }
+
+    [Parameter]
+    public string Language { set; get; } = "jsx";
+
+    [Inject]
+    public IPrismHighlighter Highlighter { set; get; }
+
+    private string __Class => $"{_Class} language-{Language}";
+
+    protected override async Task OnAfterMountAsync()
+    {
+        await HighlightAsync();
+    }
+
+    protected override async Task OnAfterUpdateAsync()
+    {
+        await HighlightAsync();
+    }
+
+    private async Task HighlightAsync()
+    {
+        await Highlighter.HighlighterAsync(_codeRef, Code, Language);
+    }
+}

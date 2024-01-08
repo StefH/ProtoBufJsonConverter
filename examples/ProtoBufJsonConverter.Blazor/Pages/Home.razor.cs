@@ -29,6 +29,18 @@ public partial class Home
 
     private bool IsProcessing => _state == State.Processing;
 
+    //private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    //{
+    //    return new StandaloneEditorConstructionOptions
+    //    {
+    //        AutomaticLayout = true,
+    //        Language = "javascript",
+    //        Value = "function xyz() {\n" +
+    //                "   console.log(\"Hello world!\");\n" +
+    //                "}"
+    //    };
+    //}
+
     protected override async Task OnInitializedAsync()
     {
         _protoDefinition = await Client.GetStringAsync("greet.proto");

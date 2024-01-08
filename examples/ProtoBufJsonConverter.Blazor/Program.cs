@@ -6,6 +6,8 @@ using HighlightBlazor;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using ProtoBufJsonConverter.Services;
+using Skclusive.Core.Component;
+using Skclusive.Script.Prism;
 
 namespace ProtoBufJsonConverter.Blazor;
 
@@ -25,7 +27,10 @@ public class Program
             })
             .AddBootstrap5Providers()
             .AddFontAwesomeIcons()
-            .AddBlazoriseRichTextEdit();
+            .AddBlazoriseRichTextEdit()
+            .TryAddPrismServices(new CoreConfigBuilder()
+                .WithIsServer(false)
+                .Build());
 
         builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
         builder.Services.AddSingleton<IMetadataReferenceService, BlazorWasmMetadataReferenceService>();

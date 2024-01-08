@@ -14,10 +14,12 @@
 		<PackageReference Include="HighlightBlazor" Version="0.1.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" PrivateAssets="all" />
+
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\ProtoBufJsonConverter\ProtoBufJsonConverter.csproj" />
+		<ProjectReference Include="..\Skclusive.Script.Prism-master\src\Prism.csproj" />
 	</ItemGroup>
 
 </Project>
