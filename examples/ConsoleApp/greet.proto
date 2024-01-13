@@ -26,3 +26,9 @@ message Other {
 message HelloReply {
   string message = 1;
 }
+
+message Person {
+  string name = 1;
+  int32 id = 2;
+  string email = 3;
+}

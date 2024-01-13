@@ -45,6 +45,21 @@ public class DynamicProtoLoader
             .WithGrpcHeader(true);
         var protobuf4WithGrpcHeader = await converter.ConvertAsync(convertToProtoBufRequestWithGrpcHeader);
 
-        int x = 9;
+        var person = new
+        {
+            Name = "stef heyenrath",
+            Id = 42,
+            Email = "info@mstack.nl"
+        };
+
+        var convertToProtoBufRequestPerson = new ConvertToProtoBufRequest(protoDefinition, "greet.Person", person);
+        var protobuf3PersonBytes = await converter.ConvertAsync(convertToProtoBufRequestPerson);
+        var personAsString = ByteArrayToString(protobuf3PersonBytes);
+        int x = 0;
+    }
+
+    public static string ByteArrayToString(byte[] byteArray)
+    {
+        return string.Join(", ", byteArray.Select(b => $"0x{b:X2}"));
     }
 }
