@@ -181,5 +181,5 @@ For a full example, see [examples/ProtoBufJsonConverter.Blazor](https://github.c
 ---
 
 ## Examples
-- [Blazor WASM](https://wonderful-beach-0d16cee03.4.azurestaticapps.net/)
+- [Blazor WASM](https://protobuf.heyenrath.nl)
 - [Blazor Static Web App](https://zealous-desert-029b2f003.4.azurestaticapps.net/)
