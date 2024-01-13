@@ -33,18 +33,20 @@ public class WebcilConverter
         
 
         wrapper.WriteWasmWrappedWebcil(outputWasmStream);
-        // outputWasmStream.Flush();
+        outputWasmStream.Flush();
         outputWasmStream.Seek(0, SeekOrigin.Begin);
+
+        // ---
 
         var out2 = new MemoryStream();
         outputWasmStream.CopyTo(out2);
         out2.Seek(0, SeekOrigin.Begin);
         outputWasmStream.Seek(0, SeekOrigin.Begin);
 
-        var x = new WasmWebcilUnwrapper(out2);
-        var newS = new MemoryStream();
+        var unwrapper = new WasmWebcilUnwrapper(out2);
 
-        x.WriteUnwrapped(newS);
+        var newS = new MemoryStream();
+        unwrapper.WriteUnwrapped(newS);
         newS.Flush();
 
         var newA = newS.ToArray();
@@ -52,18 +54,17 @@ public class WebcilConverter
 
         bool isEqual = origA.SequenceEqual(newA);
 
-
         newS.Seek(0, SeekOrigin.Begin);
-        var WebcilHeader = ReadHeader(newS);
-        var WebcilSectionHeaders = ReadSectionHeaders(newS, WebcilHeader.coff_sections);
+        var webcilHeader = ReadHeader(newS);
+        var webcilSectionHeaders = ReadSectionHeaders(newS, webcilHeader.coff_sections);
 
         var newDllStream = new MemoryStream();
-
-        foreach (var peHeader in WebcilSectionHeaders)
+        foreach (var webcilSectionHeader in webcilSectionHeaders)
         {
-            var buffer = new byte[peHeader.SizeOfRawData];
-            newS.Seek(peHeader.PointerToRawData, SeekOrigin.Begin);
+            var buffer = new byte[webcilSectionHeader.SizeOfRawData];
+            newS.Seek(webcilSectionHeader.PointerToRawData, SeekOrigin.Begin);
             ReadExactly(newS, buffer);
+
             newDllStream.Write(buffer, 0, buffer.Length);
         }
         newDllStream.Flush();
