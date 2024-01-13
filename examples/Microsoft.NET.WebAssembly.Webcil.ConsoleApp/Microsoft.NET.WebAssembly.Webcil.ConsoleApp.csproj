@@ -9,11 +9,23 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="PEReader2.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--<ProjectReference Include="..\Microsoft.NET.WebAssembly.Webcil\Microsoft.NET.WebAssembly.Webcil.csproj" />-->
+	  <ProjectReference Include="..\..\src\ProtoBufJsonConverter\ProtoBufJsonConverter.csproj" />
+
+	  <ProjectReference Include="..\ProtoBufJsonConverter.Blazor\ProtoBufJsonConverter.Blazor.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="TestClass1.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Compile>
 	</ItemGroup>
 
 </Project>

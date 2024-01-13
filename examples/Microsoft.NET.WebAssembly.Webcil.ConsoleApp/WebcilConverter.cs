@@ -1,8 +1,12 @@
 ﻿using System.Buffers.Binary;
 using System.Collections.Immutable;
+using System.IO;
+using System.Reflection;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using ProtoBuf;
 
 namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
@@ -51,7 +55,7 @@ public class WebcilConverter
 
         var newA = newS.ToArray();
         var origA = mem2.ToArray();
-
+        
         bool isEqual = origA.SequenceEqual(newA);
 
         newS.Seek(0, SeekOrigin.Begin);
@@ -59,6 +63,23 @@ public class WebcilConverter
         var webcilSectionHeaders = ReadSectionHeaders(newS, webcilHeader.coff_sections);
 
         var newDllStream = new MemoryStream();
+
+        /* PE headers
+        Name    VirtualSize VirtualAddress  SizeOfRawData   PointerToRawData    PointerToRelocations;SectionHeader.PointerToLineNumbers;SectionHeader.NumberOfRelocations;SectionHeader.NumberOfLineNumbers;SectionHeader.SectionCharacteristics
+        .text   31624       8192            31744           512                 0;0;0;0;"ContainsCode, MemExecute, MemRead"
+        .rsrc   1896        40960           2048            32256               0;0;0;0;"ContainsInitializedData, MemRead"
+        .reloc  12          49152           512             34304               0;0;0;0;"ContainsInitializedData, MemDiscardable, MemRead"
+        */
+
+
+        /* webcil headers
+
+                VirtualSize VirtualAddress  SizeOfRawData   PointerToRawData
+                31624       8192            31744           76
+                1896        40960           2048            31820
+                12          49152           512             33868
+         */
+
         foreach (var webcilSectionHeader in webcilSectionHeaders)
         {
             var buffer = new byte[webcilSectionHeader.SizeOfRawData];
@@ -73,17 +94,67 @@ public class WebcilConverter
         inputDllStream.Seek(0, SeekOrigin.Begin);
 
         var newDllBytes = newDllStream.ToArray();
+        var newDllBytesLen = newDllBytes.Length;
         var dllBytes = inputDllStream.ToArray();
-
-        File.WriteAllBytes(@"c:\temp\new.dll", newDllBytes);
+        var dllBytesLen = dllBytes.Length;
+        var diff = dllBytesLen - newDllBytesLen;
 
         bool isEqual2 = dllBytes.SequenceEqual(newDllBytes);
 
+        File.WriteAllBytes(@"c:\temp\new.dll", newDllBytes);
+        
         var m1 = MetadataReference.CreateFromImage(dllBytes);
         var m2 = MetadataReference.CreateFromImage(newDllBytes);
 
-        int y = 0;
+        var references = RequiredAssemblies.Value.Select(requiredAssembly => MetadataReference.CreateFromFile(requiredAssembly.Location)).Cast<MetadataReference>().ToList();
+        references.Add(m2);
+
+        var assemblyName = Path.GetRandomFileName();
+
+        // Parse the source code
+        var syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText("TestClass1.cs"));
+
+        // Create a compilation
+        var compilation = CSharpCompilation.Create(
+            assemblyName,
+            new[] { syntaxTree },
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+        );
+
+        // Compile the source code
+        using var codeStream = new MemoryStream();
+
+        // Wrap this in a task to avoid Blazor Startup Error: System.Threading.SynchronizationLockException: Cannot wait on monitors on this runtime
+        var result = compilation.Emit(codeStream);
+
+        if (!result.Success)
+        {
+            var failures = result
+                .Diagnostics
+                .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
+
+            throw new InvalidOperationException($"Unable to compile the code. Errors: {string.Join(",", failures.Select(f => $"{f.Id}-{f.GetMessage()}"))}");
+        }
+
+        var a = Assembly.Load(codeStream.ToArray());
+
+        int xxxx = 0;
     }
+
+    private static readonly Lazy<IReadOnlyList<Assembly>> RequiredAssemblies = new(() =>
+    {
+        var assemblySystemRuntime = Assembly.GetEntryAssembly()!
+            .GetReferencedAssemblies()
+            .First(a => a.Name == "System.Runtime");
+
+        return new List<Assembly>
+        {
+            Assembly.Load(assemblySystemRuntime),
+            typeof(object).Assembly,
+            typeof(ProtoContractAttribute).Assembly
+        };
+    });
 
     private static ImmutableArray<WebcilSectionHeader> ReadSectionHeaders(Stream s, int sectionsHeaders)
     {
@@ -175,7 +246,7 @@ public class WebcilConverter
     {
         var headers = peReader.PEHeaders;
         var peHeader = headers.PEHeader!;
-        var coffHeader = headers.CoffHeader!;
+        var coffHeader = headers.CoffHeader;
         var sections = headers.SectionHeaders;
         WebcilHeader header;
         header.id[0] = (byte)'W';

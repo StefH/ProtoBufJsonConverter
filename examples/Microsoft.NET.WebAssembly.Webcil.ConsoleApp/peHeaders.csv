@@ -1,0 +1,4 @@
+﻿SectionHeader;SectionHeader.Name;SectionHeader.VirtualSize;SectionHeader.VirtualAddress;SectionHeader.SizeOfRawData;SectionHeader.PointerToRawData;SectionHeader.PointerToRelocations;SectionHeader.PointerToLineNumbers;SectionHeader.NumberOfRelocations;SectionHeader.NumberOfLineNumbers;SectionHeader.SectionCharacteristics
+System.Reflection.PortableExecutable.SectionHeader;.text;31624;8192;31744;512;0;0;0;0;"ContainsCode, MemExecute, MemRead"
+System.Reflection.PortableExecutable.SectionHeader;.rsrc;1896;40960;2048;32256;0;0;0;0;"ContainsInitializedData, MemRead"
+System.Reflection.PortableExecutable.SectionHeader;.reloc;12;49152;512;34304;0;0;0;0;"ContainsInitializedData, MemDiscardable, MemRead"

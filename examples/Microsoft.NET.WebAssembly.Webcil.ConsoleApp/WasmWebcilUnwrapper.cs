@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
+﻿namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
 public class WasmWebcilUnwrapper
 {
@@ -15,12 +12,10 @@ public class WasmWebcilUnwrapper
     public void WriteUnwrapped(Stream outputStream)
     {
         ValidateWasmPrefix();
-        // ExtractAndWriteWebcilPayload(outputStream);
-        using (var reader = new BinaryReader(_wasmStream, System.Text.Encoding.UTF8, leaveOpen: true))
-        {
-            var bytes = ReadDataSection(reader);
-            outputStream.Write(bytes);
-        }
+
+        using var reader = new BinaryReader(_wasmStream, System.Text.Encoding.UTF8, leaveOpen: true);
+        var bytes = ReadDataSection(reader);
+        outputStream.Write(bytes);
     }
 
     private void ValidateWasmPrefix()
@@ -43,22 +38,29 @@ public class WasmWebcilUnwrapper
         }
     }
 
-    private void SkipSection(BinaryReader reader)
+    private static void SkipSection(BinaryReader reader)
     {
-        uint size = ULEB128Decode(reader);
+        var size = ULEB128Decode(reader);
         reader.BaseStream.Seek(size, SeekOrigin.Current);
     }
 
-    private byte[] ReadDataSection(BinaryReader reader)
+    private static byte[] ReadDataSection(BinaryReader reader)
     {
         // Skip until we find the data section, which contains the Webcil payload.
         byte[] buffer = new byte[1];
         while (true)
         {
-            reader.Read(buffer, 0, 1);
+            var dataRead = reader.Read(buffer, 0, 1);
+            if (dataRead == 0)
+            {
+                throw new InvalidOperationException();
+            }
+
             // Check for the Data section (ID = 11)
             if (buffer[0] == 11)
+            {
                 break;
+            }
 
             // Skip other sections by reading and ignoring their content.
             SkipSection(reader);

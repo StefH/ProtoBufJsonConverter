@@ -1,7 +1,4 @@
-﻿using System.Reflection;
-using System.Reflection.Metadata;
-
-namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
+﻿namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
 internal class Program
 {
