@@ -2,8 +2,8 @@
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Reflection.PortableExecutable;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
@@ -68,7 +68,7 @@ public class WebcilConverter
         .rsrc   1896        40960           2048            32256               0;0;0;0;"ContainsInitializedData, MemRead"
         .reloc  12          49152           512             34304               0;0;0;0;"ContainsInitializedData, MemDiscardable, MemRead"
         */
-        
+
         /* webcil headers
 
                 VirtualSize VirtualAddress  SizeOfRawData   PointerToRawData
@@ -104,13 +104,13 @@ public class WebcilConverter
 
         var msdos_stub = new byte[]
         {
-            0x0E, 0x1F, 0xBA, 0x0E, 0x00, 0xB4, 0x09, 0xCD, 0x21, 0xB8, 0x01, 0x4C, 0xCD, 0x21, 0x54, 0x68, 
-            0x69, 0x73, 0x20, 0x70, 0x72, 0x6F, 0x67, 0x72, 0x61, 0x6D, 0x20, 0x63, 0x61, 0x6E, 0x6E, 0x6F, 
-            0x74, 0x20, 0x62, 0x65, 0x20, 0x72, 0x75, 0x6E, 0x20, 0x69, 0x6E, 0x20, 0x44, 0x4F, 0x53, 0x20, 
+            0x0E, 0x1F, 0xBA, 0x0E, 0x00, 0xB4, 0x09, 0xCD, 0x21, 0xB8, 0x01, 0x4C, 0xCD, 0x21, 0x54, 0x68,
+            0x69, 0x73, 0x20, 0x70, 0x72, 0x6F, 0x67, 0x72, 0x61, 0x6D, 0x20, 0x63, 0x61, 0x6E, 0x6E, 0x6F,
+            0x74, 0x20, 0x62, 0x65, 0x20, 0x72, 0x75, 0x6E, 0x20, 0x69, 0x6E, 0x20, 0x44, 0x4F, 0x53, 0x20,
             0x6D, 0x6F, 0x64, 0x65, 0x2E, 0x0D, 0x0D, 0x0A, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
         newDllStream.Write(msdos_stub);
-
+        
         var IMAGE_NT_HEADERS32 = new IMAGE_NT_HEADERS32
         {
             Signature = 0x4550,
@@ -129,10 +129,10 @@ public class WebcilConverter
                 Magic = 0x010B, // Signature/Magic - Represents PE32 for 32-bit (0x10b) and PE32+ for 64-bit (0x20B) 
                 MajorLinkerVersion = 0x30,
                 MinorLinkerVersion = 0,
-                SizeOfCode = (uint) webcilSectionHeaders[0].SizeOfRawData,
+                SizeOfCode = (uint)webcilSectionHeaders[0].SizeOfRawData,
                 SizeOfInitializedData = (uint)(webcilSectionHeaders[1].SizeOfRawData + webcilSectionHeaders[2].SizeOfRawData),
                 SizeOfUninitializedData = 0,
-                AddressOfEntryPoint = 0x9B82, // TODO = 39810  (1150?)
+                AddressOfEntryPoint = 0x9B82, // TODO = 39810
                 BaseOfCode = 0x2000,
                 BaseOfData = 0xA000,
                 ImageBase = 0x400000, // The default value for applications is 0x00400000
@@ -146,7 +146,7 @@ public class WebcilConverter
                 MinorSubsystemVersion = 0,
                 Win32VersionValue = 0,
                 SizeOfImage = 0xE000, // TODO
-                SizeOfHeaders = 0x0200, // TODO
+                SizeOfHeaders = GetSizeOfHeaders(IMAGE_DOS_HEADER),
                 CheckSum = 0,
                 Subsystem = 3, // IMAGE_SUBSYSTEM_WINDOWS_CUI
                 DllCharacteristics = 0x8560,
@@ -257,6 +257,22 @@ public class WebcilConverter
         //var a = Assembly.Load(codeStream.ToArray());
 
         int xxxx = 0;
+    }
+
+    private static uint GetSizeOfHeaders(IMAGE_DOS_HEADER IMAGE_DOS_HEADER)
+    {
+        int soh = IMAGE_DOS_HEADER.FileAddressOfNewExeHeader + // e_lfanew member of IMAGE_DOS_HEADER
+                  sizeof(uint) + // 4 byte signature
+                  Unsafe.SizeOf<IMAGE_FILE_HEADER>() + // size of IMAGE_FILE_HEADER
+                  Unsafe.SizeOf<IMAGE_OPTIONAL_HEADER32>() + // size of optional header
+                  (3 * Unsafe.SizeOf<IMAGE_SECTION_HEADER>()) // size of all section headers
+            ;
+        if (soh < 512)
+        {
+            soh = 512;
+        }
+
+        return (uint)soh;
     }
 
     public static byte[] StructToBytes<T>(T structData) where T : struct
