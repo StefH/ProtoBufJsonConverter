@@ -110,7 +110,8 @@ public class WebcilConverter
             0x6D, 0x6F, 0x64, 0x65, 0x2E, 0x0D, 0x0D, 0x0A, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
         newDllStream.Write(msdos_stub);
-        
+
+        uint fileAlignment = 0x0200;
         var IMAGE_NT_HEADERS32 = new IMAGE_NT_HEADERS32
         {
             Signature = 0x4550,
@@ -137,7 +138,7 @@ public class WebcilConverter
                 BaseOfData = 0xA000,
                 ImageBase = 0x400000, // The default value for applications is 0x00400000
                 SectionAlignment = 0x2000,
-                FileAlignment = 0x0200,
+                FileAlignment = fileAlignment,
                 MajorOperatingSystemVersion = 4,
                 MinorOperatingSystemVersion = 0,
                 MajorImageVersion = 0,
@@ -181,7 +182,12 @@ public class WebcilConverter
 
         var IMAGE_SECTION_HEADER_text = new IMAGE_SECTION_HEADER
         {
-            Name = new byte[8] { 0x00, 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00 }
+            Name = new byte[8] { 0x00, 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00 },
+            VirtualSize = (uint) webcilSectionHeaders[0].VirtualSize,
+            VirtualAddress = (uint)webcilSectionHeaders[0].VirtualAddress,
+            SizeOfRawData = (uint)webcilSectionHeaders[0].SizeOfRawData,
+            PointerToRawData = GetSectionHeaderPointerToRawData(webcilSectionHeaders[0], fileAlignment),
+            Characteristics = 0x60000020
         };
         newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_text));
 
@@ -257,6 +263,11 @@ public class WebcilConverter
         //var a = Assembly.Load(codeStream.ToArray());
 
         int xxxx = 0;
+    }
+
+    private static uint GetSectionHeaderPointerToRawData(WebcilSectionHeader webcilSectionHeader, uint fileAlignment)
+    {
+        return webcilSectionHeader.PointerToRawData < fileAlignment ? fileAlignment : (uint) webcilSectionHeader.PointerToRawData;
     }
 
     private static uint GetSizeOfHeaders(IMAGE_DOS_HEADER IMAGE_DOS_HEADER)

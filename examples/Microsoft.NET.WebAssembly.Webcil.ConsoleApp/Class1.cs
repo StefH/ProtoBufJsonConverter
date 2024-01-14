@@ -169,23 +169,52 @@ public struct IMAGE_SECTION_HEADER
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
     public byte[] Name;
 
-    public UnionType Misc;
+    //public UnionType Misc;
 
+    /// <summary>
+    /// The total size of the section when loaded into memory, in bytes. If this value is greater than the SizeOfRawData member, the section is filled with zeroes.
+    /// This field is valid only for executable images and should be set to 0 for object files.
+    /// </summary>
+    public uint VirtualSize;
+
+    /// <summary>
+    /// The address of the first byte of the section when loaded into memory, relative to the image base.
+    /// For object files, this is the address of the first byte before relocation is applied.
+    /// </summary>
     public uint VirtualAddress;
+
+    /// <summary>
+    /// The size of the initialized data on disk, in bytes.
+    /// This value must be a multiple of the FileAlignment member of the IMAGE_OPTIONAL_HEADER structure.
+    /// If this value is less than the VirtualSize member, the remainder of the section is filled with zeroes.
+    /// If the section contains only uninitialized data, the member is zero.
+    /// </summary>
     public uint SizeOfRawData;
+
+    /// <summary>
+    /// A file pointer to the first page within the COFF file.
+    /// This value must be a multiple of the FileAlignment member of the IMAGE_OPTIONAL_HEADER structure.
+    /// If a section contains only uninitialized data, set this member is zero.
+    /// </summary>
     public uint PointerToRawData;
+
     public uint PointerToRelocations;
+
     public uint PointerToLinenumbers;
+
     public ushort NumberOfRelocations;
+
     public ushort NumberOfLinenumbers;
+
     public uint Characteristics;
 
-    [StructLayout(LayoutKind.Explicit)]
-    public struct UnionType
-    {
-        [FieldOffset(0)]
-        public uint PhysicalAddress;
-        [FieldOffset(0)]
-        public uint VirtualSize;
-    }
+    //[StructLayout(LayoutKind.Explicit)]
+    //public struct UnionType
+    //{
+    //    [FieldOffset(0)]
+    //    public uint PhysicalAddress;
+
+    //    [FieldOffset(0)]
+    //    public uint VirtualSize;
+    //}
 }
