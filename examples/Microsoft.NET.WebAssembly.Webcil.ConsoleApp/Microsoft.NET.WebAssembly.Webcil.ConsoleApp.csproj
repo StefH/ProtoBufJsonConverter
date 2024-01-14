@@ -14,6 +14,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
+		<PackageReference Include="Span.ReaderWriter" Version="0.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>

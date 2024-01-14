@@ -1,9 +1,9 @@
 ﻿using System.Buffers.Binary;
 using System.Collections.Immutable;
-using System.IO;
 using System.Reflection;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
@@ -20,7 +20,7 @@ public class WebcilConverter
         {
             GatherInfo(peReader, out wcInfo, out peInfo);
         }
-        
+
         // if wrapping in WASM, write the webcil payload to memory because we need to discover the length
         // webcil is about the same size as the PE file
         using var memoryStream = new MemoryStream(checked((int)inputDllStream.Length));
@@ -34,7 +34,7 @@ public class WebcilConverter
         memoryStream.CopyTo(mem2);
         mem2.Seek(0, SeekOrigin.Begin);
         memoryStream.Seek(0, SeekOrigin.Begin);
-        
+
 
         wrapper.WriteWasmWrappedWebcil(outputWasmStream);
         outputWasmStream.Flush();
@@ -55,14 +55,12 @@ public class WebcilConverter
 
         var newA = newS.ToArray();
         var origA = mem2.ToArray();
-        
+
         bool isEqual = origA.SequenceEqual(newA);
 
         newS.Seek(0, SeekOrigin.Begin);
         var webcilHeader = ReadHeader(newS);
         var webcilSectionHeaders = ReadSectionHeaders(newS, webcilHeader.coff_sections);
-
-        var newDllStream = new MemoryStream();
 
         /* PE headers
         Name    VirtualSize VirtualAddress  SizeOfRawData   PointerToRawData    PointerToRelocations;SectionHeader.PointerToLineNumbers;SectionHeader.NumberOfRelocations;SectionHeader.NumberOfLineNumbers;SectionHeader.SectionCharacteristics
@@ -70,8 +68,7 @@ public class WebcilConverter
         .rsrc   1896        40960           2048            32256               0;0;0;0;"ContainsInitializedData, MemRead"
         .reloc  12          49152           512             34304               0;0;0;0;"ContainsInitializedData, MemDiscardable, MemRead"
         */
-
-
+        
         /* webcil headers
 
                 VirtualSize VirtualAddress  SizeOfRawData   PointerToRawData
@@ -80,13 +77,133 @@ public class WebcilConverter
                 12          49152           512             33868
          */
 
+        var newDllStream = new MemoryStream();
+        var IMAGE_DOS_HEADER = new IMAGE_DOS_HEADER
+        {
+            MagicNumber = 0x5A4D, // The value “MZ” are the initials of the PE designer Mark Zbikowski
+            BytesOnLastPageOfFile = 0x90,
+            PagesInFile = 3,
+            Relocations = 0,
+            SizeOfHeaderInParagraphs = 4,
+            MinimumExtraParagraphs = 0,
+            MaximumExtraParagraphs = 0xFFFF,
+            InitialSS = 0,
+            InitialSP = 0xB8,
+            Checksum = 0,
+            InitialIP = 0,
+            InitialCS = 0,
+            AddressOfRelocationTable = 0x40,
+            OverlayNumber = 0,
+            ReservedWords1 = new ushort[] { 0, 0, 0, 0 },
+            OEMIdentifier = 0,
+            OEMInformation = 0,
+            ReservedWords2 = new ushort[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            FileAddressOfNewExeHeader = 0x80
+        };
+        newDllStream.Write(StructToBytes(IMAGE_DOS_HEADER));
+
+        var msdos_stub = new byte[]
+        {
+            0x0E, 0x1F, 0xBA, 0x0E, 0x00, 0xB4, 0x09, 0xCD, 0x21, 0xB8, 0x01, 0x4C, 0xCD, 0x21, 0x54, 0x68, 
+            0x69, 0x73, 0x20, 0x70, 0x72, 0x6F, 0x67, 0x72, 0x61, 0x6D, 0x20, 0x63, 0x61, 0x6E, 0x6E, 0x6F, 
+            0x74, 0x20, 0x62, 0x65, 0x20, 0x72, 0x75, 0x6E, 0x20, 0x69, 0x6E, 0x20, 0x44, 0x4F, 0x53, 0x20, 
+            0x6D, 0x6F, 0x64, 0x65, 0x2E, 0x0D, 0x0D, 0x0A, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+        newDllStream.Write(msdos_stub);
+
+        var IMAGE_NT_HEADERS32 = new IMAGE_NT_HEADERS32
+        {
+            Signature = 0x4550,
+            FileHeader = new IMAGE_FILE_HEADER
+            {
+                Machine = 0x014C,
+                NumberOfSections = 3,
+                TimeDateStamp = 0xF5192B61,
+                PointerToSymbolTable = 0,
+                NumberOfSymbols = 0,
+                SizeOfOptionalHeader = 0x00E0,
+                Characteristics = 0x0022
+            },
+            OptionalHeader = new IMAGE_OPTIONAL_HEADER32
+            {
+                Magic = 0x010B, // Signature/Magic - Represents PE32 for 32-bit (0x10b) and PE32+ for 64-bit (0x20B) 
+                MajorLinkerVersion = 0x30,
+                MinorLinkerVersion = 0,
+                SizeOfCode = (uint) webcilSectionHeaders[0].SizeOfRawData,
+                SizeOfInitializedData = (uint)(webcilSectionHeaders[1].SizeOfRawData + webcilSectionHeaders[2].SizeOfRawData),
+                SizeOfUninitializedData = 0,
+                AddressOfEntryPoint = 0x9B82, // TODO = 39810  (1150?)
+                BaseOfCode = 0x2000,
+                BaseOfData = 0xA000,
+                ImageBase = 0x400000, // The default value for applications is 0x00400000
+                SectionAlignment = 0x2000,
+                FileAlignment = 0x0200,
+                MajorOperatingSystemVersion = 4,
+                MinorOperatingSystemVersion = 0,
+                MajorImageVersion = 0,
+                MinorImageVersion = 0,
+                MajorSubsystemVersion = 4,
+                MinorSubsystemVersion = 0,
+                Win32VersionValue = 0,
+                SizeOfImage = 0xE000, // TODO
+                SizeOfHeaders = 0x0200, // TODO
+                CheckSum = 0,
+                Subsystem = 3, // IMAGE_SUBSYSTEM_WINDOWS_CUI
+                DllCharacteristics = 0x8560,
+                SizeOfStackReserve = 0x100000,
+                SizeOfStackCommit = 0x1000,
+                SizeOfHeapReserve = 0x100000,
+                SizeOfHeapCommit = 0x1000,
+                LoaderFlags = 0,
+                NumberOfRvaAndSizes = 0x10,
+                DataDirectory = new IMAGE_DATA_DIRECTORY[0x10]
+                {
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { Size = 0x4F, VirtualAddress = 39727 }, // TODO IMAGE_DIRECTORY_ENTRY_IMPORT 39727
+                    new IMAGE_DATA_DIRECTORY { Size = 1, VirtualAddress = 1 }, // TODO IMAGE_DIRECTORY_ENTRY_RESOURCE
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { },
+                    new IMAGE_DATA_DIRECTORY { }
+                }
+            }
+        };
+        newDllStream.Write(StructToBytes(IMAGE_NT_HEADERS32));
+
+        var IMAGE_SECTION_HEADER_text = new IMAGE_SECTION_HEADER
+        {
+            Name = new byte[8] { 0x00, 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00 }
+        };
+        newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_text));
+
+        var IMAGE_SECTION_HEADER_rsrc = new IMAGE_SECTION_HEADER
+        {
+
+        };
+        newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_rsrc));
+
+        var IMAGE_SECTION_HEADER_reloc = new IMAGE_SECTION_HEADER
+        {
+
+        };
+        newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_reloc));
+
         foreach (var webcilSectionHeader in webcilSectionHeaders)
         {
             var buffer = new byte[webcilSectionHeader.SizeOfRawData];
             newS.Seek(webcilSectionHeader.PointerToRawData, SeekOrigin.Begin);
             ReadExactly(newS, buffer);
 
-            newDllStream.Write(buffer, 0, buffer.Length);
+            //newDllStream.Write(buffer, 0, buffer.Length);
         }
         newDllStream.Flush();
         newDllStream.Seek(0, SeekOrigin.Begin);
@@ -102,7 +219,7 @@ public class WebcilConverter
         bool isEqual2 = dllBytes.SequenceEqual(newDllBytes);
 
         File.WriteAllBytes(@"c:\temp\new.dll", newDllBytes);
-        
+
         var m1 = MetadataReference.CreateFromImage(dllBytes);
         var m2 = MetadataReference.CreateFromImage(newDllBytes);
 
@@ -134,12 +251,31 @@ public class WebcilConverter
                 .Diagnostics
                 .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
 
-            throw new InvalidOperationException($"Unable to compile the code. Errors: {string.Join(",", failures.Select(f => $"{f.Id}-{f.GetMessage()}"))}");
+            //throw new InvalidOperationException($"Unable to compile the code. Errors: {string.Join(",", failures.Select(f => $"{f.Id}-{f.GetMessage()}"))}");
         }
 
-        var a = Assembly.Load(codeStream.ToArray());
+        //var a = Assembly.Load(codeStream.ToArray());
 
         int xxxx = 0;
+    }
+
+    public static byte[] StructToBytes<T>(T structData) where T : struct
+    {
+        int size = Marshal.SizeOf(structData);
+        byte[] byteArray = new byte[size];
+        IntPtr ptr = Marshal.AllocHGlobal(size);
+
+        try
+        {
+            Marshal.StructureToPtr(structData, ptr, false);
+            Marshal.Copy(ptr, byteArray, 0, size);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(ptr);
+        }
+
+        return byteArray;
     }
 
     private static readonly Lazy<IReadOnlyList<Assembly>> RequiredAssemblies = new(() =>
@@ -163,7 +299,7 @@ public class WebcilConverter
         {
             result.Add(ReadSectionHeader(s));
         }
-        
+
         return ImmutableArray.Create(result.ToArray());
     }
 
@@ -599,5 +735,22 @@ public class WebcilConverter
             SizeOfRawData = sizeOfRawData;
             PointerToRawData = pointerToRawData;
         }
+    }
+
+    // stef
+    private static uint ReadULEB128(Stream stream)
+    {
+        uint result = 0;
+        int shift = 0;
+        byte byteVal;
+
+        do
+        {
+            byteVal = (byte)stream.ReadByte();
+            result |= (uint)(byteVal & 0x7F) << shift;
+            shift += 7;
+        } while ((byteVal & 0x80) != 0);
+
+        return result;
     }
 }
