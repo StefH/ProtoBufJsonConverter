@@ -35,6 +35,18 @@ message HelloReply {
 
 ### :one: Convert ProtoBuf `byte[]` to a JSON `string`
 
+``` mermaid
+---
+title: "Convert ProtoBuf byte[] to a JSON string"
+---
+flowchart LR
+	Def["ProtoBuf Definition\n(.proto)"] --> protobuf_net["protobuf-net:\nGenerate C# code"]
+	Bytes["ProtoBuf bytes"] --> Des["protobuf-net:\nDeserialize ProtoBuf bytes to object"]
+	protobuf_net --> CodeCompile["Compile C# code\nto Assembly"]
+	CodeCompile --> Des
+	Des --> JSON2OBJ["Convert object to JSON"]
+```
+
 #### Code
 ``` csharp
 var protoDefinition = "...". // See above
