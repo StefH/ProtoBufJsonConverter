@@ -40,10 +40,12 @@ message HelloReply {
 title: "Convert ProtoBuf byte[] to a JSON string"
 ---
 flowchart LR
-	Def["ProtoBuf Definition\n(.proto)"] --> protobuf_net["protobuf-net:\nGenerate C# code"]
-	Bytes["ProtoBuf bytes"] --> Des["protobuf-net:\nDeserialize ProtoBuf bytes to object"]
+	Def["ProtoBuf Definition\n(.proto)"] --> protobuf_net["protobuf-net:\n\nGenerate C# code"]
+	Bytes["ProtoBuf bytes"] --> Des["protobuf-net:\n\nDeserialize ProtoBuf bytes to instance\n(using the MessageType and the object-type)"]
+        MessageType["Message Type"] --> Des 
 	protobuf_net --> CodeCompile["Compile C# code\nto Assembly"]
-	CodeCompile --> Des
+	CodeCompile --> CodeType["typeof(object)"]
+        CodeType --> Des
 	Des --> JSON2OBJ["Serialize object to JSON"]
 ```
 
