@@ -44,7 +44,7 @@ flowchart LR
 	Bytes["ProtoBuf bytes"] --> Des["protobuf-net:\nDeserialize ProtoBuf bytes to object"]
 	protobuf_net --> CodeCompile["Compile C# code\nto Assembly"]
 	CodeCompile --> Des
-	Des --> JSON2OBJ["Convert object to JSON"]
+	Des --> JSON2OBJ["Serialize object to JSON"]
 ```
 
 #### Code
