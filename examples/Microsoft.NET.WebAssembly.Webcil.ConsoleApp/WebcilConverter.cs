@@ -63,7 +63,7 @@ public class WebcilConverter
         var webcilHeader = ReadHeader(newS);
         var webcilSectionHeaders = ReadSectionHeaders(newS, webcilHeader.coff_sections);
         var webcilSectionHeadersCount = webcilSectionHeaders.Length;
-        
+        var webcilSectionHeadersSizeOfRawData = (uint) webcilSectionHeaders.Sum(x => x.SizeOfRawData);
 
         /* PE headers
         Name    VirtualSize VirtualAddress  SizeOfRawData   PointerToRawData    PointerToRelocations;SectionHeader.PointerToLineNumbers;SectionHeader.NumberOfRelocations;SectionHeader.NumberOfLineNumbers;SectionHeader.SectionCharacteristics
@@ -88,13 +88,12 @@ public class WebcilConverter
             0x6D, 0x6F, 0x64, 0x65, 0x2E, 0x0D, 0x0D, 0x0A, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
-        // 436
         int sizeofWebCilHeader = Marshal.SizeOf(new WebcilHeader()); // 28
         int sizeofWebCilSectionHeaders = Marshal.SizeOf(new WebcilSectionHeader()) * webcilSectionHeadersCount; // 48
-        int sizeofIMAGE_DOS_HEADER = Marshal.SizeOf(new IMAGE_DOS_HEADER());
-        int sizeofmsdos_stub = msdos_stub.Length;
-        int sizeofIMAGE_NT_HEADERS32 = Marshal.SizeOf(new IMAGE_NT_HEADERS32());
-        int sizeofIMAGE_SECTION_HEADER = Marshal.SizeOf(new IMAGE_SECTION_HEADER());
+        int sizeofIMAGE_DOS_HEADER = Marshal.SizeOf(new IMAGE_DOS_HEADER()); // 64
+        int sizeofmsdos_stub = msdos_stub.Length; // 64
+        int sizeofIMAGE_NT_HEADERS32 = Marshal.SizeOf(new IMAGE_NT_HEADERS32()); // 248
+        int sizeofIMAGE_SECTION_HEADER = Marshal.SizeOf(new IMAGE_SECTION_HEADER()); // 40
 
         int PESectionStart = sizeofIMAGE_DOS_HEADER + sizeofmsdos_stub + sizeofIMAGE_NT_HEADERS32 + webcilSectionHeadersCount * sizeofIMAGE_SECTION_HEADER; // 496
         int PESectionStartRounded = RoundToNearest(PESectionStart);
@@ -132,9 +131,10 @@ public class WebcilConverter
         newDllStream.Write(msdos_stub);
 
         uint fileAlignment = 0x0200;
+        uint sectionAlignment = 0x2000;
         var IMAGE_NT_HEADERS32 = new IMAGE_NT_HEADERS32
         {
-            Signature = 0x4550,
+            Signature = 0x4550, // 'PE'
             FileHeader = new IMAGE_FILE_HEADER
             {
                 Machine = 0x014C,
@@ -153,11 +153,11 @@ public class WebcilConverter
                 SizeOfCode = (uint)webcilSectionHeaders[0].SizeOfRawData,
                 SizeOfInitializedData = (uint)(webcilSectionHeaders[1].SizeOfRawData + webcilSectionHeaders[2].SizeOfRawData),
                 SizeOfUninitializedData = 0,
-                AddressOfEntryPoint = 0x9B82, // TODO = 39810
+                AddressOfEntryPoint = 0, // This can be set to 0
                 BaseOfCode = 0x2000,
                 BaseOfData = 0xA000,
                 ImageBase = 0x400000, // The default value for applications is 0x00400000
-                SectionAlignment = 0x2000,
+                SectionAlignment = sectionAlignment,
                 FileAlignment = fileAlignment,
                 MajorOperatingSystemVersion = 4,
                 MinorOperatingSystemVersion = 0,
@@ -166,7 +166,7 @@ public class WebcilConverter
                 MajorSubsystemVersion = 4,
                 MinorSubsystemVersion = 0,
                 Win32VersionValue = 0,
-                SizeOfImage = 0xE000, // TODO
+                SizeOfImage = RoundToNearest(webcilSectionHeadersSizeOfRawData, sectionAlignment),
                 SizeOfHeaders = GetSizeOfHeaders(imageDosHeader),
                 CheckSum = 0,
                 Subsystem = 3, // IMAGE_SUBSYSTEM_WINDOWS_CUI
@@ -179,22 +179,22 @@ public class WebcilConverter
                 NumberOfRvaAndSizes = 0x10,
                 DataDirectory = new IMAGE_DATA_DIRECTORY[0x10]
                 {
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { Size = 0x4F, VirtualAddress = 39727 }, // TODO IMAGE_DIRECTORY_ENTRY_IMPORT 39727
-                    new IMAGE_DATA_DIRECTORY { Size = 1, VirtualAddress = 1 }, // TODO IMAGE_DIRECTORY_ENTRY_RESOURCE
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { },
-                    new IMAGE_DATA_DIRECTORY { }
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000 , VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_EXPORT
+                    new IMAGE_DATA_DIRECTORY { Size = 0x004F , VirtualAddress = 0x9B2F }, // TODO IMAGE_DIRECTORY_ENTRY_IMPORT // 39727
+                    new IMAGE_DATA_DIRECTORY { Size = (uint) webcilSectionHeaders[1].VirtualSize, VirtualAddress = (uint) webcilSectionHeaders[1].VirtualAddress }, // IMAGE_DIRECTORY_ENTRY_RESOURCE
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_EXCEPTION
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_SECURITY
+                    new IMAGE_DATA_DIRECTORY { Size = (uint) webcilSectionHeaders[2].VirtualSize, VirtualAddress = (uint) webcilSectionHeaders[2].VirtualAddress }, // IMAGE_DIRECTORY_ENTRY_BASERELOC
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_DEBUG (can be 0)
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_ARCHITECTURE
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_GLOBALPTR
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_TLS
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0008, VirtualAddress = (uint) webcilSectionHeaders[0].VirtualAddress }, // IMAGE_DIRECTORY_ENTRY_IAT
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0048, VirtualAddress = (uint) webcilSectionHeaders[0].VirtualAddress + 8 }, // TODO ??? IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }  // ?
                 }
             }
         };
@@ -203,7 +203,7 @@ public class WebcilConverter
         var IMAGE_SECTION_HEADER_text = new IMAGE_SECTION_HEADER
         {
             Name = new byte[8] { 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00 },
-            VirtualSize = (uint) webcilSectionHeaders[0].VirtualSize,
+            VirtualSize = (uint)webcilSectionHeaders[0].VirtualSize,
             VirtualAddress = (uint)webcilSectionHeaders[0].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[0].SizeOfRawData,
             PointerToRawData = webcilSectionHeaders[0].GetCorrectedPointerToRawData(PointerToRawDataOffsetBetweenWebcilAndPE),
@@ -292,18 +292,25 @@ public class WebcilConverter
                 .Diagnostics
                 .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
 
-            //throw new InvalidOperationException($"Unable to compile the code. Errors: {string.Join(",", failures.Select(f => $"{f.Id}-{f.GetMessage()}"))}");
+            throw new InvalidOperationException($"Unable to compile the code. Errors: {string.Join(",", failures.Select(f => $"{f.Id}-{f.GetMessage()}"))}");
         }
 
-        //var a = Assembly.Load(codeStream.ToArray());
+        var a = Assembly.Load(codeStream.ToArray());
 
         int xxxx = 0;
     }
 
     public static int RoundToNearest(int number, int nearest = 512)
     {
-        var divided = (1.0*number) / nearest;
+        var divided = (1.0 * number) / nearest;
         var rounded = (int)Math.Round(divided, MidpointRounding.AwayFromZero);
+        return rounded * nearest;
+    }
+
+    public static uint RoundToNearest(uint number, uint nearest = 512)
+    {
+        var divided = (1.0 * number) / nearest;
+        var rounded = (uint)Math.Round(divided, MidpointRounding.AwayFromZero);
         return rounded * nearest;
     }
 
@@ -448,7 +455,7 @@ public class WebcilConverter
         var peHeader = headers.PEHeader!;
         var coffHeader = headers.CoffHeader;
         var sections = headers.SectionHeaders;
-        
+
         WebcilHeader header;
         header.id[0] = (byte)'W';
         header.id[1] = (byte)'b';
