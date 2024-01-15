@@ -77,8 +77,24 @@ public class WebcilConverter
                 12          49152           512             33868
          */
 
+        var msdos_stub = new byte[]
+        {
+            0x0E, 0x1F, 0xBA, 0x0E, 0x00, 0xB4, 0x09, 0xCD, 0x21, 0xB8, 0x01, 0x4C, 0xCD, 0x21, 0x54, 0x68,
+            0x69, 0x73, 0x20, 0x70, 0x72, 0x6F, 0x67, 0x72, 0x61, 0x6D, 0x20, 0x63, 0x61, 0x6E, 0x6E, 0x6F,
+            0x74, 0x20, 0x62, 0x65, 0x20, 0x72, 0x75, 0x6E, 0x20, 0x69, 0x6E, 0x20, 0x44, 0x4F, 0x53, 0x20,
+            0x6D, 0x6F, 0x64, 0x65, 0x2E, 0x0D, 0x0D, 0x0A, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+
+        // 436
+        int sizeofIMAGE_DOS_HEADER = Marshal.SizeOf(new IMAGE_DOS_HEADER());
+        int sizeofmsdos_stub = msdos_stub.Length;
+        int sizeofIMAGE_NT_HEADERS32 = Marshal.SizeOf(new IMAGE_NT_HEADERS32());
+        int sizeofIMAGE_SECTION_HEADER = Marshal.SizeOf(new IMAGE_SECTION_HEADER());
+
+        int offset = sizeofIMAGE_DOS_HEADER + sizeofmsdos_stub + sizeofIMAGE_NT_HEADERS32 + webcilSectionHeaders.Length * sizeofIMAGE_SECTION_HEADER;
+
         var newDllStream = new MemoryStream();
-        var IMAGE_DOS_HEADER = new IMAGE_DOS_HEADER
+        var imageDosHeader = new IMAGE_DOS_HEADER
         {
             MagicNumber = 0x5A4D, // The value “MZ” are the initials of the PE designer Mark Zbikowski
             BytesOnLastPageOfFile = 0x90,
@@ -100,16 +116,9 @@ public class WebcilConverter
             ReservedWords2 = new ushort[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             FileAddressOfNewExeHeader = 0x80
         };
-        newDllStream.Write(StructToBytes(IMAGE_DOS_HEADER));
+        newDllStream.Write(StructToBytes(imageDosHeader));
 
-        var msdos_stub = new byte[]
-        {
-            0x0E, 0x1F, 0xBA, 0x0E, 0x00, 0xB4, 0x09, 0xCD, 0x21, 0xB8, 0x01, 0x4C, 0xCD, 0x21, 0x54, 0x68,
-            0x69, 0x73, 0x20, 0x70, 0x72, 0x6F, 0x67, 0x72, 0x61, 0x6D, 0x20, 0x63, 0x61, 0x6E, 0x6E, 0x6F,
-            0x74, 0x20, 0x62, 0x65, 0x20, 0x72, 0x75, 0x6E, 0x20, 0x69, 0x6E, 0x20, 0x44, 0x4F, 0x53, 0x20,
-            0x6D, 0x6F, 0x64, 0x65, 0x2E, 0x0D, 0x0D, 0x0A, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-        };
-        newDllStream.Write(msdos_stub);
+        //newDllStream.Write(msdos_stub);
 
         uint fileAlignment = 0x0200;
         var IMAGE_NT_HEADERS32 = new IMAGE_NT_HEADERS32
@@ -147,7 +156,7 @@ public class WebcilConverter
                 MinorSubsystemVersion = 0,
                 Win32VersionValue = 0,
                 SizeOfImage = 0xE000, // TODO
-                SizeOfHeaders = GetSizeOfHeaders(IMAGE_DOS_HEADER),
+                SizeOfHeaders = GetSizeOfHeaders(imageDosHeader),
                 CheckSum = 0,
                 Subsystem = 3, // IMAGE_SUBSYSTEM_WINDOWS_CUI
                 DllCharacteristics = 0x8560,
@@ -284,9 +293,9 @@ public class WebcilConverter
     {
         int soh = IMAGE_DOS_HEADER.FileAddressOfNewExeHeader + // e_lfanew member of IMAGE_DOS_HEADER
                   sizeof(uint) + // 4 byte signature
-                  Unsafe.SizeOf<IMAGE_FILE_HEADER>() + // size of IMAGE_FILE_HEADER
-                  Unsafe.SizeOf<IMAGE_OPTIONAL_HEADER32>() + // size of optional header
-                  (3 * Unsafe.SizeOf<IMAGE_SECTION_HEADER>()) // size of all section headers
+                  Marshal.SizeOf<IMAGE_FILE_HEADER>() + // size of IMAGE_FILE_HEADER
+                  Marshal.SizeOf<IMAGE_OPTIONAL_HEADER32>() + // size of optional header
+                  3 * Marshal.SizeOf<IMAGE_SECTION_HEADER>() // size of all section headers
             ;
         if (soh < 512)
         {
@@ -421,6 +430,7 @@ public class WebcilConverter
         var peHeader = headers.PEHeader!;
         var coffHeader = headers.CoffHeader;
         var sections = headers.SectionHeaders;
+        
         WebcilHeader header;
         header.id[0] = (byte)'W';
         header.id[1] = (byte)'b';
