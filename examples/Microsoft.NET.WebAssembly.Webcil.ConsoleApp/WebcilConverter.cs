@@ -86,6 +86,8 @@ public class WebcilConverter
         };
 
         // 436
+        int sizeofWebCilHeader = Marshal.SizeOf(new WebcilHeader());
+        int sizeofWebCilSectionHeaders = Marshal.SizeOf(new WebcilSectionHeader()) * webcilSectionHeaders.Length;
         int sizeofIMAGE_DOS_HEADER = Marshal.SizeOf(new IMAGE_DOS_HEADER());
         int sizeofmsdos_stub = msdos_stub.Length;
         int sizeofIMAGE_NT_HEADERS32 = Marshal.SizeOf(new IMAGE_NT_HEADERS32());
