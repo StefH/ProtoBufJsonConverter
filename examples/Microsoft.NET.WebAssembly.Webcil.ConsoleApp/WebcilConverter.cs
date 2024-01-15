@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Extensions;
 using ProtoBuf;
 
 namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
@@ -61,6 +62,8 @@ public class WebcilConverter
         newS.Seek(0, SeekOrigin.Begin);
         var webcilHeader = ReadHeader(newS);
         var webcilSectionHeaders = ReadSectionHeaders(newS, webcilHeader.coff_sections);
+        var webcilSectionHeadersCount = webcilSectionHeaders.Length;
+        
 
         /* PE headers
         Name    VirtualSize VirtualAddress  SizeOfRawData   PointerToRawData    PointerToRelocations;SectionHeader.PointerToLineNumbers;SectionHeader.NumberOfRelocations;SectionHeader.NumberOfLineNumbers;SectionHeader.SectionCharacteristics
@@ -86,14 +89,20 @@ public class WebcilConverter
         };
 
         // 436
-        int sizeofWebCilHeader = Marshal.SizeOf(new WebcilHeader());
-        int sizeofWebCilSectionHeaders = Marshal.SizeOf(new WebcilSectionHeader()) * webcilSectionHeaders.Length;
+        int sizeofWebCilHeader = Marshal.SizeOf(new WebcilHeader()); // 28
+        int sizeofWebCilSectionHeaders = Marshal.SizeOf(new WebcilSectionHeader()) * webcilSectionHeadersCount; // 48
         int sizeofIMAGE_DOS_HEADER = Marshal.SizeOf(new IMAGE_DOS_HEADER());
         int sizeofmsdos_stub = msdos_stub.Length;
         int sizeofIMAGE_NT_HEADERS32 = Marshal.SizeOf(new IMAGE_NT_HEADERS32());
         int sizeofIMAGE_SECTION_HEADER = Marshal.SizeOf(new IMAGE_SECTION_HEADER());
 
-        int offset = sizeofIMAGE_DOS_HEADER + sizeofmsdos_stub + sizeofIMAGE_NT_HEADERS32 + webcilSectionHeaders.Length * sizeofIMAGE_SECTION_HEADER;
+        int PESectionStart = sizeofIMAGE_DOS_HEADER + sizeofmsdos_stub + sizeofIMAGE_NT_HEADERS32 + webcilSectionHeadersCount * sizeofIMAGE_SECTION_HEADER; // 496
+        int PESectionStartRounded = RoundToNearest(PESectionStart);
+        byte[] extraBytesAfterSections = new byte[PESectionStartRounded - PESectionStart];
+
+        var PointerToRawDataFirstSectionHeader = webcilSectionHeaders[0].PointerToRawData;
+        int PointerToRawDataOffsetBetweenWebcilAndPE = PESectionStartRounded - PointerToRawDataFirstSectionHeader;
+
 
         var newDllStream = new MemoryStream();
         var imageDosHeader = new IMAGE_DOS_HEADER
@@ -120,7 +129,7 @@ public class WebcilConverter
         };
         newDllStream.Write(StructToBytes(imageDosHeader));
 
-        //newDllStream.Write(msdos_stub);
+        newDllStream.Write(msdos_stub);
 
         uint fileAlignment = 0x0200;
         var IMAGE_NT_HEADERS32 = new IMAGE_NT_HEADERS32
@@ -197,7 +206,7 @@ public class WebcilConverter
             VirtualSize = (uint) webcilSectionHeaders[0].VirtualSize,
             VirtualAddress = (uint)webcilSectionHeaders[0].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[0].SizeOfRawData,
-            PointerToRawData = GetSectionHeaderPointerToRawData(webcilSectionHeaders[0], fileAlignment),
+            PointerToRawData = webcilSectionHeaders[0].GetCorrectedPointerToRawData(PointerToRawDataOffsetBetweenWebcilAndPE),
             Characteristics = 0x60000020
         };
         newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_text));
@@ -208,7 +217,7 @@ public class WebcilConverter
             VirtualSize = (uint)webcilSectionHeaders[1].VirtualSize,
             VirtualAddress = (uint)webcilSectionHeaders[1].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[1].SizeOfRawData,
-            PointerToRawData = GetSectionHeaderPointerToRawData(webcilSectionHeaders[1], fileAlignment),
+            PointerToRawData = webcilSectionHeaders[1].GetCorrectedPointerToRawData(PointerToRawDataOffsetBetweenWebcilAndPE),
             Characteristics = 0x40000040
         };
         newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_rsrc));
@@ -219,10 +228,15 @@ public class WebcilConverter
             VirtualSize = (uint)webcilSectionHeaders[2].VirtualSize,
             VirtualAddress = (uint)webcilSectionHeaders[2].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[2].SizeOfRawData,
-            PointerToRawData = GetSectionHeaderPointerToRawData(webcilSectionHeaders[2], fileAlignment),
+            PointerToRawData = webcilSectionHeaders[2].GetCorrectedPointerToRawData(PointerToRawDataOffsetBetweenWebcilAndPE),
             Characteristics = 0x42000040
         };
         newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_reloc));
+
+        if (extraBytesAfterSections.Length > 0)
+        {
+            newDllStream.Write(extraBytesAfterSections);
+        }
 
         foreach (var webcilSectionHeader in webcilSectionHeaders)
         {
@@ -286,9 +300,11 @@ public class WebcilConverter
         int xxxx = 0;
     }
 
-    private static uint GetSectionHeaderPointerToRawData(WebcilSectionHeader webcilSectionHeader, uint fileAlignment)
+    public static int RoundToNearest(int number, int nearest = 512)
     {
-        return webcilSectionHeader.PointerToRawData < fileAlignment ? fileAlignment : (uint) webcilSectionHeader.PointerToRawData;
+        var divided = (1.0*number) / nearest;
+        var rounded = (int)Math.Round(divided, MidpointRounding.AwayFromZero);
+        return rounded * nearest;
     }
 
     private static uint GetSizeOfHeaders(IMAGE_DOS_HEADER IMAGE_DOS_HEADER)
