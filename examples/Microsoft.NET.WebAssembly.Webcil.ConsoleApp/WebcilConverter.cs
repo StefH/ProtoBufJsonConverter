@@ -244,7 +244,7 @@ public class WebcilConverter
             newS.Seek(webcilSectionHeader.PointerToRawData, SeekOrigin.Begin);
             ReadExactly(newS, buffer);
 
-            //newDllStream.Write(buffer, 0, buffer.Length);
+            newDllStream.Write(buffer, 0, buffer.Length);
         }
         newDllStream.Flush();
         newDllStream.Seek(0, SeekOrigin.Begin);
