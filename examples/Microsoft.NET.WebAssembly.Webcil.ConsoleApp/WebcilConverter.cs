@@ -88,12 +88,12 @@ public class WebcilConverter
             0x6D, 0x6F, 0x64, 0x65, 0x2E, 0x0D, 0x0D, 0x0A, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
 
-        int sizeofWebCilHeader = Marshal.SizeOf(new WebcilHeader()); // 28
-        int sizeofWebCilSectionHeaders = Marshal.SizeOf(new WebcilSectionHeader()) * webcilSectionHeadersCount; // 48
-        int sizeofIMAGE_DOS_HEADER = Marshal.SizeOf(new IMAGE_DOS_HEADER()); // 64
+        int sizeofWebCilHeader = Marshal.SizeOf<WebcilHeader>(); // 28
+        int sizeofWebCilSectionHeaders = Marshal.SizeOf<WebcilSectionHeader>() * webcilSectionHeadersCount; // 48
+        int sizeofIMAGE_DOS_HEADER = Marshal.SizeOf<IMAGE_DOS_HEADER>(); // 64
         int sizeofmsdos_stub = msdos_stub.Length; // 64
-        int sizeofIMAGE_NT_HEADERS32 = Marshal.SizeOf(new IMAGE_NT_HEADERS32()); // 248
-        int sizeofIMAGE_SECTION_HEADER = Marshal.SizeOf(new IMAGE_SECTION_HEADER()); // 40
+        int sizeofIMAGE_NT_HEADERS32 = Marshal.SizeOf<IMAGE_NT_HEADERS32>(); // 248
+        int sizeofIMAGE_SECTION_HEADER = Marshal.SizeOf<IMAGE_SECTION_HEADER>(); // 40
 
         int PESectionStart = sizeofIMAGE_DOS_HEADER + sizeofmsdos_stub + sizeofIMAGE_NT_HEADERS32 + webcilSectionHeadersCount * sizeofIMAGE_SECTION_HEADER; // 496
         int PESectionStartRounded = RoundToNearest(PESectionStart);
@@ -167,7 +167,7 @@ public class WebcilConverter
                 MinorSubsystemVersion = 0,
                 Win32VersionValue = 0,
                 SizeOfImage = RoundToNearest(webcilSectionHeadersSizeOfRawData, sectionAlignment),
-                SizeOfHeaders = GetSizeOfHeaders(imageDosHeader),
+                SizeOfHeaders = GetSizeOfHeaders(imageDosHeader, webcilSectionHeadersCount),
                 CheckSum = 0,
                 Subsystem = 3, // IMAGE_SUBSYSTEM_WINDOWS_CUI
                 DllCharacteristics = 0x8560,
@@ -314,20 +314,16 @@ public class WebcilConverter
         return rounded * nearest;
     }
 
-    private static uint GetSizeOfHeaders(IMAGE_DOS_HEADER IMAGE_DOS_HEADER)
+    private static uint GetSizeOfHeaders(IMAGE_DOS_HEADER IMAGE_DOS_HEADER, int numSectionHeaders)
     {
         int soh = IMAGE_DOS_HEADER.FileAddressOfNewExeHeader + // e_lfanew member of IMAGE_DOS_HEADER
                   sizeof(uint) + // 4 byte signature
                   Marshal.SizeOf<IMAGE_FILE_HEADER>() + // size of IMAGE_FILE_HEADER
                   Marshal.SizeOf<IMAGE_OPTIONAL_HEADER32>() + // size of optional header
-                  3 * Marshal.SizeOf<IMAGE_SECTION_HEADER>() // size of all section headers
+                  numSectionHeaders * Marshal.SizeOf<IMAGE_SECTION_HEADER>() // size of all section headers
             ;
-        if (soh < 512)
-        {
-            soh = 512;
-        }
 
-        return (uint)soh;
+        return (uint) RoundToNearest(soh);
     }
 
     public static byte[] StructToBytes<T>(T structData) where T : struct
