@@ -2,7 +2,6 @@
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Reflection.PortableExecutable;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -179,8 +178,8 @@ public class WebcilConverter
                 NumberOfRvaAndSizes = 0x10,
                 DataDirectory = new IMAGE_DATA_DIRECTORY[0x10]
                 {
-                    new IMAGE_DATA_DIRECTORY { Size = 0x0000 , VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_EXPORT
-                    new IMAGE_DATA_DIRECTORY { Size = 0x004F , VirtualAddress = 0x9B2F }, // TODO IMAGE_DIRECTORY_ENTRY_IMPORT // 39727
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_EXPORT
+                    new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_IMPORT (can be 0)
                     new IMAGE_DATA_DIRECTORY { Size = (uint) webcilSectionHeaders[1].VirtualSize, VirtualAddress = (uint) webcilSectionHeaders[1].VirtualAddress }, // IMAGE_DIRECTORY_ENTRY_RESOURCE
                     new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_EXCEPTION
                     new IMAGE_DATA_DIRECTORY { Size = 0x0000, VirtualAddress = 0x0000 }, // IMAGE_DIRECTORY_ENTRY_SECURITY
@@ -270,7 +269,8 @@ public class WebcilConverter
         var assemblyName = Path.GetRandomFileName();
 
         // Parse the source code
-        var syntaxTree = CSharpSyntaxTree.ParseText(File.ReadAllText("TestClass1.cs"));
+        var code = File.ReadAllText("TestClass1.cs");
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
         // Create a compilation
         var compilation = CSharpCompilation.Create(
@@ -296,6 +296,9 @@ public class WebcilConverter
         }
 
         var a = Assembly.Load(codeStream.ToArray());
+
+        var t = Type.GetType("Microsoft.NET.WebAssembly.Webcil.ConsoleApp.TestClass1");
+        var ins = Activator.CreateInstance(t);
 
         int xxxx = 0;
     }
