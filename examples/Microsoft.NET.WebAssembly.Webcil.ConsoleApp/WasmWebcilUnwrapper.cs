@@ -2,7 +2,7 @@
 
 namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
-public class WasmWebcilUnwrapper : IDisposable
+internal class WasmWebcilUnwrapper : IDisposable
 {
     private readonly Stream _wasmStream;
 

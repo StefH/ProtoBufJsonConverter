@@ -40,7 +40,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "example - Blazor", "example
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.NET.WebAssembly.Webcil", "examples\Microsoft.NET.WebAssembly.Webcil\Microsoft.NET.WebAssembly.Webcil.csproj", "{4500FF72-60C9-40D6-9ABB-4F5A5BD6CE74}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.NET.WebAssembly.Webcil.ConsoleApp", "examples\Microsoft.NET.WebAssembly.Webcil.ConsoleApp\Microsoft.NET.WebAssembly.Webcil.ConsoleApp.csproj", "{963988DD-21B7-49F6-B91F-224840886887}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.NET.WebAssembly.Webcil.ConsoleApp", "examples\Microsoft.NET.WebAssembly.Webcil.ConsoleApp\Microsoft.NET.WebAssembly.Webcil.ConsoleApp.csproj", "{963988DD-21B7-49F6-B91F-224840886887}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "examples\ConsoleApp1\ConsoleApp1.csproj", "{7115CD61-47DB-4BFE-97E4-B0A15A31E6E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetadataReferenceService.Abstractions", "examples\MetadataReferenceService.Abstractions\MetadataReferenceService.Abstractions.csproj", "{988BC5D5-F84C-4D39-A7ED-AB1F75737718}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,6 +88,14 @@ Global
 		{963988DD-21B7-49F6-B91F-224840886887}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{963988DD-21B7-49F6-B91F-224840886887}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{963988DD-21B7-49F6-B91F-224840886887}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7115CD61-47DB-4BFE-97E4-B0A15A31E6E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7115CD61-47DB-4BFE-97E4-B0A15A31E6E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7115CD61-47DB-4BFE-97E4-B0A15A31E6E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7115CD61-47DB-4BFE-97E4-B0A15A31E6E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{988BC5D5-F84C-4D39-A7ED-AB1F75737718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{988BC5D5-F84C-4D39-A7ED-AB1F75737718}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{988BC5D5-F84C-4D39-A7ED-AB1F75737718}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{988BC5D5-F84C-4D39-A7ED-AB1F75737718}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +110,8 @@ Global
 		{A58F54FD-3E70-465B-9CD5-2565D7CDE069} = {F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}
 		{4500FF72-60C9-40D6-9ABB-4F5A5BD6CE74} = {F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}
 		{963988DD-21B7-49F6-B91F-224840886887} = {F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}
+		{7115CD61-47DB-4BFE-97E4-B0A15A31E6E3} = {F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}
+		{988BC5D5-F84C-4D39-A7ED-AB1F75737718} = {F83CE41A-E6D0-4F4B-B827-BC7DFC2FE003}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {45F31459-D6F5-441C-890A-F02A1328053D}

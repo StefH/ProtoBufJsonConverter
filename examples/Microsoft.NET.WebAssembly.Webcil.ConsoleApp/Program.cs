@@ -2,58 +2,53 @@
 
 internal class Program
 {
-    private static void ReadExactly(FileStream s, Span<byte> buffer)
-    {
-        s.ReadExactly(buffer);
-    }
+    //private static byte[] ULEB128Encode(uint value)
+    //{
+    //    uint n = value;
+    //    int len = 0;
+    //    do
+    //    {
+    //        n >>= 7;
+    //        len++;
+    //    } while (n != 0);
+    //    byte[] arr = new byte[len];
+    //    int i = 0;
+    //    n = value;
+    //    do
+    //    {
+    //        byte b = (byte)(n & 0x7f);
+    //        n >>= 7;
+    //        if (n != 0)
+    //            b |= 0x80;
+    //        arr[i++] = b;
+    //    } while (n != 0);
+    //    return arr;
+    //}
 
-    private static byte[] ULEB128Encode(uint value)
-    {
-        uint n = value;
-        int len = 0;
-        do
-        {
-            n >>= 7;
-            len++;
-        } while (n != 0);
-        byte[] arr = new byte[len];
-        int i = 0;
-        n = value;
-        do
-        {
-            byte b = (byte)(n & 0x7f);
-            n >>= 7;
-            if (n != 0)
-                b |= 0x80;
-            arr[i++] = b;
-        } while (n != 0);
-        return arr;
-    }
+    //private static uint ULEB128Decode(byte[] bytes)
+    //{
+    //    uint result = 0;
+    //    int shift = 0;
+    //    foreach (byte b in bytes)
+    //    {
+    //        // Get the value of the current byte without the continuation bit.
+    //        uint current = (uint)(b & 0x7F);
+    //        result |= (current << shift);
 
-    private static uint ULEB128Decode(byte[] bytes)
-    {
-        uint result = 0;
-        int shift = 0;
-        foreach (byte b in bytes)
-        {
-            // Get the value of the current byte without the continuation bit.
-            uint current = (uint)(b & 0x7F);
-            result |= (current << shift);
+    //        // If the continuation bit is not set, break.
+    //        if ((b & 0x80) == 0)
+    //            break;
 
-            // If the continuation bit is not set, break.
-            if ((b & 0x80) == 0)
-                break;
-
-            shift += 7;
-        }
-        return result;
-    }
+    //        shift += 7;
+    //    }
+    //    return result;
+    //}
 
 
     static void Main(string[] args)
     {
-        var e = ULEB128Encode(123456);
-        var ee = ULEB128Decode(e);
+        //var e = ULEB128Encode(123456);
+        //var ee = ULEB128Decode(e);
 
         var dllStream = new MemoryStream(File.ReadAllBytes(@"c:\temp\ProtoBufJsonConverter.Blazor.dll")); //File.OpenRead(@"c:\temp\ProtoBufJsonConverter.Blazor.dll"));
         var wasmStream = new MemoryStream();
