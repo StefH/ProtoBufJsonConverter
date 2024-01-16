@@ -1,8 +1,8 @@
-﻿using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Extensions;
+﻿using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Utils;
 
 namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
-public class WasmWebcilUnwrapper
+public class WasmWebcilUnwrapper : IDisposable
 {
     private readonly Stream _wasmStream;
 
@@ -243,4 +243,8 @@ public class WasmWebcilUnwrapper
 
     //    return result;
     //}
+    public void Dispose()
+    {
+        _wasmStream.Dispose();
+    }
 }

@@ -61,7 +61,7 @@ internal class Program
         var inputStream = File.OpenRead(@"c:\temp\ProtoBufJsonConverter.Blazor.wasm");
         var outStream = File.OpenWrite(@"c:\temp\ProtoBufJsonConverter.Blazor.dll2");
 
-        new WebcilConverter().ConvertToWebcil(dllStream, wasmStream);
+        new WebcilConverterModified().ConvertToWebcil(dllStream, wasmStream);
         wasmStream.Flush();
 
         //using WebcilReader reader = new WebcilReader(inputStream);

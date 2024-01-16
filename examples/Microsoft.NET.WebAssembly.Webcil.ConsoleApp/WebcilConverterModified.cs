@@ -7,12 +7,13 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Extensions;
 using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.NT_Structs;
+using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Utils;
 using ProtoBuf;
 using static Microsoft.NET.WebAssembly.Webcil.ConsoleApp.NT_Structs.IMAGE_SECTION_HEADER;
 
 namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
-public class WebcilConverter
+public class WebcilConverterModified
 {
     public void ConvertToWebcil(MemoryStream inputDllStream, Stream outputWasmStream)
     {
@@ -48,6 +49,10 @@ public class WebcilConverter
         outputWasmStream.CopyTo(out2);
         out2.Seek(0, SeekOrigin.Begin);
         outputWasmStream.Seek(0, SeekOrigin.Begin);
+
+        var b = WebcilConverterUtils.ConvertFromWasmWrappedWebcil(out2);
+        NewMethod(b);
+        return;
 
         var unwrapper = new WasmWebcilUnwrapper(out2);
 
@@ -262,10 +267,19 @@ public class WebcilConverter
 
         File.WriteAllBytes(@"c:\temp\new.dll", newDllBytes);
 
-        var m1 = MetadataReference.CreateFromImage(dllBytes);
+        // var m1 = MetadataReference.CreateFromImage(dllBytes);
+        NewMethod(newDllBytes);
+
+        int xxxx = 0;
+    }
+
+    private static void NewMethod(byte[] newDllBytes)
+    {
         var m2 = MetadataReference.CreateFromImage(newDllBytes);
 
-        var references = RequiredAssemblies.Value.Select(requiredAssembly => MetadataReference.CreateFromFile(requiredAssembly.Location)).Cast<MetadataReference>().ToList();
+        var references = RequiredAssemblies.Value
+            .Select(requiredAssembly => MetadataReference.CreateFromFile(requiredAssembly.Location))
+            .Cast<MetadataReference>().ToList();
         references.Add(m2);
 
         var assemblyName = Path.GetRandomFileName();
@@ -294,27 +308,26 @@ public class WebcilConverter
                 .Diagnostics
                 .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
 
-            throw new InvalidOperationException($"Unable to compile the code. Errors: {string.Join(",", failures.Select(f => $"{f.Id}-{f.GetMessage()}"))}");
+            throw new InvalidOperationException(
+                $"Unable to compile the code. Errors: {string.Join(",", failures.Select(f => $"{f.Id}-{f.GetMessage()}"))}");
         }
 
         var a = Assembly.Load(codeStream.ToArray());
 
         var t = Type.GetType("Microsoft.NET.WebAssembly.Webcil.ConsoleApp.TestClass1")!;
         var ins = Activator.CreateInstance(t);
-
-        int xxxx = 0;
     }
 
     public static int RoundToNearest(int number, int nearest = 512)
     {
-        var divided = (1.0 * number) / nearest;
+        var divided = 1.0 * number / nearest;
         var rounded = (int)Math.Round(divided, MidpointRounding.AwayFromZero);
         return rounded * nearest;
     }
 
     public static uint RoundToNearest(uint number, uint nearest = 512)
     {
-        var divided = (1.0 * number) / nearest;
+        var divided = 1.0 * number / nearest;
         var rounded = (uint)Math.Round(divided, MidpointRounding.AwayFromZero);
         return rounded * nearest;
     }
@@ -811,19 +824,19 @@ public class WebcilConverter
     //}
 
     // stef
-    private static uint ReadULEB128(Stream stream)
-    {
-        uint result = 0;
-        int shift = 0;
-        byte byteVal;
+    //private static uint ReadULEB128(Stream stream)
+    //{
+    //    uint result = 0;
+    //    int shift = 0;
+    //    byte byteVal;
 
-        do
-        {
-            byteVal = (byte)stream.ReadByte();
-            result |= (uint)(byteVal & 0x7F) << shift;
-            shift += 7;
-        } while ((byteVal & 0x80) != 0);
+    //    do
+    //    {
+    //        byteVal = (byte)stream.ReadByte();
+    //        result |= (uint)(byteVal & 0x7F) << shift;
+    //        shift += 7;
+    //    } while ((byteVal & 0x80) != 0);
 
-        return result;
-    }
+    //    return result;
+    //}
 }

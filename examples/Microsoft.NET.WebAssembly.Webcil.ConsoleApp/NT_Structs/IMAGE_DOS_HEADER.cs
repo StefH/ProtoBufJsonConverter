@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct IMAGE_DOS_HEADER
 {
-    public ushort MagicNumber;              // e_magic - Magic number
+    public ushort MagicNumber;              // e_magic - Magic number (The value “MZ” are the initials of the PE designer Mark Zbikowski)
     public ushort BytesOnLastPageOfFile;    // e_cblp - Bytes on last page of file
     public ushort PagesInFile;              // e_cp - Pages in file
     public ushort Relocations;              // e_crlc - Relocations
