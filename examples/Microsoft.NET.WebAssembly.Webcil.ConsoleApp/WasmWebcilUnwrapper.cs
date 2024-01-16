@@ -1,4 +1,6 @@
-﻿namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
+﻿using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Extensions;
+
+namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
 public class WasmWebcilUnwrapper
 {
@@ -21,7 +23,8 @@ public class WasmWebcilUnwrapper
     private void ValidateWasmPrefix()
     {
         // Create a byte array matching the length of the prefix.
-        byte[] buffer = new byte[WebcilWasmWrapper.s_wasmWrapperPrefix.Length];
+        var prefix = WebcilWasmWrapperUtils.GetPrefix();
+        var buffer = new byte[prefix.Length];
         int bytesRead = _wasmStream.Read(buffer, 0, buffer.Length);
         if (bytesRead < buffer.Length)
         {
@@ -31,7 +34,7 @@ public class WasmWebcilUnwrapper
         // Compare the read prefix with the expected one.
         for (int i = 0; i < buffer.Length; i++)
         {
-            if (buffer[i] != WebcilWasmWrapper.s_wasmWrapperPrefix[i])
+            if (buffer[i] != prefix[i])
             {
                 throw new InvalidOperationException("Invalid Wasm prefix.");
             }
@@ -200,46 +203,44 @@ public class WasmWebcilUnwrapper
         return result;
     }
 
-    private void ExtractAndWriteWebcilPayload(Stream outputStream)
-    {
-        // Skipping directly to the payload assuming the structure is exactly as the wrapper defines.
-        // This might not be robust for all Wasm files, especially if they don't match the structure exactly.
+    //private void ExtractAndWriteWebcilPayload(Stream outputStream)
+    //{
+    //    // Skipping directly to the payload assuming the structure is exactly as the wrapper defines.
+    //    // This might not be robust for all Wasm files, especially if they don't match the structure exactly.
 
-        // Skip until where the payload should start.
-        _wasmStream.Seek(WebcilWasmWrapper.s_wasmWrapperPrefix.Length, SeekOrigin.Begin);
+    //    // Skip until where the payload should start.
+    //    _wasmStream.Seek(WebcilWasmWrapper.s_wasmWrapperPrefix.Length, SeekOrigin.Begin);
 
-        // Read the section header and size.
-        int sectionId = _wasmStream.ReadByte();
-        if (sectionId != 11)  // 0x0B is the data section ID
-        {
-            throw new InvalidOperationException("Data section not found.");
-        }
+    //    // Read the section header and size.
+    //    int sectionId = _wasmStream.ReadByte();
+    //    if (sectionId != 11)  // 0x0B is the data section ID
+    //    {
+    //        throw new InvalidOperationException("Data section not found.");
+    //    }
 
-        // Read the ULEB128 encoded size of the section.
-        uint size = ReadULEB128(_wasmStream);
+    //    // Read the ULEB128 encoded size of the section.
+    //    uint size = ReadULEB128(_wasmStream);
 
-        // Skip the rest of the headers and padding to get to the payload.
-        _wasmStream.Seek(WebcilWasmWrapper.SegmentCodeSize + WebcilWasmWrapper.WebcilPayloadInternalAlignment - 1, SeekOrigin.Current);
+    //    // Skip the rest of the headers and padding to get to the payload.
+    //    _wasmStream.Seek(WebcilWasmWrapper.SegmentCodeSize + WebcilWasmWrapper.WebcilPayloadInternalAlignment - 1, SeekOrigin.Current);
 
-        // Copy the payload to the output stream.
-        _wasmStream.CopyTo(outputStream);
-    }
+    //    // Copy the payload to the output stream.
+    //    _wasmStream.CopyTo(outputStream);
+    //}
 
-    private static uint ReadULEB128(Stream stream)
-    {
-        uint result = 0;
-        int shift = 0;
-        byte byteVal;
+    //private static uint ReadULEB128(Stream stream)
+    //{
+    //    uint result = 0;
+    //    int shift = 0;
+    //    byte byteVal;
 
-        do
-        {
-            byteVal = (byte)stream.ReadByte();
-            result |= (uint)(byteVal & 0x7F) << shift;
-            shift += 7;
-        } while ((byteVal & 0x80) != 0);
+    //    do
+    //    {
+    //        byteVal = (byte)stream.ReadByte();
+    //        result |= (uint)(byteVal & 0x7F) << shift;
+    //        shift += 7;
+    //    } while ((byteVal & 0x80) != 0);
 
-        return result;
-    }
+    //    return result;
+    //}
 }
-
-

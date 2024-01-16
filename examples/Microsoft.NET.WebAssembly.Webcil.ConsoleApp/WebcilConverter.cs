@@ -6,7 +6,9 @@ using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Extensions;
+using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.NT_Structs;
 using ProtoBuf;
+using static Microsoft.NET.WebAssembly.Webcil.ConsoleApp.NT_Structs.IMAGE_SECTION_HEADER;
 
 namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
@@ -202,7 +204,7 @@ public class WebcilConverter
         var IMAGE_SECTION_HEADER_text = new IMAGE_SECTION_HEADER
         {
             Name = new byte[] { 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00 },
-            VirtualSize = (uint)webcilSectionHeaders[0].VirtualSize,
+            Misc = new UnionType { VirtualSize = (uint)webcilSectionHeaders[0].VirtualSize },
             VirtualAddress = (uint)webcilSectionHeaders[0].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[0].SizeOfRawData,
             PointerToRawData = webcilSectionHeaders[0].GetCorrectedPointerToRawData(PointerToRawDataOffsetBetweenWebcilAndPE),
@@ -213,7 +215,7 @@ public class WebcilConverter
         var IMAGE_SECTION_HEADER_rsrc = new IMAGE_SECTION_HEADER
         {
             Name = new byte[] { 0x2E, 0x72, 0x73, 0x72, 0x63, 0x00, 0x00, 0x00 },
-            VirtualSize = (uint)webcilSectionHeaders[1].VirtualSize,
+            Misc = new UnionType { VirtualSize = (uint)webcilSectionHeaders[1].VirtualSize },
             VirtualAddress = (uint)webcilSectionHeaders[1].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[1].SizeOfRawData,
             PointerToRawData = webcilSectionHeaders[1].GetCorrectedPointerToRawData(PointerToRawDataOffsetBetweenWebcilAndPE),
@@ -224,7 +226,7 @@ public class WebcilConverter
         var IMAGE_SECTION_HEADER_reloc = new IMAGE_SECTION_HEADER
         {
             Name = new byte[] { 0x2E, 0x72, 0x65, 0x6C, 0x6F, 0x63, 0x00, 0x00 },
-            VirtualSize = (uint)webcilSectionHeaders[2].VirtualSize,
+            Misc = new UnionType { VirtualSize = (uint)webcilSectionHeaders[2].VirtualSize },
             VirtualAddress = (uint)webcilSectionHeaders[2].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[2].SizeOfRawData,
             PointerToRawData = webcilSectionHeaders[2].GetCorrectedPointerToRawData(PointerToRawDataOffsetBetweenWebcilAndPE),
@@ -297,7 +299,7 @@ public class WebcilConverter
 
         var a = Assembly.Load(codeStream.ToArray());
 
-        var t = Type.GetType("Microsoft.NET.WebAssembly.Webcil.ConsoleApp.TestClass1");
+        var t = Type.GetType("Microsoft.NET.WebAssembly.Webcil.ConsoleApp.TestClass1")!;
         var ins = Activator.CreateInstance(t);
 
         int xxxx = 0;
@@ -764,49 +766,49 @@ public class WebcilConverter
         public const int WC_VERSION_MINOR = 0;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public unsafe struct WebcilHeader
-    {
-        public fixed byte id[4]; // 'W' 'b' 'I' 'L'
+    //[StructLayout(LayoutKind.Sequential, Pack = 1)]
+    //public unsafe struct WebcilHeader
+    //{
+    //    public fixed byte id[4]; // 'W' 'b' 'I' 'L'
 
-        // 4 bytes
-        public ushort version_major; // 0
+    //    // 4 bytes
+    //    public ushort version_major; // 0
 
-        public ushort version_minor; // 0
-        // 8 bytes
+    //    public ushort version_minor; // 0
+    //    // 8 bytes
 
-        public ushort coff_sections;
+    //    public ushort coff_sections;
 
-        public ushort reserved0; // 0
+    //    public ushort reserved0; // 0
 
-        // 12 bytes
-        public uint pe_cli_header_rva;
+    //    // 12 bytes
+    //    public uint pe_cli_header_rva;
 
-        public uint pe_cli_header_size;
+    //    public uint pe_cli_header_size;
 
-        // 20 bytes
-        public uint pe_debug_rva;
+    //    // 20 bytes
+    //    public uint pe_debug_rva;
 
-        public uint pe_debug_size;
-        // 28 bytes
-    }
+    //    public uint pe_debug_size;
+    //    // 28 bytes
+    //}
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public readonly struct WebcilSectionHeader
-    {
-        public readonly int VirtualSize;
-        public readonly int VirtualAddress;
-        public readonly int SizeOfRawData;
-        public readonly int PointerToRawData;
+    //[StructLayout(LayoutKind.Sequential, Pack = 1)]
+    //public readonly struct WebcilSectionHeader
+    //{
+    //    public readonly int VirtualSize;
+    //    public readonly int VirtualAddress;
+    //    public readonly int SizeOfRawData;
+    //    public readonly int PointerToRawData;
 
-        public WebcilSectionHeader(int virtualSize, int virtualAddress, int sizeOfRawData, int pointerToRawData)
-        {
-            VirtualSize = virtualSize;
-            VirtualAddress = virtualAddress;
-            SizeOfRawData = sizeOfRawData;
-            PointerToRawData = pointerToRawData;
-        }
-    }
+    //    public WebcilSectionHeader(int virtualSize, int virtualAddress, int sizeOfRawData, int pointerToRawData)
+    //    {
+    //        VirtualSize = virtualSize;
+    //        VirtualAddress = virtualAddress;
+    //        SizeOfRawData = sizeOfRawData;
+    //        PointerToRawData = pointerToRawData;
+    //    }
+    //}
 
     // stef
     private static uint ReadULEB128(Stream stream)

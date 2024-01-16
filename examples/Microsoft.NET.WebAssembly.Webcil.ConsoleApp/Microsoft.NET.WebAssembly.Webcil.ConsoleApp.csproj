@@ -19,6 +19,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\ProtoBufJsonConverter\ProtoBufJsonConverter.csproj" />
+	  <ProjectReference Include="..\Microsoft.NET.WebAssembly.Webcil\Microsoft.NET.WebAssembly.Webcil.csproj" />
 
 	  <ProjectReference Include="..\ProtoBufJsonConverter.Blazor\ProtoBufJsonConverter.Blazor.csproj" />
 	</ItemGroup>

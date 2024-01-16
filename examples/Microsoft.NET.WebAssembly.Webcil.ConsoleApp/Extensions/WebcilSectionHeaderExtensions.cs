@@ -1,6 +1,4 @@
-﻿using static Microsoft.NET.WebAssembly.Webcil.ConsoleApp.WebcilConverter;
-
-namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Extensions;
+﻿namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Extensions;
 
 internal static class WebcilSectionHeaderExtensions
 {

@@ -1,4 +1,4 @@
-﻿namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
+﻿namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp.NT_Structs;
 
 using System.Runtime.InteropServices;
 
@@ -19,13 +19,13 @@ public struct IMAGE_DOS_HEADER
     public ushort InitialCS;                // e_cs - Initial (relative) CS value
     public ushort AddressOfRelocationTable; // e_lfarlc - File address of relocation table
     public ushort OverlayNumber;            // e_ovno - Overlay number
-    
+
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
     public ushort[] ReservedWords1;         // e_res - Reserved words
-    
+
     public ushort OEMIdentifier;            // e_oemid - OEM identifier (for e_oeminfo)
     public ushort OEMInformation;           // e_oeminfo - OEM information; e_oemid specific
-    
+
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
     public ushort[] ReservedWords2;         // e_res2 - Reserved words
 
