@@ -201,7 +201,7 @@ public class WebcilConverter
 
         var IMAGE_SECTION_HEADER_text = new IMAGE_SECTION_HEADER
         {
-            Name = new byte[8] { 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00 },
+            Name = new byte[] { 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00 },
             VirtualSize = (uint)webcilSectionHeaders[0].VirtualSize,
             VirtualAddress = (uint)webcilSectionHeaders[0].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[0].SizeOfRawData,
@@ -212,7 +212,7 @@ public class WebcilConverter
 
         var IMAGE_SECTION_HEADER_rsrc = new IMAGE_SECTION_HEADER
         {
-            Name = new byte[8] { 0x2E, 0x72, 0x73, 0x72, 0x63, 0x00, 0x00, 0x00 },
+            Name = new byte[] { 0x2E, 0x72, 0x73, 0x72, 0x63, 0x00, 0x00, 0x00 },
             VirtualSize = (uint)webcilSectionHeaders[1].VirtualSize,
             VirtualAddress = (uint)webcilSectionHeaders[1].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[1].SizeOfRawData,
@@ -223,7 +223,7 @@ public class WebcilConverter
 
         var IMAGE_SECTION_HEADER_reloc = new IMAGE_SECTION_HEADER
         {
-            Name = new byte[8] { 0x2E, 0x72, 0x65, 0x6C, 0x6F, 0x63, 0x00, 0x00 },
+            Name = new byte[] { 0x2E, 0x72, 0x65, 0x6C, 0x6F, 0x63, 0x00, 0x00 },
             VirtualSize = (uint)webcilSectionHeaders[2].VirtualSize,
             VirtualAddress = (uint)webcilSectionHeaders[2].VirtualAddress,
             SizeOfRawData = (uint)webcilSectionHeaders[2].SizeOfRawData,

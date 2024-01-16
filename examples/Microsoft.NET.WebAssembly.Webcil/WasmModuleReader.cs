@@ -2,7 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Collections.Immutable;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Microsoft.NET.WebAssembly.Webcil;
@@ -24,7 +27,7 @@ internal class WasmModuleReader : IDisposable
         Element,
         Code,
         Data,
-        DataCount
+        DataCount,
     }
 
     private readonly BinaryReader _reader;
