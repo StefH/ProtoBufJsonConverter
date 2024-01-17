@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<!--<TargetFrameworks>$(TargetFrameworkForNETCoreTasks);$(TargetFrameworkForNETFrameworkTasks)</TargetFrameworks>-->
-		<TargetFrameworks>net462;netstandard2.0;netstandard2.1</TargetFrameworks>
+		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0</TargetFrameworks>
 		<Langversion>latest</Langversion>
 		<Description>Abstractions for modifying .NET webcil binary images</Description>
 		<EnableDefaultItems>true</EnableDefaultItems>
