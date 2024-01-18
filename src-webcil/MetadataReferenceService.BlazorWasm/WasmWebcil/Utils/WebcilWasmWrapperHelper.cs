@@ -3,7 +3,7 @@ using Microsoft.NET.WebAssembly.Webcil;
 
 namespace MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
 
-internal static class WebcilWasmWrapperUtils
+internal static class WebcilWasmWrapperHelper
 {
     public static byte[] GetPrefix()
     {

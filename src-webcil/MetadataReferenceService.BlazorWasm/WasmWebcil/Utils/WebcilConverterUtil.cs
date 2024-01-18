@@ -7,7 +7,7 @@ using Microsoft.NET.WebAssembly.Webcil;
 
 namespace MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
 
-public static class WebcilConverterUtils
+public static class WebcilConverterUtil
 {
     private static readonly byte[] SectionHeaderText = { 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00 }; // .text
     private static readonly byte[] SectionHeaderRsRc = { 0x2E, 0x72, 0x73, 0x72, 0x63, 0x00, 0x00, 0x00 }; // .rsrc
@@ -21,6 +21,7 @@ public static class WebcilConverterUtils
     };
     private static readonly ushort[] DOSReservedWords1 = { 0, 0, 0, 0 };
     private static readonly ushort[] DOSReservedWords2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    private static readonly DateTime Epoch = new(1970, 1, 1);
 
     public static byte[] ConvertFromWasmWrappedWebcil(Stream wasmWrappedWebcilStream)
     {
@@ -52,7 +53,7 @@ public static class WebcilConverterUtils
         var extraBytesAfterSections = new byte[sectionStartRounded - sectionStart];
         var pointerToRawDataFirstSectionHeader = webcilSectionHeaders[0].PointerToRawData;
         var pointerToRawDataOffsetBetweenWebcilAndPE = sectionStartRounded - pointerToRawDataFirstSectionHeader;
-        
+
         using var peStream = new MemoryStream();
 
         var DOSHeader = new IMAGE_DOS_HEADER
@@ -88,9 +89,9 @@ public static class WebcilConverterUtils
             Signature = 0x4550, // 'PE'
             FileHeader = new IMAGE_FILE_HEADER
             {
-                Machine = 0x014C,
+                Machine = Constants.IMAGE_FILE_MACHINE_I386,
                 NumberOfSections = 3,
-                TimeDateStamp = 0xF5192B61, // TODO : This is a dummy TimeDateStamp
+                TimeDateStamp = GetImageTimestamp(),
                 PointerToSymbolTable = 0,
                 NumberOfSymbols = 0,
                 SizeOfOptionalHeader = 0x00E0,
@@ -263,7 +264,21 @@ public static class WebcilConverterUtils
 
         return (uint)soh.RoundToNearest();
     }
-    
+
+    /// <summary>
+    /// The low 32 bits of the time stamp of the image.
+    /// This represents the date and time the image was created by the linker.
+    /// The value is represented in the number of seconds elapsed since midnight (00:00:00), January 1, 1970, Universal Coordinated Time, according to the system clock.
+    /// </summary>
+    private static uint GetImageTimestamp()
+    {
+        // Calculate the total seconds since Unix epoch
+        var totalSeconds = (DateTime.UtcNow - Epoch).Ticks / TimeSpan.TicksPerSecond;
+
+        // Convert to uint (low 32 bits)
+        return (uint)totalSeconds;
+    }
+
     private static byte[] StructToBytes<T>(T structData) where T : struct
     {
         int size = Marshal.SizeOf(structData);
