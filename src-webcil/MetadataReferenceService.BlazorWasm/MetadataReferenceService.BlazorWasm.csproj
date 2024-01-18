@@ -5,6 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<PackageTags>MetadataReference;CodeAnalysis;Blazor;Wasm;Webcil;Decode;PE;DLL;Portable Executable</PackageTags>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -12,6 +13,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="..\Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" Link="Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" />
+		<Compile Include="..\Microsoft.NET.WebAssembly.Webcil\*.cs" Link="Microsoft.NET.WebAssembly.Webcil\%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<!--<ItemGroup>
 	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" Link="Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" />
 	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WasmModuleReader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WasmModuleReader.cs" />
 	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebciHeader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebciHeader.cs" />
@@ -20,7 +26,7 @@
 	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilReader.Reflection.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilReader.Reflection.cs" />
 	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilSectionHeader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilSectionHeader.cs" />
 	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilWasmWrapper.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilWasmWrapper.cs" />
-	</ItemGroup>
+	</ItemGroup>-->
 
 	<ItemGroup>
 		<ProjectReference Include="..\MetadataReferenceService.Abstractions\MetadataReferenceService.Abstractions.csproj" />
@@ -42,10 +48,6 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Microsoft.NET.WebAssembly.Webcil\Internal\" />
 	</ItemGroup>
 
 </Project>

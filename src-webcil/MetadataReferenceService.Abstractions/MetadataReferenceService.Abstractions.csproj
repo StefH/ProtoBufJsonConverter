@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net462;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Langversion>latest</Langversion>
+		<PackageTags>MetadataReference;CodeAnalysis;Interface</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>

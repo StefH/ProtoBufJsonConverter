@@ -48,7 +48,7 @@ public static class WebcilConverterUtils
         var sizeofNTHeaders = Marshal.SizeOf<IMAGE_NT_HEADERS32>(); // 248
         var sizeofSectionHeader = Marshal.SizeOf<IMAGE_SECTION_HEADER>(); // 40
         var sectionStart = sizeofDOSHeader + sizeofMSDOS + sizeofNTHeaders + webcilSectionHeadersCount * sizeofSectionHeader; // 496
-        var sectionStartRounded = RoundToNearest(sectionStart);
+        var sectionStartRounded = sectionStart.RoundToNearest();
         var extraBytesAfterSections = new byte[sectionStartRounded - sectionStart];
         var pointerToRawDataFirstSectionHeader = webcilSectionHeaders[0].PointerToRawData;
         var pointerToRawDataOffsetBetweenWebcilAndPE = sectionStartRounded - pointerToRawDataFirstSectionHeader;
@@ -117,7 +117,7 @@ public static class WebcilConverterUtils
                 MajorSubsystemVersion = 4,
                 MinorSubsystemVersion = 0,
                 Win32VersionValue = 0,
-                SizeOfImage = RoundToNearest(webcilSectionHeadersSizeOfRawData, sectionAlignment),
+                SizeOfImage = webcilSectionHeadersSizeOfRawData.RoundToNearest(sectionAlignment),
                 SizeOfHeaders = GetSizeOfHeaders(DOSHeader, webcilSectionHeadersCount),
                 CheckSum = 0,
                 Subsystem = 3, // IMAGE_SUBSYSTEM_WINDOWS_CUI
@@ -205,9 +205,9 @@ public static class WebcilConverterUtils
         return peStream.ToArray();
     }
 
-    private static WebcilHeader ReadHeader(Stream s)
+    private static WebcilHeader ReadHeader(Stream webcilStream)
     {
-        var webcilHeader = ReadStructure<WebcilHeader>(s);
+        var webcilHeader = ReadStructure<WebcilHeader>(webcilStream);
 
         if (!BitConverter.IsLittleEndian)
         {
@@ -223,20 +223,20 @@ public static class WebcilConverterUtils
         return webcilHeader;
     }
 
-    private static ImmutableArray<WebcilSectionHeader> ReadSectionHeaders(Stream s, int sectionsHeaders)
+    private static ImmutableArray<WebcilSectionHeader> ReadSectionHeaders(Stream webcilStream, int sectionsHeaders)
     {
         var result = new List<WebcilSectionHeader>();
         for (int i = 0; i < sectionsHeaders; i++)
         {
-            result.Add(ReadSectionHeader(s));
+            result.Add(ReadSectionHeader(webcilStream));
         }
 
         return ImmutableArray.Create(result.ToArray());
     }
 
-    private static WebcilSectionHeader ReadSectionHeader(Stream s)
+    private static WebcilSectionHeader ReadSectionHeader(Stream webcilStream)
     {
-        var sectionHeader = ReadStructure<WebcilSectionHeader>(s);
+        var sectionHeader = ReadStructure<WebcilSectionHeader>(webcilStream);
 
         if (!BitConverter.IsLittleEndian)
         {
@@ -261,23 +261,9 @@ public static class WebcilConverterUtils
                   numSectionHeaders * Marshal.SizeOf<IMAGE_SECTION_HEADER>() // size of all section headers
         ;
 
-        return (uint)RoundToNearest(soh);
+        return (uint)soh.RoundToNearest();
     }
-
-    private static int RoundToNearest(int number, int nearest = 512)
-    {
-        var divided = 1.0 * number / nearest;
-        var rounded = (int)Math.Round(divided, MidpointRounding.AwayFromZero);
-        return rounded * nearest;
-    }
-
-    private static uint RoundToNearest(uint number, uint nearest = 512)
-    {
-        var divided = 1.0 * number / nearest;
-        var rounded = (uint)Math.Round(divided, MidpointRounding.AwayFromZero);
-        return rounded * nearest;
-    }
-
+    
     private static byte[] StructToBytes<T>(T structData) where T : struct
     {
         int size = Marshal.SizeOf(structData);

@@ -17,8 +17,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\src-webcil\MetadataReferenceService.BlazorWasm\MetadataReferenceService.BlazorWasm.csproj" />
 		<ProjectReference Include="..\..\src\ProtoBufJsonConverter\ProtoBufJsonConverter.csproj" />
-		<ProjectReference Include="..\MetadataReferenceService.BlazorWasm\MetadataReferenceService.BlazorWasm.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
