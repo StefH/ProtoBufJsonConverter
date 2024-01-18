@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using Google.Protobuf.Reflection;
+using MetadataReferenceService.Abstractions;
 using ProtoBuf.Reflection;
 using ProtoBufJsonConverter.Extensions;
 using ProtoBufJsonConverter.Models;
@@ -24,7 +25,7 @@ public class Converter : IConverter
 
     private readonly IMetadataReferenceService _metadataReferenceService;
 
-    public Converter() : this(new DefaultMetadataReferenceService())
+    public Converter() : this(new CreateFromFileMetadataReferenceService())
     {
     }
 

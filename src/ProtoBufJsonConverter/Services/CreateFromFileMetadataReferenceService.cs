@@ -1,11 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
+using MetadataReferenceService.Abstractions;
 using Microsoft.CodeAnalysis;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Services;
 
-internal class DefaultMetadataReferenceService : IMetadataReferenceService
+internal class CreateFromFileMetadataReferenceService : IMetadataReferenceService
 {
     private readonly ConcurrentDictionary<string, MetadataReference> _cachedMetadataReferences = new();
 

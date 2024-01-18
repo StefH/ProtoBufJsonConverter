@@ -1,11 +1,11 @@
 ﻿using System.Buffers.Binary;
 using System.Collections.Immutable;
-using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.NT_Structs;
 using System.Runtime.InteropServices;
-using Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Extensions;
-using Stef.Validation;
+using MetadataReferenceService.BlazorWasm.WasmWebcil.Extensions;
+using MetadataReferenceService.BlazorWasm.WasmWebcil.NT_Structs;
+using Microsoft.NET.WebAssembly.Webcil;
 
-namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp.Utils;
+namespace MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
 
 public static class WebcilConverterUtils
 {
@@ -19,12 +19,11 @@ public static class WebcilConverterUtils
         0x74, 0x20, 0x62, 0x65, 0x20, 0x72, 0x75, 0x6E, 0x20, 0x69, 0x6E, 0x20, 0x44, 0x4F, 0x53, 0x20,
         0x6D, 0x6F, 0x64, 0x65, 0x2E, 0x0D, 0x0D, 0x0A, 0x24, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     };
+    private static readonly ushort[] DOSReservedWords1 = { 0, 0, 0, 0 };
+    private static readonly ushort[] DOSReservedWords2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-    
     public static byte[] ConvertFromWasmWrappedWebcil(Stream wasmWrappedWebcilStream)
     {
-        Guard.NotNull(wasmWrappedWebcilStream);
-
         using var unwrapper = new WasmWebcilUnwrapper(wasmWrappedWebcilStream);
 
         using var webcilStream = new MemoryStream();
@@ -37,29 +36,26 @@ public static class WebcilConverterUtils
 
     public static byte[] ConvertFromWebcil(Stream webcilStream)
     {
-        Guard.NotNull(webcilStream);
-
+        // These are WebCil variables
         var webcilHeader = ReadHeader(webcilStream);
         var webcilSectionHeaders = ReadSectionHeaders(webcilStream, webcilHeader.coff_sections);
         var webcilSectionHeadersCount = webcilSectionHeaders.Length;
         var webcilSectionHeadersSizeOfRawData = (uint)webcilSectionHeaders.Sum(x => x.SizeOfRawData);
 
-        int sizeofWebCilHeader = Marshal.SizeOf<WebcilHeader>(); // 28
-        int sizeofWebCilSectionHeaders = Marshal.SizeOf<WebcilSectionHeader>() * webcilSectionHeadersCount; // 48
-        int sizeofIMAGE_DOS_HEADER = Marshal.SizeOf<IMAGE_DOS_HEADER>(); // 64
-        int sizeofmsdos_stub = MSDOS.Length; // 64
-        int sizeofIMAGE_NT_HEADERS32 = Marshal.SizeOf<IMAGE_NT_HEADERS32>(); // 248
-        int sizeofIMAGE_SECTION_HEADER = Marshal.SizeOf<IMAGE_SECTION_HEADER>(); // 40
-
-        int PESectionStart = sizeofIMAGE_DOS_HEADER + sizeofmsdos_stub + sizeofIMAGE_NT_HEADERS32 + webcilSectionHeadersCount * sizeofIMAGE_SECTION_HEADER; // 496
-        int PESectionStartRounded = RoundToNearest(PESectionStart);
-        byte[] extraBytesAfterSections = new byte[PESectionStartRounded - PESectionStart];
-
+        // These are PE (Portable Executable) variables
+        var sizeofDOSHeader = Marshal.SizeOf<IMAGE_DOS_HEADER>(); // 64
+        var sizeofMSDOS = MSDOS.Length; // 64
+        var sizeofNTHeaders = Marshal.SizeOf<IMAGE_NT_HEADERS32>(); // 248
+        var sizeofSectionHeader = Marshal.SizeOf<IMAGE_SECTION_HEADER>(); // 40
+        var sectionStart = sizeofDOSHeader + sizeofMSDOS + sizeofNTHeaders + webcilSectionHeadersCount * sizeofSectionHeader; // 496
+        var sectionStartRounded = RoundToNearest(sectionStart);
+        var extraBytesAfterSections = new byte[sectionStartRounded - sectionStart];
         var pointerToRawDataFirstSectionHeader = webcilSectionHeaders[0].PointerToRawData;
-        int pointerToRawDataOffsetBetweenWebcilAndPE = PESectionStartRounded - pointerToRawDataFirstSectionHeader;
+        var pointerToRawDataOffsetBetweenWebcilAndPE = sectionStartRounded - pointerToRawDataFirstSectionHeader;
         
-        using var newDllStream = new MemoryStream();
-        var imageDosHeader = new IMAGE_DOS_HEADER
+        using var peStream = new MemoryStream();
+
+        var DOSHeader = new IMAGE_DOS_HEADER
         {
             MagicNumber = 0x5A4D,
             BytesOnLastPageOfFile = 0x90,
@@ -75,15 +71,15 @@ public static class WebcilConverterUtils
             InitialCS = 0,
             AddressOfRelocationTable = 0x40,
             OverlayNumber = 0,
-            ReservedWords1 = new ushort[] { 0, 0, 0, 0 },
+            ReservedWords1 = DOSReservedWords1,
             OEMIdentifier = 0,
             OEMInformation = 0,
-            ReservedWords2 = new ushort[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            ReservedWords2 = DOSReservedWords2,
             FileAddressOfNewExeHeader = 0x80
         };
-        newDllStream.Write(StructToBytes(imageDosHeader));
+        peStream.Write(StructToBytes(DOSHeader));
 
-        newDllStream.Write(MSDOS);
+        peStream.Write(MSDOS);
 
         uint fileAlignment = 0x0200;
         uint sectionAlignment = 0x2000;
@@ -94,7 +90,7 @@ public static class WebcilConverterUtils
             {
                 Machine = 0x014C,
                 NumberOfSections = 3,
-                TimeDateStamp = 0xF5192B61,
+                TimeDateStamp = 0xF5192B61, // TODO : This is a dummy TimeDateStamp
                 PointerToSymbolTable = 0,
                 NumberOfSymbols = 0,
                 SizeOfOptionalHeader = 0x00E0,
@@ -122,7 +118,7 @@ public static class WebcilConverterUtils
                 MinorSubsystemVersion = 0,
                 Win32VersionValue = 0,
                 SizeOfImage = RoundToNearest(webcilSectionHeadersSizeOfRawData, sectionAlignment),
-                SizeOfHeaders = GetSizeOfHeaders(imageDosHeader, webcilSectionHeadersCount),
+                SizeOfHeaders = GetSizeOfHeaders(DOSHeader, webcilSectionHeadersCount),
                 CheckSum = 0,
                 Subsystem = 3, // IMAGE_SUBSYSTEM_WINDOWS_CUI
                 DllCharacteristics = 0x8560,
@@ -153,9 +149,9 @@ public static class WebcilConverterUtils
                 }
             }
         };
-        newDllStream.Write(StructToBytes(IMAGE_NT_HEADERS32));
+        peStream.Write(StructToBytes(IMAGE_NT_HEADERS32));
 
-        var IMAGE_SECTION_HEADER_text = new IMAGE_SECTION_HEADER
+        var textSectionHeader = new IMAGE_SECTION_HEADER
         {
             Name = SectionHeaderText,
             Misc = new IMAGE_SECTION_HEADER.UnionType { VirtualSize = (uint)webcilSectionHeaders[0].VirtualSize },
@@ -164,9 +160,9 @@ public static class WebcilConverterUtils
             PointerToRawData = webcilSectionHeaders[0].GetCorrectedPointerToRawData(pointerToRawDataOffsetBetweenWebcilAndPE),
             Characteristics = 0x60000020
         };
-        newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_text));
+        peStream.Write(StructToBytes(textSectionHeader));
 
-        var IMAGE_SECTION_HEADER_rsrc = new IMAGE_SECTION_HEADER
+        var rsrcSectionHeader = new IMAGE_SECTION_HEADER
         {
             Name = SectionHeaderRsRc,
             Misc = new IMAGE_SECTION_HEADER.UnionType { VirtualSize = (uint)webcilSectionHeaders[1].VirtualSize },
@@ -175,9 +171,9 @@ public static class WebcilConverterUtils
             PointerToRawData = webcilSectionHeaders[1].GetCorrectedPointerToRawData(pointerToRawDataOffsetBetweenWebcilAndPE),
             Characteristics = 0x40000040
         };
-        newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_rsrc));
+        peStream.Write(StructToBytes(rsrcSectionHeader));
 
-        var IMAGE_SECTION_HEADER_reloc = new IMAGE_SECTION_HEADER
+        var relocSectionHeader = new IMAGE_SECTION_HEADER
         {
             Name = SectionHeaderReloc,
             Misc = new IMAGE_SECTION_HEADER.UnionType { VirtualSize = (uint)webcilSectionHeaders[2].VirtualSize },
@@ -186,27 +182,27 @@ public static class WebcilConverterUtils
             PointerToRawData = webcilSectionHeaders[2].GetCorrectedPointerToRawData(pointerToRawDataOffsetBetweenWebcilAndPE),
             Characteristics = 0x42000040
         };
-        newDllStream.Write(StructToBytes(IMAGE_SECTION_HEADER_reloc));
+        peStream.Write(StructToBytes(relocSectionHeader));
 
         if (extraBytesAfterSections.Length > 0)
         {
-            newDllStream.Write(extraBytesAfterSections);
+            peStream.Write(extraBytesAfterSections);
         }
 
-        // Just copy all
+        // Just copy all data
         foreach (var webcilSectionHeader in webcilSectionHeaders)
         {
             var buffer = new byte[webcilSectionHeader.SizeOfRawData];
             webcilStream.Seek(webcilSectionHeader.PointerToRawData, SeekOrigin.Begin);
             ReadExactly(webcilStream, buffer);
 
-            newDllStream.Write(buffer, 0, buffer.Length);
+            peStream.Write(buffer, 0, buffer.Length);
         }
 
-        newDllStream.Flush();
-        newDllStream.Seek(0, SeekOrigin.Begin);
+        peStream.Flush();
+        peStream.Seek(0, SeekOrigin.Begin);
 
-        return newDllStream.ToArray();
+        return peStream.ToArray();
     }
 
     private static WebcilHeader ReadHeader(Stream s)
@@ -268,14 +264,14 @@ public static class WebcilConverterUtils
         return (uint)RoundToNearest(soh);
     }
 
-    public static int RoundToNearest(int number, int nearest = 512)
+    private static int RoundToNearest(int number, int nearest = 512)
     {
         var divided = 1.0 * number / nearest;
         var rounded = (int)Math.Round(divided, MidpointRounding.AwayFromZero);
         return rounded * nearest;
     }
 
-    public static uint RoundToNearest(uint number, uint nearest = 512)
+    private static uint RoundToNearest(uint number, uint nearest = 512)
     {
         var divided = 1.0 * number / nearest;
         var rounded = (uint)Math.Round(divided, MidpointRounding.AwayFromZero);
@@ -300,35 +296,6 @@ public static class WebcilConverterUtils
 
         return byteArray;
     }
-
-    //#if NETCOREAPP2_1_OR_GREATER
-    //    private static byte[] StructToBytes<T>(T structure) where T : struct
-    //    {
-    //        unsafe
-    //        {
-    //            byte* p = (byte*)&structure;
-    //            return new ReadOnlySpan<byte>(p, Marshal.SizeOf<T>()).ToArray();
-    //        }
-    //    }
-    //#else
-    //    private static byte[] StructToBytes<T>(T structure) where T : struct
-    //    {
-    //        int size = Marshal.SizeOf<T>();
-    //        byte[] buffer = new byte[size];
-    //        IntPtr ptr = IntPtr.Zero;
-    //        try
-    //        {
-    //            ptr = Marshal.AllocHGlobal(size);
-    //            Marshal.StructureToPtr(structure, ptr, false);
-    //            Marshal.Copy(ptr, buffer, 0, size);
-    //        }
-    //        finally
-    //        {
-    //            Marshal.FreeHGlobal(ptr);
-    //        }
-    //        return buffer;
-    //    }
-    //#endif
 
 #if NETCOREAPP2_1_OR_GREATER
     private static T ReadStructure<T>(Stream s) where T : unmanaged
@@ -365,7 +332,7 @@ public static class WebcilConverterUtils
     }
 #endif
 
-#if NETCOREAPP2_1_OR_GREATER
+#if NETCOREAPP2_1_OR_GREATER && !NET6_0
     private static void ReadExactly(Stream s, Span<byte> buffer)
     {
         s.ReadExactly(buffer);

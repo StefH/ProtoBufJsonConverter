@@ -9,17 +9,17 @@ internal class DownloadFileResult
 
     public FileType FileType { get; }
 
-    [MemberNotNullWhen(true, nameof(Bytes))]
-    public byte[]? Bytes { get; }
+    [MemberNotNullWhen(true, nameof(Success))]
+    public Stream? Stream { get; }
 
     public DownloadFileResult(FileType fileType) : this(fileType, default)
     {
     }
 
-    public DownloadFileResult(FileType fileType, byte[]? bytes)
+    public DownloadFileResult(FileType fileType, Stream? stream)
     {
         FileType = fileType;
-        Success = bytes != null;
-        Bytes = bytes;
+        Success = stream != null;
+        Stream = stream;
     }
 }

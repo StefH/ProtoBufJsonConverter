@@ -4,41 +4,29 @@
 		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 
-	<!-- ILRepack
-	<Target Name="ILRepacker" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
-		<ItemGroup>
-			<InputAssemblies Include="$(OutputPath)Microsoft.NET.WebAssembly.Webcil.dll" />
-		</ItemGroup>
-
-		<ILRepack Parallel="true" Internalize="true" InputAssemblies="@(InputAssemblies)" TargetKind="Dll" OutputFile="$(OutputPath)\$(AssemblyName).dll" />
-	</Target>
-	/ILRepack -->
-
-	<PropertyGroup>
-		<ILRepackTargetConfigurations>Debug;Release</ILRepackTargetConfigurations>
-		<ILRepackExcludeAssemblies>MetadataReferenceService.Abstractions.dll;Stef.Validation.dll;Microsoft.SourceLink.GitHub.dll;Microsoft.CodeAnalysis.CSharp.dll</ILRepackExcludeAssemblies>
-	</PropertyGroup>
-
 	<ItemGroup>
-		<ProjectReference Include="..\MetadataReferenceService.Abstractions\MetadataReferenceService.Abstractions.csproj" />
-		<ProjectReference Include="..\Microsoft.NET.WebAssembly.Webcil\Microsoft.NET.WebAssembly.Webcil.csproj" />
+	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" Link="Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" />
+	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WasmModuleReader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WasmModuleReader.cs" />
+	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebciHeader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebciHeader.cs" />
+	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilConverter.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilConverter.cs" />
+	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilReader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilReader.cs" />
+	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilReader.Reflection.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilReader.Reflection.cs" />
+	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilSectionHeader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilSectionHeader.cs" />
+	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilWasmWrapper.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilWasmWrapper.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ILRepack.FullAuto" Version="1.5.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<!--<PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.26">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>-->
+		<ProjectReference Include="..\MetadataReferenceService.Abstractions\MetadataReferenceService.Abstractions.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="8.0.0" />
 		<PackageReference Include="Stef.Validation" Version="0.1.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
@@ -54,6 +42,10 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Microsoft.NET.WebAssembly.Webcil\Internal\" />
 	</ItemGroup>
 
 </Project>

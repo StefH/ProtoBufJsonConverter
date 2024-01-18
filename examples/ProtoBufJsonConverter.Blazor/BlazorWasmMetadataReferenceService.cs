@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
+using MetadataReferenceService.Abstractions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.CodeAnalysis;
-using ProtoBufJsonConverter.Services;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Blazor;
@@ -10,13 +10,13 @@ namespace ProtoBufJsonConverter.Blazor;
 /// <summary>
 /// Based on https://github.com/LostBeard/BlazorWASMScriptLoader
 /// </summary>
-public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
+public class BlazorWasmMetadataReferenceServiceOld : IMetadataReferenceService
 {
     private readonly HttpClient _httpClient = new();
 
     private readonly ConcurrentDictionary<string, MetadataReference> _cachedMetadataReferences = new();
 
-    public BlazorWasmMetadataReferenceService(NavigationManager navigationManager)
+    public BlazorWasmMetadataReferenceServiceOld(NavigationManager navigationManager)
     {
         _httpClient.BaseAddress = new Uri(Guard.NotNull(navigationManager).BaseUri);
     }

@@ -3,9 +3,10 @@ using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
 using Blazorise.RichTextEdit;
 using HighlightBlazor;
+using MetadataReferenceService.Abstractions;
+using MetadataReferenceService.BlazorWasm;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using ProtoBufJsonConverter.Services;
 
 namespace ProtoBufJsonConverter.Blazor;
 

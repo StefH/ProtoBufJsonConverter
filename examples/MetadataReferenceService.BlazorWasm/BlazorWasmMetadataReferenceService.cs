@@ -3,6 +3,7 @@ using System.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.BlazorWasm.Models;
 using MetadataReferenceService.BlazorWasm.Types;
+using MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
 using Microsoft.AspNetCore.Components;
 using Microsoft.CodeAnalysis;
 using Stef.Validation;
@@ -34,33 +35,47 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
             return metadataReference;
         }
 
-        var bytes = await DownloadFileAsync(assemblyName, cancellationToken);
-        
-        metadataReference = MetadataReference.CreateFromImage(bytes);
-        
-        _cachedMetadataReferences[assemblyName] = metadataReference;
-        return metadataReference;
+        var downloadFileResult = await DownloadFileAsync(assemblyName, cancellationToken);
+        if (downloadFileResult.Success)
+        {
+            if (downloadFileResult.FileType == FileType.Dll)
+            {
+                metadataReference = MetadataReference.CreateFromStream(downloadFileResult.Stream!);
+            }
+            else
+            {
+                var dllBytes = WebcilConverterUtils.ConvertFromWasmWrappedWebcil(downloadFileResult.Stream!);
+                metadataReference = MetadataReference.CreateFromImage(dllBytes);
+            }
+
+            _cachedMetadataReferences[assemblyName] = metadataReference;
+            return metadataReference;
+        }
+
+        throw new InvalidOperationException($"Unable to download '{assemblyName}' and create a {nameof(MetadataReference)}.");
     }
 
-    private async Task<byte[]> DownloadFileAsync(string assemblyName, CancellationToken cancellationToken)
+    private async Task<DownloadFileResult> DownloadFileAsync(string assemblyName, CancellationToken cancellationToken)
     {
 #if NET8_0
+        // First try to download the file as .wasm ("<WasmEnableWebcil>true</WasmEnableWebcil>" / default value)
         var wasm = await TryDownloadFileAsync(assemblyName, FileType.Wasm, cancellationToken);
         if (wasm.Success)
         {
-            return wasm.Bytes!;
+            return wasm;
         }
 
+        // In case "<WasmEnableWebcil>false</WasmEnableWebcil>", download the .dll
         var dll = await TryDownloadFileAsync(assemblyName, FileType.Dll, cancellationToken);
         if (dll.Success)
         {
-            return dll.Bytes!;
+            return dll;
         }
 #else
         var dll = await TryDownloadFileAsync(assemblyName, FileType.Dll, cancellationToken);
         if (dll.Success)
         {
-            return dll.Bytes!;
+            return dll;
         }
 #endif
 
@@ -69,11 +84,11 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
 
     private async Task<DownloadFileResult> TryDownloadFileAsync(string assemblyName, FileType fileType, CancellationToken cancellationToken)
     {
-        var assemblyUrl = $"./_framework/{assemblyName}.{fileType.ToString().ToLowerInvariant()}";
-        var httpResponseMessage = await _httpClient.GetAsync(assemblyUrl, cancellationToken);
+        var assemblyDownloadUrl = $"./_framework/{assemblyName}.{fileType.ToString().ToLowerInvariant()}";
+        var httpResponseMessage = await _httpClient.GetAsync(assemblyDownloadUrl, cancellationToken);
         if (httpResponseMessage.IsSuccessStatusCode)
         {
-            var bytes = await httpResponseMessage.Content.ReadAsByteArrayAsync(cancellationToken);
+            var bytes = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
             return new(fileType, bytes);
         }
 

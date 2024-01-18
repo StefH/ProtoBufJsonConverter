@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
+using MetadataReferenceService.Abstractions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
-using ProtoBufJsonConverter.Services;
 
 namespace ProtoBufJsonConverter.Utils;
 

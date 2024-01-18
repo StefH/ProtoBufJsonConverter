@@ -31,4 +31,8 @@
 		<InternalsVisibleTo Include="ProtoBufJsonConverterTests" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\examples\MetadataReferenceService.Abstractions\MetadataReferenceService.Abstractions.csproj" />
+	</ItemGroup>
+
 </Project>
