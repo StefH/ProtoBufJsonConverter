@@ -5,15 +5,20 @@ namespace MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
 
 internal static class WebcilWasmWrapperHelper
 {
+    private static readonly FieldInfo FieldInfoPrefix = typeof(WebcilWasmWrapper).GetField("s_wasmWrapperPrefix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField)!;
+
     public static byte[] GetPrefix()
     {
-        var fieldInfo = typeof(WebcilWasmWrapper).GetField("s_wasmWrapperPrefix", BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField)!;
 #if NET7_0_OR_GREATER
-        var readOnlyMemoryByteArray = (ReadOnlyMemory<byte>)fieldInfo.GetValue(null)!;
-        return readOnlyMemoryByteArray.ToArray();
+        return GetPrefixValue<ReadOnlyMemory<byte>>().ToArray();
 
 #else
-        return (byte[])fieldInfo.GetValue(null)!;
+        return GetPrefixValue<byte[]>();
 #endif
+    }
+
+    private static T GetPrefixValue<T>()
+    {
+        return (T)FieldInfoPrefix.GetValue(null)!;
     }
 }
