@@ -28,7 +28,7 @@ internal class WasmWebcilUnwrapper : IDisposable
         int bytesRead = _wasmStream.Read(buffer, 0, buffer.Length);
         if (bytesRead < buffer.Length)
         {
-            throw new InvalidOperationException("TODO");
+            throw new InvalidOperationException("Unable to read Wasm prefix.");
         }
 
         // Compare the read prefix with the expected one.
@@ -50,13 +50,14 @@ internal class WasmWebcilUnwrapper : IDisposable
         byte[] buffer = new byte[1];
         while (true)
         {
+            // Read the Data section
             var dataRead = reader.Read(buffer, 0, 1);
             if (dataRead == 0)
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException("Unable to read Data Section.");
             }
 
-            // Check for the Data section (ID = 11)
+            // Check the Data section (ID = 11)
             if (buffer[0] == 11)
             {
                 break;
@@ -71,20 +72,21 @@ internal class WasmWebcilUnwrapper : IDisposable
 
         // Read the number of segments.
         int segmentsCount = (int)ULEB128Decode(reader);
-        for (int i = 0; i < segmentsCount; i++)
+        int lastSegment = segmentsCount - 1;
+        for (int segmentIndex = 0; segmentIndex < segmentsCount; segmentIndex++)
         {
             // Ignore segmentType (1 = passive segment)
             var segmentType = reader.Read(buffer, 0, 1);
             if (segmentType != 1)
             {
-                throw new InvalidOperationException($"Unexpected segment code for segment {i}.");
+                throw new InvalidOperationException($"Unexpected segment code for segment {segmentIndex}.");
             }
 
             // Read the segment size.
-            uint segmentSize = ULEB128Decode(reader);
+            var segmentSize = ULEB128Decode(reader);
 
             // The actual Webcil payload is expected to be in the last segment.
-            if (i == segmentsCount - 1)
+            if (segmentIndex == lastSegment)
             {
                 return reader.ReadBytes((int)segmentSize);
             }

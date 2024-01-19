@@ -6,6 +6,7 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<PackageTags>MetadataReference;CodeAnalysis;Blazor;Wasm;Webcil;Decode;PE;DLL;Portable Executable</PackageTags>
+		<Description>Use this package to generate a valid MetadataReference based on an Wasm wrapped Webcil.</Description>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -16,17 +17,6 @@
 		<Compile Include="..\Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" Link="Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" />
 		<Compile Include="..\Microsoft.NET.WebAssembly.Webcil\*.cs" Link="Microsoft.NET.WebAssembly.Webcil\%(Filename)%(Extension)" />
 	</ItemGroup>
-
-	<!--<ItemGroup>
-	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" Link="Microsoft.NET.WebAssembly.Webcil\Internal\Constants.cs" />
-	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WasmModuleReader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WasmModuleReader.cs" />
-	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebciHeader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebciHeader.cs" />
-	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilConverter.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilConverter.cs" />
-	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilReader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilReader.cs" />
-	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilReader.Reflection.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilReader.Reflection.cs" />
-	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilSectionHeader.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilSectionHeader.cs" />
-	  <Compile Include="..\Microsoft.NET.WebAssembly.Webcil\WebcilWasmWrapper.cs" Link="Microsoft.NET.WebAssembly.Webcil\WebcilWasmWrapper.cs" />
-	</ItemGroup>-->
 
 	<ItemGroup>
 		<ProjectReference Include="..\MetadataReferenceService.Abstractions\MetadataReferenceService.Abstractions.csproj" />
