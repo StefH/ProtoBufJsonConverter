@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.NET.WebAssembly.Webcil;
 
-namespace MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
+namespace MetadataReferenceService.BlazorWasm.WasmWebcil.Helpers;
 
 internal static class WebcilWasmWrapperHelper
 {
@@ -11,7 +11,6 @@ internal static class WebcilWasmWrapperHelper
     {
 #if NET7_0_OR_GREATER
         return GetPrefixValue<ReadOnlyMemory<byte>>().ToArray();
-
 #else
         return GetPrefixValue<byte[]>();
 #endif

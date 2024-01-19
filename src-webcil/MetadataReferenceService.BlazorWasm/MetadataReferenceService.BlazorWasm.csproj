@@ -5,8 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<PackageTags>MetadataReference;CodeAnalysis;Blazor;Wasm;Webcil;Decode;PE;DLL;Portable Executable</PackageTags>
-		<Description>Use this package to generate a valid MetadataReference based on an Wasm wrapped Webcil.</Description>
+		<PackageTags>MetadataReference;CodeAnalysis;Blazor;Wasm;Webcil;Unwrap;Decode;PE;DLL;Portable Executable;Stream</PackageTags>
+		<Description>Use this package to generate a valid MetadataReference based on an Wasm wrapped Webcil stream.</Description>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release'">

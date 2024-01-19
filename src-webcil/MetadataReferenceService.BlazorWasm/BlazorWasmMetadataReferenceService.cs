@@ -3,7 +3,7 @@ using System.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.BlazorWasm.Models;
 using MetadataReferenceService.BlazorWasm.Types;
-using MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
+using MetadataReferenceService.BlazorWasm.WasmWebcil;
 using Microsoft.AspNetCore.Components;
 using Microsoft.CodeAnalysis;
 using Stef.Validation;
@@ -44,7 +44,7 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
             }
             else
             {
-                var dllBytes = WebcilConverterUtil.ConvertFromWasmWrappedWebcil(downloadFileResult.Stream!);
+                var dllBytes = WebcilConverterUtil.ConvertFromWebcil(downloadFileResult.Stream!);
                 metadataReference = MetadataReference.CreateFromImage(dllBytes);
             }
 

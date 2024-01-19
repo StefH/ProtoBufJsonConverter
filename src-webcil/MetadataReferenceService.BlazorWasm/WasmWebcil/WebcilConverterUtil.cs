@@ -3,9 +3,10 @@ using System.Collections.Immutable;
 using System.Runtime.InteropServices;
 using MetadataReferenceService.BlazorWasm.WasmWebcil.Extensions;
 using MetadataReferenceService.BlazorWasm.WasmWebcil.NT_Structs;
+using Microsoft.CodeAnalysis;
 using Microsoft.NET.WebAssembly.Webcil;
 
-namespace MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
+namespace MetadataReferenceService.BlazorWasm.WasmWebcil;
 
 public static class WebcilConverterUtil
 {
@@ -30,21 +31,44 @@ public static class WebcilConverterUtil
     private const uint FileAlignment = 0x0200;
     private const uint SectionAlignment = 0x2000;
 
-    public static byte[] ConvertFromWasmWrappedWebcil(Stream wasmWrappedWebcilStream)
+    /// <summary>
+    /// Convert a Portable Executable file into a Webcil file.
+    /// </summary>
+    /// <param name="inputPath">The input path for the PE file.</param>
+    /// <param name="outputPath">The output path for the Webcil file.</param>
+    /// <param name="wrapInWebAssembly">The Webcil should be wrapped in Wasm [default value is <c>true</c>].</param>
+    public static void ConvertToWebcil(string inputPath, string outputPath, bool wrapInWebAssembly = true)
     {
-        using var unwrapper = new WasmWebcilUnwrapper(wasmWrappedWebcilStream);
+        var webcilConverter = WebcilConverter.FromPortableExecutable(inputPath, outputPath);
+        webcilConverter.WrapInWebAssembly = wrapInWebAssembly;
 
-        using var webcilStream = new MemoryStream();
-        unwrapper.WriteUnwrapped(webcilStream);
-        webcilStream.Flush();
-        webcilStream.Seek(0, SeekOrigin.Begin);
-
-        return ConvertFromWebcil(webcilStream);
+        webcilConverter.ConvertToWebcil();
     }
 
-    public static byte[] ConvertFromWebcil(Stream webcilStream)
+    /// <summary>
+    /// Convert a Webcil stream into a Portable Executable which can be used to create a valid <see cref="MetadataReference"/>.
+    /// </summary>
+    /// <param name="inputStream">The input sStream.</param>
+    /// <param name="wrappedInWebAssembly">The Webcil is wrapped in Wasm [default value is <c>true</c>].</param>
+    /// <returns>A byte[] Portable Executable</returns>
+    public static byte[] ConvertFromWebcil(Stream inputStream, bool wrappedInWebAssembly = true)
     {
-        // These are WebCil variables
+        Stream webcilStream;
+        if (wrappedInWebAssembly)
+        {
+            using var unwrapper = new WasmWebcilUnwrapper(inputStream);
+            webcilStream = new MemoryStream();
+            unwrapper.WriteUnwrapped(webcilStream);
+
+            webcilStream.Flush();
+            webcilStream.Seek(0, SeekOrigin.Begin);
+        }
+        else
+        {
+            webcilStream = inputStream;
+        }
+
+        // These are Webcil variables
         var webcilHeader = ReadHeader(webcilStream);
         var webcilSectionHeaders = ReadSectionHeaders(webcilStream, webcilHeader.coff_sections);
         var webcilSectionHeadersCount = webcilSectionHeaders.Length;

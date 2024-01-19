@@ -1,4 +1,4 @@
-﻿using MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
+﻿using MetadataReferenceService.BlazorWasm.WasmWebcil.Helpers;
 
 namespace MetadataReferenceService.BlazorWasm.WasmWebcil;
 

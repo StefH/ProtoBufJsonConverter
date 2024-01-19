@@ -1,4 +1,4 @@
-﻿using MetadataReferenceService.BlazorWasm.WasmWebcil.Utils;
+﻿using MetadataReferenceService.BlazorWasm.WasmWebcil;
 
 namespace Microsoft.NET.WebAssembly.Webcil.ConsoleApp;
 
@@ -9,7 +9,7 @@ internal class Program
         // var dllStream = new MemoryStream(File.ReadAllBytes(@"c:\temp\ProtoBufJsonConverter.Blazor.dll")); //File.OpenRead(@"c:\temp\ProtoBufJsonConverter.Blazor.dll"));
         var wasmStream = File.OpenRead(@"c:\temp\ProtoBufJsonConverter.Blazor.wasm");
         
-        var peBytes = WebcilConverterUtil.ConvertFromWasmWrappedWebcil(wasmStream);
+        var peBytes = WebcilConverterUtil.ConvertFromWebcil(wasmStream);
         File.WriteAllBytes(@"c:\temp\ProtoBufJsonConverter.Blazor.dll2", peBytes);
     }
 }
