@@ -11,6 +11,7 @@ using Stef.Validation;
 namespace MetadataReferenceService.BlazorWasm;
 
 /// <summary>
+/// A Blazor Wasm Implementation of <see cref="IMetadataReferenceService"/>.
 /// - https://github.com/LostBeard/BlazorWASMScriptLoader
 /// - https://learn.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?view=aspnetcore-8.0#webcil-packaging-format-for-net-assemblies
 /// </summary>
@@ -20,11 +21,23 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
 
     private readonly ConcurrentDictionary<string, MetadataReference> _cachedMetadataReferences = new();
 
+    /// <summary>
+    /// Initializes a new instance of the BlazorWasmMetadataReferenceService class.
+    /// </summary>
+    /// <remarks>
+    /// This constructor sets the base address of the internal HTTP client
+    /// to the base URI of the application, as provided by the NavigationManager.
+    /// </remarks>
+    /// <param name="navigationManager">
+    /// An instance of NavigationManager used to obtain the application's base URI.
+    /// The navigation manager is validated to ensure it's not null before use.
+    /// </param>
     public BlazorWasmMetadataReferenceService(NavigationManager navigationManager)
     {
         _httpClient.BaseAddress = new Uri(Guard.NotNull(navigationManager).BaseUri);
     }
 
+    /// <inheritdoc />
     public async Task<MetadataReference> CreateAsync(Assembly assembly, CancellationToken cancellationToken = default)
     {
         Guard.NotNull(assembly);
