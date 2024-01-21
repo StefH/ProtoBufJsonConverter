@@ -8,14 +8,14 @@ namespace MetadataReferenceService.Abstractions.Types;
 public readonly struct AssemblyDetails
 {
     /// <summary>
-    /// Gets or sets the simple name of the assembly. This is usually, but not necessarily,
-    /// the file name of the manifest file of the assembly, minus its extension.
+    /// The simple name of the assembly.
+    /// This is usually, but not necessarily, the file name of the manifest file of the assembly, minus its extension.
     /// </summary>
     public required string Name { get; init; }
 
 
     /// <summary>
-    /// The full path or UNC location of the loaded file that contains the manifest.
+    /// The full path or UNC location of the loaded file that contains the manifest. [optional]
     /// </summary>
     public string? Location { get; init; }
 
