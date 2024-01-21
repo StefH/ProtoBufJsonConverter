@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using MetadataReferenceService.Abstractions;
+using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
@@ -63,7 +64,7 @@ internal static class AssemblyUtils
         var references = new List<MetadataReference>();
         foreach (var requiredAssembly in RequiredAssemblies.Value)
         {
-            references.Add(await metadataReferenceService.CreateAsync(requiredAssembly, cancellationToken).ConfigureAwait(false));
+            references.Add(await metadataReferenceService.CreateAsync(AssemblyDetails.FromAssembly(requiredAssembly), cancellationToken).ConfigureAwait(false));
         }
 
         return references;

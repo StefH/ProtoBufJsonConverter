@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using MetadataReferenceService.Abstractions;
+using MetadataReferenceService.Abstractions.Types;
 using MetadataReferenceService.BlazorWasm.Models;
 using MetadataReferenceService.BlazorWasm.Types;
 using MetadataReferenceService.BlazorWasm.WasmWebcil;
@@ -38,11 +39,11 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
     }
 
     /// <inheritdoc />
-    public async Task<MetadataReference> CreateAsync(Assembly assembly, CancellationToken cancellationToken = default)
+    public async Task<MetadataReference> CreateAsync(AssemblyDetails assembly, CancellationToken cancellationToken = default)
     {
-        Guard.NotNull(assembly);
+        Guard.NotNull(assembly.Name);
 
-        var assemblyName = assembly.GetName().Name!;
+        var assemblyName = assembly.Name;
         if (_cachedMetadataReferences.TryGetValue(assemblyName, out var metadataReference))
         {
             return metadataReference;
