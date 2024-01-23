@@ -8,14 +8,15 @@ namespace ProtoBufJsonConverter.Services;
 
 internal class CreateFromFileMetadataReferenceService : IMetadataReferenceService
 {
-    private readonly ConcurrentDictionary<string, MetadataReference> _cachedMetadataReferences = new();
+    private readonly ConcurrentDictionary<int, MetadataReference> _cachedMetadataReferences = new();
 
     /// <inheritdoc />
     public Task<MetadataReference> CreateAsync(AssemblyDetails assembly, CancellationToken cancellationToken = default)
     {
-        var key = Guard.NotNullOrWhiteSpace(assembly.Name);
+        Guard.NotNullOrWhiteSpace(assembly.Name);
         var location = Guard.NotNullOrWhiteSpace(assembly.Location);
 
+        var key = assembly.GetHashCode();
         return Task.FromResult(_cachedMetadataReferences.GetOrAdd(key, _ => MetadataReference.CreateFromFile(location)));
     }
 }

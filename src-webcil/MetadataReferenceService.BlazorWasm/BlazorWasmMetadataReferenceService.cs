@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Abstractions.Types;
 using MetadataReferenceService.BlazorWasm.Models;
@@ -20,7 +19,7 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
 {
     private readonly HttpClient _httpClient = new();
 
-    private readonly ConcurrentDictionary<string, MetadataReference> _cachedMetadataReferences = new();
+    private readonly ConcurrentDictionary<int, MetadataReference> _cachedMetadataReferences = new();
 
     /// <summary>
     /// Initializes a new instance of the BlazorWasmMetadataReferenceService class.
@@ -43,13 +42,13 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
     {
         Guard.NotNull(assembly.Name);
 
-        var assemblyName = assembly.Name;
-        if (_cachedMetadataReferences.TryGetValue(assemblyName, out var metadataReference))
+        var key = assembly.GetHashCode();
+        if (_cachedMetadataReferences.TryGetValue(key, out var metadataReference))
         {
             return metadataReference;
         }
 
-        var downloadFileResult = await DownloadFileAsync(assemblyName, cancellationToken);
+        var downloadFileResult = await DownloadFileAsync(assembly.Name, cancellationToken);
         if (downloadFileResult.Success)
         {
             if (downloadFileResult.FileType == FileType.Dll)
@@ -62,11 +61,11 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
                 metadataReference = MetadataReference.CreateFromImage(dllBytes);
             }
 
-            _cachedMetadataReferences[assemblyName] = metadataReference;
+            _cachedMetadataReferences[key] = metadataReference;
             return metadataReference;
         }
 
-        throw new InvalidOperationException($"Unable to download '{assemblyName}' and create a {nameof(MetadataReference)}.");
+        throw new InvalidOperationException($"Unable to download '{assembly.Name}' and create a {nameof(MetadataReference)}.");
     }
 
     private async Task<DownloadFileResult> DownloadFileAsync(string assemblyName, CancellationToken cancellationToken)
