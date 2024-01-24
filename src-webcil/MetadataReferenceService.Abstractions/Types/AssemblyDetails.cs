@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Stef.Validation;
 
 namespace MetadataReferenceService.Abstractions.Types;
 
@@ -42,10 +43,7 @@ public readonly struct AssemblyDetails
     /// <returns><see cref="AssemblyDetails"/></returns>
     public static AssemblyDetails FromAssembly(Assembly assembly)
     {
-        if (assembly == null)
-        {
-            throw new ArgumentNullException(nameof(assembly));
-        }
+        Guard.NotNull(assembly);
 
         return new AssemblyDetails
         {

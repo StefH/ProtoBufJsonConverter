@@ -2,10 +2,10 @@
 using System.Reflection;
 using Google.Protobuf.Reflection;
 using MetadataReferenceService.Abstractions;
+using MetadataReferenceService.Default;
 using ProtoBuf.Reflection;
 using ProtoBufJsonConverter.Extensions;
 using ProtoBufJsonConverter.Models;
-using ProtoBufJsonConverter.Services;
 using ProtoBufJsonConverter.Utils;
 using Stef.Validation;
 

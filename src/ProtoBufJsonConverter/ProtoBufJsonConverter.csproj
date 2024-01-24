@@ -33,7 +33,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src-webcil\MetadataReferenceService.Abstractions\MetadataReferenceService.Abstractions.csproj" />
+	  <ProjectReference Include="..\..\src-webcil\MetadataReferenceService.Default\MetadataReferenceService.Default.csproj" />
 	</ItemGroup>
 
 </Project>

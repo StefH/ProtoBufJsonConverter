@@ -4,9 +4,12 @@ using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Stef.Validation;
 
-namespace ProtoBufJsonConverter.Services;
+namespace MetadataReferenceService.Default;
 
-internal class CreateFromFileMetadataReferenceService : IMetadataReferenceService
+/// <summary>
+/// Default implementation for <see cref="IMetadataReferenceService"/> which creates a <see cref="MetadataReference"/> from a Assembly-location;
+/// </summary>
+public class CreateFromFileMetadataReferenceService : IMetadataReferenceService
 {
     private readonly ConcurrentDictionary<int, MetadataReference> _cachedMetadataReferences = new();
 

@@ -53,6 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetadataReferenceService.Ab
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetadataReferenceService.BlazorWasm", "src-webcil\MetadataReferenceService.BlazorWasm\MetadataReferenceService.BlazorWasm.csproj", "{0F7B1AEF-1C1C-441F-B8AF-5B94685E9DE9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetadataReferenceService.Default", "src-webcil\MetadataReferenceService.Default\MetadataReferenceService.Default.csproj", "{877551BE-B1E5-4B9C-B64D-36923C8B7A5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{0F7B1AEF-1C1C-441F-B8AF-5B94685E9DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F7B1AEF-1C1C-441F-B8AF-5B94685E9DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F7B1AEF-1C1C-441F-B8AF-5B94685E9DE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{877551BE-B1E5-4B9C-B64D-36923C8B7A5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{877551BE-B1E5-4B9C-B64D-36923C8B7A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{877551BE-B1E5-4B9C-B64D-36923C8B7A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{877551BE-B1E5-4B9C-B64D-36923C8B7A5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +125,7 @@ Global
 		{A0E3D469-BB99-4CE8-8679-54C0F7278072} = {B8BEB781-C0D7-4FC5-AE6A-9BC038176304}
 		{6B034AE5-81D0-4F4B-91E1-1A448F162833} = {B8BEB781-C0D7-4FC5-AE6A-9BC038176304}
 		{0F7B1AEF-1C1C-441F-B8AF-5B94685E9DE9} = {B8BEB781-C0D7-4FC5-AE6A-9BC038176304}
+		{877551BE-B1E5-4B9C-B64D-36923C8B7A5D} = {B8BEB781-C0D7-4FC5-AE6A-9BC038176304}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {45F31459-D6F5-441C-890A-F02A1328053D}
