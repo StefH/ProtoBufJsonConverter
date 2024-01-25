@@ -19,6 +19,11 @@ public readonly struct AssemblyDetails
     /// </summary>
     public string? Location { get; init; }
 
+    /// <summary>
+    /// The Assembly image as byte-array. [optional]
+    /// </summary>
+    public IEnumerable<byte>? Image { get; init; }
+
     /// <inheritdoc />
     public override int GetHashCode()
     {

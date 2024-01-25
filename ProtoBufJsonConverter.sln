@@ -45,6 +45,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src-webcil", "src-webcil", "{B8BEB781-C0D7-4FC5-AE6A-9BC038176304}"
 	ProjectSection(SolutionItems) = preProject
 		src-webcil\Directory.Build.props = src-webcil\Directory.Build.props
+		src-webcil\Readme.md = src-webcil\Readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.NET.WebAssembly.Webcil", "src-webcil\Microsoft.NET.WebAssembly.Webcil\Microsoft.NET.WebAssembly.Webcil.csproj", "{A0E3D469-BB99-4CE8-8679-54C0F7278072}"
@@ -53,7 +54,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetadataReferenceService.Ab
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetadataReferenceService.BlazorWasm", "src-webcil\MetadataReferenceService.BlazorWasm\MetadataReferenceService.BlazorWasm.csproj", "{0F7B1AEF-1C1C-441F-B8AF-5B94685E9DE9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetadataReferenceService.Default", "src-webcil\MetadataReferenceService.Default\MetadataReferenceService.Default.csproj", "{877551BE-B1E5-4B9C-B64D-36923C8B7A5D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetadataReferenceService.Default", "src-webcil\MetadataReferenceService.Default\MetadataReferenceService.Default.csproj", "{877551BE-B1E5-4B9C-B64D-36923C8B7A5D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

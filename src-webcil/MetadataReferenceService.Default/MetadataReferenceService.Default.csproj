@@ -7,7 +7,7 @@
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
 		<PackageTags>MetadataReference;CodeAnalysis;Framework;.NET;.NETCore;CreateFromFile</PackageTags>
-		<Description>Use this package to generate a valid MetadataReference based on an Assembly location.</Description>
+		<Description>Use this package to generate a valid MetadataReference based on an Assembly location or Assembly image.</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
