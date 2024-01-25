@@ -35,6 +35,20 @@ message HelloReply {
 
 ### :one: Convert ProtoBuf `byte[]` to a JSON `string`
 
+``` mermaid
+---
+title: "Convert ProtoBuf byte[] to a JSON string"
+---
+flowchart LR
+	Def["ProtoBuf Definition\n(.proto)"] --> protobuf_net["protobuf-net:\n\nGenerate C# code"]
+	Bytes["ProtoBuf bytes"] --> Des["protobuf-net:\n\nDeserialize ProtoBuf bytes to instance\n(using the MessageType\nand the object-type)"]
+        MessageType["Message Type"] --> Des 
+	protobuf_net --> CodeCompile["Compile C# code\nto Assembly"]
+	CodeCompile --> CodeType["typeof(object)"]
+        CodeType --> Des
+	Des --> JSON2OBJ["Serialize instance\nto JSON"]
+```
+
 #### Code
 ``` csharp
 var protoDefinition = "...". // See above
@@ -53,7 +67,7 @@ var json = await converter.ConvertAsync(request);
 {"name":"stef"}
 ```
 
-### :one: Convert ProtoBuf `byte[]` to an object
+### :two: Convert ProtoBuf `byte[]` to an object
 
 #### Code
 ``` csharp
@@ -83,6 +97,22 @@ var protobuf = await converter.ConvertAsync(request);
 ```
 
 ### :four: Convert any `object` to a ProtoBuf `byte[]`
+
+``` mermaid
+---
+title: "Convert an object to a ProtoBuf byte[]"
+---
+flowchart LR
+	Def["ProtoBuf Definition\n(.proto)"] --> protobuf_net["protobuf-net:\n\nGenerate C# code"]
+        protobuf_net --> CodeCompile["Compile C# code\nto Assembly"]
+        CodeCompile --> CodeType["typeof(object)"]
+        CodeType --> Ser
+	Object["Object"] --> OBJ2JSON["Serialize object\nto JSON"]
+        OBJ2JSON --> JSON2INS["Deserialize JSON to instance\n(using the object-type)"]
+        JSON2INS --> Ser["protobuf-net:\n\nSerialize instance to ProtoBuf bytes\n(using the MessageType)"]
+        MessageType["Message Type"] --> Ser
+```
+
 #### Code
 ``` csharp
 var protoDefinition = "...". // See above
