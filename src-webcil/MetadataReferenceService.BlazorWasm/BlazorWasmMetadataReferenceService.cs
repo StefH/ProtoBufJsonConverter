@@ -38,17 +38,17 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
     }
 
     /// <inheritdoc />
-    public async Task<MetadataReference> CreateAsync(AssemblyDetails assembly, CancellationToken cancellationToken = default)
+    public async Task<MetadataReference> CreateAsync(AssemblyDetails assemblyDetails, CancellationToken cancellationToken = default)
     {
-        Guard.NotNull(assembly.Name);
+        Guard.NotNull(assemblyDetails.Name);
 
-        var key = assembly.GetHashCode();
+        var key = assemblyDetails.GetHashCode();
         if (_cachedMetadataReferences.TryGetValue(key, out var metadataReference))
         {
             return metadataReference;
         }
 
-        var downloadFileResult = await DownloadFileAsync(assembly.Name, cancellationToken);
+        var downloadFileResult = await DownloadFileAsync(assemblyDetails.Name, cancellationToken);
         if (downloadFileResult.Success)
         {
             if (downloadFileResult.FileType == FileType.Dll)
@@ -65,7 +65,7 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
             return metadataReference;
         }
 
-        throw new InvalidOperationException($"Unable to download '{assembly.Name}' and create a {nameof(MetadataReference)}.");
+        throw new InvalidOperationException($"Unable to download '{assemblyDetails.Name}' and create a {nameof(MetadataReference)}.");
     }
 
     private async Task<DownloadFileResult> DownloadFileAsync(string assemblyName, CancellationToken cancellationToken)

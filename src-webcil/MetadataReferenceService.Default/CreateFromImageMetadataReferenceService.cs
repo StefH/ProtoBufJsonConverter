@@ -14,12 +14,12 @@ public class CreateFromImageMetadataReferenceService : IMetadataReferenceService
     private readonly ConcurrentDictionary<int, MetadataReference> _cachedMetadataReferences = new();
 
     /// <inheritdoc />
-    public Task<MetadataReference> CreateAsync(AssemblyDetails assembly, CancellationToken cancellationToken = default)
+    public Task<MetadataReference> CreateAsync(AssemblyDetails assemblyDetails, CancellationToken cancellationToken = default)
     {
-        Guard.NotNullOrWhiteSpace(assembly.Name);
-        var image = Guard.NotNull(assembly.Image)!;
+        Guard.NotNullOrWhiteSpace(assemblyDetails.Name);
+        var image = Guard.NotNull(assemblyDetails.Image)!;
 
-        var key = assembly.GetHashCode();
+        var key = assemblyDetails.GetHashCode();
         return Task.FromResult(_cachedMetadataReferences.GetOrAdd(key, _ => MetadataReference.CreateFromImage(image)));
     }
 }
