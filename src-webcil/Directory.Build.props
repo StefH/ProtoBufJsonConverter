@@ -1,5 +1,6 @@
 <Project>
 	<PropertyGroup>
+		<!--<Version>0.0.1-preview-03</Version>-->
 		<Copyright>Copyright © 2024 Stef Heyenrath</Copyright>
 		<Authors>Stef Heyenrath</Authors>
 		<PackageProjectUrl>https://github.com/StefH/ProtoBufJsonConverter</PackageProjectUrl>
