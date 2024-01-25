@@ -2,8 +2,11 @@
 
 namespace MetadataReferenceService.BlazorWasm.WasmWebcil.NT_Structs;
 
+/// <summary>
+/// https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-image_optional_header32
+/// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct IMAGE_OPTIONAL_HEADER32
+internal struct IMAGE_OPTIONAL_HEADER32
 {
     public ushort Magic;
     public byte MajorLinkerVersion;

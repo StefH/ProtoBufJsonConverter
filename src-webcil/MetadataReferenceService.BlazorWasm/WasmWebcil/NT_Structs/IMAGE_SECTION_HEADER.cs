@@ -2,8 +2,11 @@
 
 namespace MetadataReferenceService.BlazorWasm.WasmWebcil.NT_Structs;
 
+/// <summary>
+/// https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-image_section_header
+/// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct IMAGE_SECTION_HEADER
+internal struct IMAGE_SECTION_HEADER
 {
     /// <summary>
     /// An 8-byte, null-padded UTF-8 string.

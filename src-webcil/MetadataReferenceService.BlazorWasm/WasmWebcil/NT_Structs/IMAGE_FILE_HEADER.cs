@@ -2,8 +2,11 @@
 
 namespace MetadataReferenceService.BlazorWasm.WasmWebcil.NT_Structs;
 
+/// <summary>
+/// https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-image_file_header
+/// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct IMAGE_FILE_HEADER
+internal struct IMAGE_FILE_HEADER
 {
     /// <summary>
     /// The architecture type of the computer.

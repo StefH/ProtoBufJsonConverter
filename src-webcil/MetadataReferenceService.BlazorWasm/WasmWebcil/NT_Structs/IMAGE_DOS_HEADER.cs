@@ -2,8 +2,11 @@
 
 namespace MetadataReferenceService.BlazorWasm.WasmWebcil.NT_Structs;
 
+/// <summary>
+/// https://www.nirsoft.net/kernel_struct/vista/IMAGE_DOS_HEADER.html
+/// </summary>
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct IMAGE_DOS_HEADER
+internal struct IMAGE_DOS_HEADER
 {
     public ushort MagicNumber;              // e_magic - Magic number (The value “MZ” are the initials of the PE designer Mark Zbikowski)
     public ushort BytesOnLastPageOfFile;    // e_cblp - Bytes on last page of file

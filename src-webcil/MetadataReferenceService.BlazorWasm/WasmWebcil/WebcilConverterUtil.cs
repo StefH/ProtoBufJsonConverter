@@ -8,7 +8,7 @@ using Microsoft.NET.WebAssembly.Webcil;
 
 namespace MetadataReferenceService.BlazorWasm.WasmWebcil;
 
-public static class WebcilConverterUtil
+internal static class WebcilConverterUtil
 {
     private static readonly byte[] SectionHeaderText = { 0x2E, 0x74, 0x65, 0x78, 0x74, 0x00, 0x00, 0x00 }; // .text
     private static readonly byte[] SectionHeaderRsRc = { 0x2E, 0x72, 0x73, 0x72, 0x63, 0x00, 0x00, 0x00 }; // .rsrc
