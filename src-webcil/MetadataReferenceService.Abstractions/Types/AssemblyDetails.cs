@@ -36,7 +36,12 @@ public readonly struct AssemblyDetails
             {
                 hash = hash * 23 + Location.GetHashCode();
             }
-            
+
+            if (Image != null)
+            {
+                hash = hash * 23 + Image.GetHashCode();
+            }
+
             return hash;
         }
     }
