@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<!--<Version>0.0.1-preview-01</Version>-->
-		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
-		<PackageTags>MetadataReference;CodeAnalysis;Framework;.NET;.NETCore;CreateFromFile</PackageTags>
+		<PackageTags>MetadataReference;CodeAnalysis;Framework;.NET;.NETCore;CreateFromFile;CreateFromImage</PackageTags>
 		<Description>Use this package to generate a valid MetadataReference based on an Assembly location or Assembly image.</Description>
 	</PropertyGroup>
 

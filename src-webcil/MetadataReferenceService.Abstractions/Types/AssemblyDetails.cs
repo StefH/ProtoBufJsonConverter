@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 using Stef.Validation;
 
 namespace MetadataReferenceService.Abstractions.Types;
@@ -13,7 +14,7 @@ public readonly struct AssemblyDetails
     /// This is usually, but not necessarily, the file name of the manifest file of the assembly, minus its extension.
     /// </summary>
     public required string Name { get; init; }
-    
+
     /// <summary>
     /// The full path or UNC location of the loaded file that contains the manifest. [optional]
     /// </summary>
@@ -22,7 +23,7 @@ public readonly struct AssemblyDetails
     /// <summary>
     /// The Assembly image as byte-array. [optional]
     /// </summary>
-    public IEnumerable<byte>? Image { get; init; }
+    public byte[]? Image { get; init; }
 
     /// <inheritdoc />
     public override int GetHashCode()
@@ -31,7 +32,7 @@ public readonly struct AssemblyDetails
         unchecked
         {
             var hash = 391 + Name.GetHashCode();
-            
+
             if (Location != null)
             {
                 hash = hash * 23 + Location.GetHashCode();
@@ -39,7 +40,7 @@ public readonly struct AssemblyDetails
 
             if (Image != null)
             {
-                hash = hash * 23 + Image.GetHashCode();
+                hash = hash * 23 + ((IStructuralEquatable)Image).GetHashCode(EqualityComparer<byte>.Default);
             }
 
             return hash;
