@@ -30,8 +30,8 @@ jobs:
 
       - name: Run Tests
         run: |
-          dotnet test ./test/ProtoBufJsonConverterTests/ProtoBufJsonConverterTests.csproj -c Release -f net8.0
-          dotnet test ./test/MetadataReferenceServiceTests/MetadataReferenceServiceTests.csproj -c Release -f net8.0
+          dotnet test ./test/ProtoBufJsonConverterTests/ProtoBufJsonConverterTests.csproj -c Release
+          dotnet test ./test/MetadataReferenceServiceTests/MetadataReferenceServiceTests.csproj -c Release
 
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
@@ -42,6 +42,13 @@ jobs:
         with:
           submodules: true
           lfs: false
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+           6.0.x
+           7.0.x
+           8.0.x
           
       - name: Build And Deploy
         id: builddeploy
@@ -78,6 +85,13 @@ jobs:
         with:
           submodules: true
           lfs: false
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+           6.0.x
+           7.0.x
+           8.0.x
 
       - name: Build And Deploy WASM
         id: builddeploy
