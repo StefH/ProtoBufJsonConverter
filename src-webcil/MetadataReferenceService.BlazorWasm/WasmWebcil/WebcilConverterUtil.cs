@@ -24,8 +24,10 @@ internal static class WebcilConverterUtil
     private static readonly ushort[] DOSReservedWords2 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     private static readonly DateTime Epoch = new(1970, 1, 1);
     private static readonly int SizeofDOSHeader = Marshal.SizeOf<IMAGE_DOS_HEADER>(); // 64
+    private static readonly int SizeofFileHeader = Marshal.SizeOf<IMAGE_FILE_HEADER>();
     private static readonly int SizeofMSDOS = MSDOS.Length; // 64
     private static readonly int SizeofNTHeaders = Marshal.SizeOf<IMAGE_NT_HEADERS32>(); // 248
+    private static readonly int SizeofOptionalHeader = Marshal.SizeOf<IMAGE_OPTIONAL_HEADER32>();
     private static readonly int SizeofSectionHeader = Marshal.SizeOf<IMAGE_SECTION_HEADER>(); // 40
 
     private const uint FileAlignment = 0x0200;
@@ -282,9 +284,9 @@ internal static class WebcilConverterUtil
     {
         var soh = IMAGE_DOS_HEADER.FileAddressOfNewExeHeader + // e_lfanew member of IMAGE_DOS_HEADER
                   sizeof(uint) + // 4 byte signature
-                  Marshal.SizeOf<IMAGE_FILE_HEADER>() + // size of IMAGE_FILE_HEADER
-                  Marshal.SizeOf<IMAGE_OPTIONAL_HEADER32>() + // size of optional header
-                  numSectionHeaders * Marshal.SizeOf<IMAGE_SECTION_HEADER>() // size of all section headers
+                  SizeofFileHeader +
+                  SizeofOptionalHeader + // size of optional header
+                  numSectionHeaders * SizeofSectionHeader // size of all section headers
         ;
 
         return (uint)soh.RoundToNearest();

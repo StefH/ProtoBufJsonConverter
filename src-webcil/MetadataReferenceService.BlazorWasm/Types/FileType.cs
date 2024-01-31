@@ -6,5 +6,5 @@ internal enum FileType
 
     Wasm = 2,
 
-    Both = Dll | Wasm,
+    Both = Dll | Wasm
 }

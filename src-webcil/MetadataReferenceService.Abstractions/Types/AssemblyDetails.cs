@@ -38,9 +38,9 @@ public readonly struct AssemblyDetails
                 hash = hash * 23 + Location.GetHashCode();
             }
 
-            if (Image != null)
+            if (Image is IStructuralEquatable structuralEquatable)
             {
-                hash = hash * 23 + ((IStructuralEquatable)Image).GetHashCode(EqualityComparer<byte>.Default);
+                hash = hash * 23 + structuralEquatable.GetHashCode(EqualityComparer<byte>.Default);
             }
 
             return hash;

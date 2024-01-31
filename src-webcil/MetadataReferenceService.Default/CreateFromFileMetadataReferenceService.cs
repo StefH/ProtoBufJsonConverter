@@ -7,7 +7,7 @@ using Stef.Validation;
 namespace MetadataReferenceService.Default;
 
 /// <summary>
-/// Default implementation for <see cref="IMetadataReferenceService"/> which creates a <see cref="MetadataReference"/> from a Assembly-location;
+/// Default implementation for <see cref="IMetadataReferenceService"/> which creates a <see cref="MetadataReference"/> from a Assembly-location.
 /// </summary>
 public class CreateFromFileMetadataReferenceService : IMetadataReferenceService
 {

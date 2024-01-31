@@ -19,7 +19,7 @@ internal class DownloadFileResult
     public DownloadFileResult(FileType fileType, Stream? stream)
     {
         FileType = fileType;
-        Success = stream != null;
         Stream = stream;
+        Success = stream != null;
     }
 }
