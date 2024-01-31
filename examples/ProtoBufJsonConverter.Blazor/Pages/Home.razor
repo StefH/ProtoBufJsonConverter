@@ -97,8 +97,14 @@
         {
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">ProtoBuf (Base64)</FieldLabel>
-                <FieldBody ColumnSize="ColumnSize.Is4">
+                <FieldBody ColumnSize="ColumnSize.Is11">
                     <TextEdit @bind-Text="@_protobufAsBase64" ReadOnly="true" Disabled="@IsProcessing" />
+                </FieldBody>
+            </Field>
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">ProtoBuf (Byte Array)</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is11">
+                    <CodeHighlight Indent="false" CodeLanguage="csharp" Code="@_protobufAsByteArray" />
                 </FieldBody>
             </Field>
         }

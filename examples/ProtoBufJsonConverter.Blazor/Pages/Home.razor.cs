@@ -20,6 +20,7 @@ public partial class Home
     private string _messageType = "greet.HelloRequest";
     private ConvertType _selectedConvertType = ConvertType.ToJson;
     private string _protobufAsBase64 = "CgRzdGVm";
+    private string _protobufAsByteArray = "new byte[] { 0x0a, 0x04, 0x73, 0x74, 0x65, 0x66 }";
     private bool _skipGrpcHeader = true;
     private bool _addGrpcHeader = true;
     private string _json = "{\r\n  \"name\": \"stef\"\r\n}";
@@ -78,11 +79,20 @@ public partial class Home
     private async Task ConvertToProtoBufAsync()
     {
         _protobufAsBase64 = string.Empty;
+        _protobufAsByteArray = string.Empty;
+
+        StateHasChanged();
 
         var convertToProtoBufRequest = new ConvertToProtoBufRequest(_protoDefinition, _messageType, _json)
             .WithGrpcHeader(_addGrpcHeader);
 
         var bytes = await Converter.ConvertAsync(convertToProtoBufRequest);
         _protobufAsBase64 = Convert.ToBase64String(bytes);
+        _protobufAsByteArray = ByteArrayToString(bytes);
+    }
+
+    public static string ByteArrayToString(byte[] byteArray)
+    {
+        return string.Concat("new byte[] { ", string.Join(", ", byteArray.Select(b => $"0x{b:X2}")), " };");
     }
 }

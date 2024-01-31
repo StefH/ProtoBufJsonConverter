@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.1.0</Version>
+		<Version>0.2.0-preview-03</Version>
 		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -29,6 +29,10 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="ProtoBufJsonConverterTests" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src-webcil\MetadataReferenceService.Default\MetadataReferenceService.Default.csproj" />
 	</ItemGroup>
 
 </Project>

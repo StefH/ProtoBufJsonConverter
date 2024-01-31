@@ -256,7 +256,7 @@ public class WebcilConverter
         }
     }
 
-#if NETCOREAPP2_1_OR_GREATER
+#if NETCOREAPP2_1_OR_GREATER && !NET6_0
     private static void ReadExactly(FileStream s, Span<byte> buffer)
     {
         s.ReadExactly(buffer);

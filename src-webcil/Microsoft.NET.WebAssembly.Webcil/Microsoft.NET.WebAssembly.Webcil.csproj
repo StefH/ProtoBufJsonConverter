@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!--<TargetFrameworks>$(TargetFrameworkForNETCoreTasks);$(TargetFrameworkForNETFrameworkTasks)</TargetFrameworks>-->
+		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0;net7.0;net8.0</TargetFrameworks>
+		<Langversion>latest</Langversion>
+		<Description>Abstractions for modifying .NET webcil binary images</Description>
+		<EnableDefaultItems>true</EnableDefaultItems>
+		<Nullable>enable</Nullable>
+		<IncludeSymbols>true</IncludeSymbols>
+		<Serviceable>true</Serviceable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<IsShipping>true</IsShipping>
+		<!-- this assembly should not produce a public package, rather it's meant to be shipped by the
+          WasmAppBuilder task and the BrowserDebugProxy -->
+		<IsShippingPackage>false</IsShippingPackage>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="IsExternalInit" Version="1.0.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.Memory" Version="4.5.5" />
+		<PackageReference Include="System.Reflection.Metadata" Version="8.0.0" />
+		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
+	</ItemGroup>
+
+	<!--<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <Compile Include="$(CoreLibSharedDir)System\Diagnostics\CodeAnalysis\NullableAttributes.cs" Link="System\Diagnostics\CodeAnalysis\NullableAttributes.cs" />
+    <Compile Include="..\Common\IsExternalInit.cs" />
+  </ItemGroup>-->
+
+</Project>

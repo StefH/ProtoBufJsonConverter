@@ -1,6 +1,6 @@
 ﻿namespace ProtoBufJsonConverter.Blazor.Enums;
 
-internal enum ConvertType
+public enum ConvertType
 {
     ToJson,
 
