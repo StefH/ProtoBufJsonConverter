@@ -1,3 +1,6 @@
+# 0.2.0 (03 February 2024)
+- [#9](https://github.com/StefH/ProtoBufJsonConverter/pull/9) - MetadataReferenceService.BlazorWasm - WebcilConverterUtil [enhancement] contributed by [StefH](https://github.com/StefH)
+
 # 0.1.0 (06 January 2024)
 - [#7](https://github.com/StefH/ProtoBufJsonConverter/pull/7) - Change methods to Async + add Blazor examples [enhancement] contributed by [StefH](https://github.com/StefH)
 - [#8](https://github.com/StefH/ProtoBufJsonConverter/pull/8) - Run Unit Tests in CI [Test] contributed by [StefH](https://github.com/StefH)
