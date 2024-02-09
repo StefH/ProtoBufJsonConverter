@@ -11,10 +11,12 @@ The reason for this is that by default the `WasmEnableWebcil` is set to `true`:
 
 See [webcil-packaging-format-for-net-assemblies](https://learn.microsoft.com/en-us/aspnet/core/blazor/host-and-deploy/webassembly?view=aspnetcore-8.0#webcil-packaging-format-for-net-assemblies)
 
-## NuGet
-- [![NuGet Badge](https://buildstats.info/nuget/MetadataReferenceService.Abstractions)](https://www.nuget.org/packages/MetadataReferenceService.Abstractions)
-- [![NuGet Badge](https://buildstats.info/nuget/MetadataReferenceService.BlazorWasm)](https://www.nuget.org/packages/MetadataReferenceService.BlazorWasm)
-- [![NuGet Badge](https://buildstats.info/nuget/MetadataReferenceService.Default)](https://www.nuget.org/packages/MetadataReferenceService.Default)
+## NuGets
+| Package | NuGet |
+| - | - |
+| MetadataReferenceService.Abstractions | [![NuGet Badge](https://buildstats.info/nuget/MetadataReferenceService.Abstractions)](https://www.nuget.org/packages/MetadataReferenceService.Abstractions)
+| MetadataReferenceService.BlazorWasm | [![NuGet Badge](https://buildstats.info/nuget/MetadataReferenceService.BlazorWasm)](https://www.nuget.org/packages/MetadataReferenceService.BlazorWasm)
+| MetadataReferenceService.Default | [![NuGet Badge](https://buildstats.info/nuget/MetadataReferenceService.Default)](https://www.nuget.org/packages/MetadataReferenceService.Default)
 
 ## Usage
 ``` c#
