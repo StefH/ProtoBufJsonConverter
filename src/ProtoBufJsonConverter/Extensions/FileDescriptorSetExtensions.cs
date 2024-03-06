@@ -5,24 +5,19 @@ internal static class FileDescriptorSetExtensions
 {
     internal static string GetInputTypeFromMessageType(this FileDescriptorSet set, string messageType)
     {
-        var parts = messageType.Split('.');
-
         string packageName;
         string typeName;
-        switch (parts.Length)
+
+        var lastDotIndex = messageType.LastIndexOf('.');
+        if (lastDotIndex == -1)
         {
-            case 2:
-                packageName = parts[0];
-                typeName = parts[1];
-                break;
-
-            case 1:
-                packageName = string.Empty;
-                typeName = parts[0];
-                break;
-
-            default:
-                throw new ArgumentException($"The type '{messageType}' is not valid.");
+            packageName = string.Empty;
+            typeName = messageType;
+        }
+        else
+        {
+            packageName = messageType.Substring(0, lastDotIndex);
+            typeName = messageType.Substring(lastDotIndex + 1);
         }
 
         var fileDescriptorProto = set.Files.FirstOrDefault(f => f.Package == packageName);
