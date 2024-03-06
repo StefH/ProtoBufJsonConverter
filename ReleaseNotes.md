@@ -1,3 +1,7 @@
+# 0.3.0 (06 March 2024)
+- [#11](https://github.com/StefH/ProtoBufJsonConverter/pull/11) - Fix for when proto package name contains dot(s) [bug] contributed by [StefH](https://github.com/StefH)
+- [#10](https://github.com/StefH/ProtoBufJsonConverter/issues/10) - Error when proto package name contains dot(s) [bug]
+
 # 0.2.0 (03 February 2024)
 - [#9](https://github.com/StefH/ProtoBufJsonConverter/pull/9) - MetadataReferenceService.BlazorWasm - WebcilConverterUtil [enhancement] contributed by [StefH](https://github.com/StefH)
 
