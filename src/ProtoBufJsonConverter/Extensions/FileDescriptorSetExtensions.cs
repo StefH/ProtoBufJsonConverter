@@ -1,9 +1,13 @@
-﻿// ReSharper disable once CheckNamespace
+﻿extern alias ProtobufNetReflectionAlias;
+
+using GoogleProtobufReflection = ProtobufNetReflectionAlias::Google.Protobuf.Reflection;
+
+// ReSharper disable once CheckNamespace
 namespace Google.Protobuf.Reflection;
 
 internal static class FileDescriptorSetExtensions
 {
-    internal static string GetInputTypeFromMessageType(this FileDescriptorSet set, string messageType)
+    internal static string GetInputTypeFromMessageType(this GoogleProtobufReflection.FileDescriptorSet set, string messageType)
     {
         string packageName;
         string typeName;
@@ -35,7 +39,7 @@ internal static class FileDescriptorSetExtensions
         return messageType;
     }
 
-    internal static string GetInputTypeFromServiceMethod(this FileDescriptorSet set, string method)
+    internal static string GetInputTypeFromServiceMethod(this GoogleProtobufReflection.FileDescriptorSet set, string method)
     {
         var parts = method.Split('.');
 
