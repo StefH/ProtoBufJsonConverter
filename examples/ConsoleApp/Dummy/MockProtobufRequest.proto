@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+ package My.Message;
+ import "google/protobuf/timestamp.proto";
+ import "google/protobuf/wrappers.proto";
+ import "MyMessageOptions.proto";
+
+ message MockProtobufRequest {
+	option (declarative_fields) = {partition_key_field: "unique_key", schema_version: "1.0", message_type: "MockProtobufRequest", source_system: "XXX" };
+	string  unique_key = 1; 
+ }
