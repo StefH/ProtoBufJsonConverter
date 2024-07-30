@@ -88,6 +88,18 @@ message HelloReply
 }
 ";
 
+private const string ProtoDefinitionWithWellKnownTypes = @"
+syntax = "proto3"
+
+import "google/protobuf/empty.proto";
+
+package organization.greet.api.v1;
+
+service Greeter {
+  rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+";
+
     private readonly Converter _sut;
 
     public ConverterTests()
@@ -148,6 +160,25 @@ message HelloReply
         var @object = new { name = "stef" };
 
         var request = new ConvertToProtoBufRequest(ProtoDefinition, messageType, @object, addGrpcHeader);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be(expectedBytes);
+    }
+
+    [Theory]
+    [InlineData(true, "AAAAAAYKBHN0ZWY=")]
+    [InlineData(false, "CgRzdGVm")]
+    public async Task ConvertAsync_WellKnownTypes_ConvertJsonToProtoBufRequest(bool addGrpcHeader, string expectedBytes)
+    {
+        // Arrange
+        const string messageType = "google.protobuf.Empty";
+
+        const string json = "{}";
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinition, messageType, json, addGrpcHeader);
 
         // Act
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
