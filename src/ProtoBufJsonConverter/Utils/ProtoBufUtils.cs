@@ -47,7 +47,7 @@ internal class ProtoBufUtils
 
         var bytes = memoryStream.ToArray();
 
-        if (addGrpcHeader)
+        if (bytes.Length > 0 && addGrpcHeader)
         {
             var length = bytes.Length - HeaderSize;
             WriteHeader(bytes, length);

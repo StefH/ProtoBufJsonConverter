@@ -4,6 +4,7 @@ using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
+using ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -72,12 +73,19 @@ internal static class AssemblyUtils
 
     internal static Type GetType(Assembly assembly, string inputTypeFullName)
     {
-        var type = assembly.GetType(inputTypeFullName);
-        if (type == null)
+        switch (inputTypeFullName)
         {
-            throw new ArgumentException($"The type '{type}' cannot be found in the assembly.");
-        }
+            case "google.protobuf.Empty":
+                return typeof(Empty);
 
-        return type;
+            case "google.protobuf.Duration":
+                return typeof(Duration);
+
+            case "google.protobuf.Timestamp":
+                return typeof(Timestamp);
+
+            default:
+                return assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.");
+        }
     }
 }

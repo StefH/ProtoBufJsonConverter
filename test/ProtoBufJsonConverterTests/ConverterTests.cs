@@ -28,11 +28,15 @@ message HelloReply
     private const string ProtoDefinition = @"
 syntax = ""proto3"";
 
+import ""google/protobuf/empty.proto"";
+
 package greet;
 
 service Greeter
 {
     rpc SayHello (HelloRequest) returns(HelloReply);
+
+    rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 message HelloRequest
@@ -88,22 +92,41 @@ message HelloReply
 }
 ";
 
-private const string ProtoDefinitionWithWellKnownTypes = @"
-syntax = ""proto3""
+    private const string ProtoDefinitionWithWellKnownTypes = @"
+syntax = ""proto3"";
 
 import ""google/protobuf/empty.proto"";
+import ""google/protobuf/timestamp.proto"";
+import ""google/protobuf/duration.proto"";
 
-service Greeter {
-  rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+service Greeter
+{
+    rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+message MyMessageTimestamp
+{
+    google.protobuf.Timestamp ts = 1;
+}
+
+message MyMessageDuration
+{
+    google.protobuf.Duration du = 1;
 }
 ";
 
-    private readonly Converter _sut;
+    //    private const string ProtoDefinitionWithWellKnownTypesAny = @"
+    //syntax = ""proto3"";
 
-    public ConverterTests()
-    {
-        _sut = new Converter();
-    }
+    //import ""google/protobuf/any.proto"";
+
+    //message MyMessage
+    //{
+    //    google.protobuf.Any data = 1;
+    //}
+    //";
+
+    private readonly Converter _sut = new();
 
     [Theory]
     [InlineData("AAAAAAYKBHN0ZWY=", ProtoDefinitionNoPackage, "HelloRequest")]
@@ -166,22 +189,73 @@ service Greeter {
         Convert.ToBase64String(bytes).Should().Be(expectedBytes);
     }
 
-    [Theory]
-    [InlineData(true, "AAAAAAYKBHN0ZWY=")]
-    [InlineData(false, "CgRzdGVm")]
-    public async Task ConvertAsync_WellKnownTypes_ConvertJsonToProtoBufRequest(bool addGrpcHeader, string expectedBytes)
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesEmpty_ConvertJsonToProtoBufRequest()
     {
         // Arrange
         const string messageType = "google.protobuf.Empty";
 
         const string json = "{}";
 
-        var request = new ConvertToProtoBufRequest(ProtoDefinition, messageType, json, addGrpcHeader);
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, json);
 
         // Act
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        Convert.ToBase64String(bytes).Should().Be(expectedBytes);
+        bytes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesEmpty_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "google.protobuf.Empty";
+
+        var @object = new { };
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        bytes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesTimeStamp_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageTimestamp";
+
+        var datetime = new DateTime(2024, 7, 30, 1, 2, 3);
+        var @object = new { ts = datetime };
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CgYIi/egtQY=");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesDuration_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageDuration";
+
+        var timespan = new TimeSpan(1, 2, 3, 4, 5, 6);
+        var @object = new { du = timespan };
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CgkI2NwFELDFsQI=");
     }
 }
