@@ -73,19 +73,12 @@ internal static class AssemblyUtils
 
     internal static Type GetType(Assembly assembly, string inputTypeFullName)
     {
-        switch (inputTypeFullName)
+        return inputTypeFullName switch
         {
-            case "google.protobuf.Empty":
-                return typeof(Empty);
-
-            case "google.protobuf.Duration":
-                return typeof(Duration);
-
-            case "google.protobuf.Timestamp":
-                return typeof(Timestamp);
-
-            default:
-                return assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.");
-        }
+            "google.protobuf.Empty" => typeof(Empty),
+            "google.protobuf.Duration" => typeof(Duration),
+            "google.protobuf.Timestamp" => typeof(Timestamp),
+            _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
+        };
     }
 }
