@@ -89,11 +89,9 @@ message HelloReply
 ";
 
 private const string ProtoDefinitionWithWellKnownTypes = @"
-syntax = "proto3"
+syntax = ""proto3""
 
-import "google/protobuf/empty.proto";
-
-package organization.greet.api.v1;
+import ""google/protobuf/empty.proto"";
 
 service Greeter {
   rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
