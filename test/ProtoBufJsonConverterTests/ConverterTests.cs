@@ -115,16 +115,16 @@ message MyMessageDuration
 }
 ";
 
-    //    private const string ProtoDefinitionWithWellKnownTypesAny = @"
-    //syntax = ""proto3"";
+    private const string ProtoDefinitionWithWellKnownTypesFromGoogle = @"
+syntax = ""proto3"";
 
-    //import ""google/protobuf/any.proto"";
+import ""google/protobuf/any.proto"";
 
-    //message MyMessage
-    //{
-    //    google.protobuf.Any data = 1;
-    //}
-    //";
+message MyMessage
+{
+    google.protobuf.Any data = 1;
+}
+";
 
     private readonly Converter _sut = new();
 
@@ -257,5 +257,22 @@ message MyMessageDuration
 
         // Assert
         Convert.ToBase64String(bytes).Should().Be("CgkI2NwFELDFsQI=");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesFromGoogle_ConvertJsonToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "google.protobuf.Any";
+
+        const string json = @"{ ""@type"": ""type.googleapis.com/google.protobuf.StringValue"", ""value"": ""stef"" }";
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, json);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        bytes.Should().BeEmpty();
     }
 }
