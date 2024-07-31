@@ -1,15 +1,12 @@
 ﻿// https://andrewlock.net/disambiguating-types-with-the-same-name-with-extern-alias/
 extern alias gpb;
-
-using Google.Protobuf.Reflection;
 using gpb::Google.Protobuf;
+using gpb::Google.Protobuf.Reflection;
 using gpb::Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
-using TypeRegistry = gpb::Google.Protobuf.Reflection.TypeRegistry;
 
-namespace ProtoBufJsonConverter
+namespace ProtoBufJsonConverter.Json
 {
     extern alias gpb;
 
@@ -21,7 +18,7 @@ namespace ProtoBufJsonConverter
     {
         public override bool CanConvert(System.Type objectType)
         {
-            return typeof(gpb::Google.Protobuf.IMessage).IsAssignableFrom(objectType);
+            return typeof(IMessage).IsAssignableFrom(objectType);
         }
 
         public override object? ReadJson(JsonReader reader, System.Type objectType, object? existingValue, JsonSerializer serializer)
@@ -34,37 +31,40 @@ namespace ProtoBufJsonConverter
             // Convert it back to json text.
             var text = JsonConvert.SerializeObject(o);
 
-            var stringValue = new StringValue { Value = "stef" };
-            var anyMessage = Any.Pack(stringValue);
+            //var stringValue = new StringValue { Value = "stef" };
+            //var anyMessage = Any.Pack(stringValue);
 
-            byte[] byteArray = anyMessage.ToByteArray();
-            var b64 = System.Convert.ToBase64String(byteArray);
+            //byte[] byteArray = anyMessage.ToByteArray();
+            //var b64 = Convert.ToBase64String(byteArray);
 
             // Create a type registry and register the StringValue type
-            var typeRegistry = TypeRegistry.FromMessages(StringValue.Descriptor);
+            
 
             // Convert the Any message to JSON using the type registry
-            var jsonFormatter = new JsonFormatter(new JsonFormatter.Settings(true).WithTypeRegistry(typeRegistry));
+            //var jsonFormatter = new JsonFormatter(new JsonFormatter.Settings(true).WithTypeRegistry(typeRegistry));
 
 
             // Convert to JSON
-            string json = jsonFormatter.Format(anyMessage);
+           // string json = jsonFormatter.Format(anyMessage);
 
 
             // And let protobuf's parser parse the text.
-            var message = (gpb::Google.Protobuf.IMessage)Activator.CreateInstance(objectType);
+            var message = (IMessage)Activator.CreateInstance(objectType);
+            var typeRegistry = TypeRegistry.FromMessages(message.Descriptor, StringValue.Descriptor);
 
             //var x = message.Descriptor.Parser.ParseJson(text);
 
             var JsonParser = new JsonParser(new JsonParser.Settings(3).WithTypeRegistry(typeRegistry));
 
-            return JsonParser.Parse(text, message.Descriptor);
+            var x = JsonParser.Parse(text, message.Descriptor);
+
+            return x;
         }
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             // Let Protobuf's JsonFormatter do all the work.
-            writer.WriteRawValue(gpb::Google.Protobuf.JsonFormatter.Default.Format((IMessage?)value));
+            writer.WriteRawValue(JsonFormatter.Default.Format((IMessage?)value));
         }
     }
 }

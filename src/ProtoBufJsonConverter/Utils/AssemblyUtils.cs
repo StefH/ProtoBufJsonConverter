@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
 using ProtoBuf.WellKnownTypes;
-using WKT = gpb::Google.Protobuf.WellKnownTypes;
+using GoogleWellKnownTypes = gpb::Google.Protobuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -28,7 +28,7 @@ internal static class AssemblyUtils
             typeof(ProtoContractAttribute).Assembly
         };
     });
-    private static readonly Lazy<Assembly> GoogleAssembly = new(() => typeof(WKT.Any).Assembly);
+    private static readonly Lazy<Assembly> GoogleAssembly = new(() => typeof(GoogleWellKnownTypes.Any).Assembly);
 
     internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
@@ -91,6 +91,7 @@ internal static class AssemblyUtils
             "google.protobuf.Empty" => typeof(Empty),
             "google.protobuf.Duration" => typeof(Duration),
             "google.protobuf.Timestamp" => typeof(Timestamp),
+            "google.protobuf.Any" => typeof(GoogleWellKnownTypes.Any),
             _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
         };
     }

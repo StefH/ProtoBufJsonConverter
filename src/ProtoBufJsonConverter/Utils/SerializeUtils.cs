@@ -1,17 +1,14 @@
 ﻿using System.Reflection;
 using Newtonsoft.Json;
-
-//using JsonConverter.Abstractions;
-//using JsonConverter.Newtonsoft.Json;
 using ProtoBuf;
+using ProtoBufJsonConverter.Json;
 using ProtoBufJsonConverter.Models;
 
 namespace ProtoBufJsonConverter.Utils;
 
 internal static class SerializeUtils
 {
-    // private static readonly Lazy<IJsonConverter> DefaultJsonConverter = new(() => new NewtonsoftJsonConverter());
-    private static readonly ProtoMessageConverter ProtoMessageConverter = new ProtoMessageConverter();
+    private static readonly ProtoMessageConverter ProtoMessageConverter = new();
 
     internal static string ConvertObjectToJson(ConvertToProtoBufRequest request)
     {
@@ -26,7 +23,7 @@ internal static class SerializeUtils
         {
             Formatting = request.WriteIndented ? Formatting.Indented : Formatting.None,
             Converters = [ ProtoMessageConverter ]
-        }); // request.WriteIndented, ProtoMessageConverter);
+        });
     }
 
     internal static object ConvertProtoBufToObject(Assembly assembly, string inputTypeFullName, byte[] protoBufBytes, bool skipGrpcHeader)

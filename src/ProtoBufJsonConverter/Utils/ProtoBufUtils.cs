@@ -1,15 +1,47 @@
-﻿using System.Buffers.Binary;
+﻿extern alias gpb;
+using System.Buffers.Binary;
+using gpb::Google.Protobuf.WellKnownTypes;
+using ProtoBuf.Meta;
 
 namespace ProtoBufJsonConverter.Utils;
 
 /// <summary>
 /// Based on https://github.com/pawitp/protobuf-decoder/blob/master/src/protobufDecoder.js
 /// </summary>
-internal class ProtoBufUtils
+internal static class ProtoBufUtils
 {
     private const int SizeOfUInt32 = 4;
     private const int HeaderSize = 1 + SizeOfUInt32; // 1 (Compression flag) + 4 (UInt32)
-    
+
+    // - https://protobuf.dev/reference/protobuf/google.protobuf/
+    private static readonly (System.Type Type, string MemberName)[] WellKnownTypes =
+    [
+        (typeof(Any), nameof(Any.Value)),
+        (typeof(BoolValue), nameof(BoolValue.Value)),
+        (typeof(BytesValue), nameof(BytesValue.Value)),
+        (typeof(DoubleValue), nameof(DoubleValue.Value)),
+        (typeof(FloatValue), nameof(FloatValue.Value)),
+        (typeof(Int32Value), nameof(Int32Value.Value)),
+        (typeof(Int64Value), nameof(Int64Value.Value)),
+        (typeof(StringValue), nameof(StringValue.Value)),
+        (typeof(UInt32Value), nameof(UInt32Value.Value)),
+        (typeof(UInt64Value), nameof(UInt64Value.Value))
+    ];
+
+    static ProtoBufUtils()
+    {
+        // Initialization
+        // - https://github.com/protobuf-net/protobuf-net/issues/722
+
+        var typeModel = RuntimeTypeModel.Default;
+        foreach (var wellKnownType in WellKnownTypes)
+        {
+            typeModel
+                .Add(wellKnownType.Type)
+                .AddField(1, wellKnownType.MemberName);
+        }
+    }
+
     internal static MemoryStream GetMemoryStreamFromBytes(byte[] buffer, bool skipGrpcHeader)
     {
         var offset = 0;
