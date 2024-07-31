@@ -120,11 +120,11 @@ message MyMessageDuration
     private const string ProtoDefinitionWithWellKnownTypesFromGoogle = @"
 syntax = ""proto3"";
 
-import ""google/protobuf/any.proto"";
+import ""google/protobuf/wrappers.proto"";
 
 message MyMessage
 {
-    google.protobuf.Any any = 1;
+    google.protobuf.StringValue str = 1;
 }
 ";
 
@@ -262,12 +262,12 @@ message MyMessage
     }
 
     [Fact]
-    public async Task ConvertAsync_WellKnownTypesAny_ConvertJsonToProtoBufRequest()
+    public async Task ConvertAsync_WellKnownTypesStringValue_ConvertJsonToProtoBufRequest()
     {
         // Arrange
-        const string messageType = "google.protobuf.Any";
+        const string messageType = "google.protobuf.StringValue";
 
-        const string json = @"{ ""@type"": ""type.googleapis.com/google.protobuf.StringValue"", ""value"": ""stef"" }";
+        const string json = @"{ ""stef"" }";
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, json);
 
@@ -275,6 +275,14 @@ message MyMessage
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        Convert.ToBase64String(bytes).Should().Be("expected");
+        Convert.ToBase64String(bytes).Should().Be("Ci90eXBlLmdvb2dsZWFwaXMuY29tL2dvb2dsZS5wcm90b2J1Zi5TdHJpbmdWYWx1ZRAKEAQQcxB0EGUQZg==");
+        
+        var request2 = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
+
+        // Act
+        var json2 = await _sut.ConvertAsync(request2).ConfigureAwait(false);
+
+        // Assert
+        json2.Should().Be(@"{""name"":""stef""}");
     }
 }

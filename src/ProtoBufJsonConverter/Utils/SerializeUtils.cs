@@ -8,11 +8,13 @@ namespace ProtoBufJsonConverter.Utils;
 
 internal static class SerializeUtils
 {
-    private static readonly ProtoMessageConverter ProtoMessageConverter = new();
+    // private static readonly ProtoMessageConverter ProtoMessageConverter = new();
+    private static readonly WellKnownTypesConverter ProtoMessageConverter = new();
 
     internal static string ConvertObjectToJson(ConvertToProtoBufRequest request)
     {
         return JsonConvert.SerializeObject(request.Input, ProtoMessageConverter);
+        // return JsonConvert.SerializeObject(request.Input);
     }
 
     internal static string ConvertProtoBufToJson(Assembly assembly, string inputTypeFullName, ConvertToJsonRequest request)

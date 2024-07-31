@@ -14,18 +14,18 @@ internal static class ProtoBufUtils
     private const int HeaderSize = 1 + SizeOfUInt32; // 1 (Compression flag) + 4 (UInt32)
 
     // - https://protobuf.dev/reference/protobuf/google.protobuf/
-    private static readonly (System.Type Type, string MemberName)[] WellKnownTypes =
+    private static readonly (System.Type Type, string[] MemberNames)[] WellKnownTypes =
     [
-        (typeof(Any), nameof(Any.Value)),
-        (typeof(BoolValue), nameof(BoolValue.Value)),
-        (typeof(BytesValue), nameof(BytesValue.Value)),
-        (typeof(DoubleValue), nameof(DoubleValue.Value)),
-        (typeof(FloatValue), nameof(FloatValue.Value)),
-        (typeof(Int32Value), nameof(Int32Value.Value)),
-        (typeof(Int64Value), nameof(Int64Value.Value)),
-        (typeof(StringValue), nameof(StringValue.Value)),
-        (typeof(UInt32Value), nameof(UInt32Value.Value)),
-        (typeof(UInt64Value), nameof(UInt64Value.Value))
+        (typeof(Any), [nameof(Any.TypeUrl), nameof(Any.Value)]),
+        (typeof(BoolValue), [ nameof(BoolValue.Value) ]),
+        (typeof(BytesValue), [ nameof(BytesValue.Value) ]),
+        (typeof(DoubleValue), [ nameof(DoubleValue.Value) ]),
+        (typeof(FloatValue), [ nameof(FloatValue.Value) ]),
+        (typeof(Int32Value), [ nameof(Int32Value.Value) ]),
+        (typeof(Int64Value), [ nameof(Int64Value.Value) ]),
+        (typeof(StringValue), [ nameof(StringValue.Value) ]),
+        (typeof(UInt32Value), [ nameof(UInt32Value.Value) ]),
+        (typeof(UInt64Value), [ nameof(UInt64Value.Value) ])
     ];
 
     static ProtoBufUtils()
@@ -36,9 +36,12 @@ internal static class ProtoBufUtils
         var typeModel = RuntimeTypeModel.Default;
         foreach (var wellKnownType in WellKnownTypes)
         {
-            typeModel
-                .Add(wellKnownType.Type)
-                .AddField(1, wellKnownType.MemberName);
+            var metaType = typeModel.Add(wellKnownType.Type);
+
+            for (var i = 0; i < wellKnownType.MemberNames.Length; i++)
+            {
+                metaType.AddField(1 + i, wellKnownType.MemberNames[i]);
+            }
         }
     }
 
