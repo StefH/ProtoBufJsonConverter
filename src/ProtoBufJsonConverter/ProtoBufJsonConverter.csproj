@@ -19,8 +19,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.27.2" Aliases="gpb" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="8.0.0" />
-		<PackageReference Include="JsonConverter.Newtonsoft.Json" Version="0.5.0" />
+		<!--<PackageReference Include="JsonConverter.Newtonsoft.Json" Version="0.5.0" />-->
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="protobuf-net" Version="3.2.30" />
 		<PackageReference Include="protobuf-net.Reflection" Version="3.2.12" />
 		<PackageReference Include="Stef.Validation" Version="0.1.1" />

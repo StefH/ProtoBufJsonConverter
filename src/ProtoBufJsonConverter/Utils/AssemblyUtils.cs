@@ -1,10 +1,14 @@
-﻿using System.Reflection;
+﻿// https://andrewlock.net/disambiguating-types-with-the-same-name-with-extern-alias/
+extern alias gpb;
+
+using System.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
 using ProtoBuf.WellKnownTypes;
+using WKT = gpb::Google.Protobuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -24,9 +28,12 @@ internal static class AssemblyUtils
             typeof(ProtoContractAttribute).Assembly
         };
     });
+    private static readonly Lazy<Assembly> GoogleAssembly = new(() => typeof(WKT.Any).Assembly);
 
     internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
+        var includeGoogle = code.IndexOf("global::Google.Protobuf.WellKnownTypes", StringComparison.OrdinalIgnoreCase) >= 0;
+
         // Specify the assembly name
         var assemblyName = Path.GetRandomFileName();
 
@@ -36,8 +43,8 @@ internal static class AssemblyUtils
         // Create a compilation
         var compilation = CSharpCompilation.Create(
             assemblyName,
-            new[] { syntaxTree },
-            await CreateMetadataReferences(metadataReferenceService, cancellationToken).ConfigureAwait(false),
+            [syntaxTree],
+            await CreateMetadataReferencesAsync(metadataReferenceService, includeGoogle, cancellationToken).ConfigureAwait(false),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
@@ -60,10 +67,16 @@ internal static class AssemblyUtils
         return Assembly.Load(stream.ToArray());
     }
 
-    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferences(IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
+    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferencesAsync(IMetadataReferenceService metadataReferenceService, bool includeGoogle, CancellationToken cancellationToken)
     {
+        var requiredAssemblies = RequiredAssemblies.Value.ToList();
+        if (includeGoogle)
+        {
+            requiredAssemblies.Add(GoogleAssembly.Value);
+        }
+
         var references = new List<MetadataReference>();
-        foreach (var requiredAssembly in RequiredAssemblies.Value)
+        foreach (var requiredAssembly in requiredAssemblies)
         {
             references.Add(await metadataReferenceService.CreateAsync(AssemblyDetails.FromAssembly(requiredAssembly), cancellationToken).ConfigureAwait(false));
         }
