@@ -118,11 +118,11 @@ message MyMessageDuration
     private const string ProtoDefinitionWithWellKnownTypesFromGoogle = @"
 syntax = ""proto3"";
 
-import ""google/protobuf/any.proto"";
+import ""google/protobuf/wrappers.proto"";
 
 message MyMessage
 {
-    google.protobuf.Any data = 1;
+    google.protobuf.StringValue str = 1;
 }
 ";
 
@@ -263,9 +263,9 @@ message MyMessage
     public async Task ConvertAsync_WellKnownTypesFromGoogle_ConvertJsonToProtoBufRequest()
     {
         // Arrange
-        const string messageType = "google.protobuf.Any";
+        const string messageType = "google.protobuf.";
 
-        const string json = @"{ ""@type"": ""type.googleapis.com/google.protobuf.StringValue"", ""value"": ""stef"" }";
+        const string json = @"{ ""value"": ""stef"" }";
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, json);
 
