@@ -1,7 +1,11 @@
 ﻿extern alias gpb;
 using System.Buffers.Binary;
+using System.Collections.ObjectModel;
+using gpb::Google.Protobuf;
 using gpb::Google.Protobuf.WellKnownTypes;
+using ProtoBuf;
 using ProtoBuf.Meta;
+using ProtoBuf.Serializers;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -14,18 +18,20 @@ internal static class ProtoBufUtils
     private const int HeaderSize = 1 + SizeOfUInt32; // 1 (Compression flag) + 4 (UInt32)
 
     // - https://protobuf.dev/reference/protobuf/google.protobuf/
-    private static readonly (System.Type Type, string[] MemberNames)[] WellKnownTypes =
+    internal static readonly (System.Type Type, string[] MemberNames)[] WellKnownTypes =
     [
         (typeof(Any), [nameof(Any.TypeUrl), nameof(Any.Value)]),
-        (typeof(BoolValue), [ nameof(BoolValue.Value) ]),
-        (typeof(BytesValue), [ nameof(BytesValue.Value) ]),
-        (typeof(DoubleValue), [ nameof(DoubleValue.Value) ]),
-        (typeof(FloatValue), [ nameof(FloatValue.Value) ]),
-        (typeof(Int32Value), [ nameof(Int32Value.Value) ]),
-        (typeof(Int64Value), [ nameof(Int64Value.Value) ]),
-        (typeof(StringValue), [ nameof(StringValue.Value) ]),
-        (typeof(UInt32Value), [ nameof(UInt32Value.Value) ]),
-        (typeof(UInt64Value), [ nameof(UInt64Value.Value) ])
+        //(typeof(IEnumerable<byte>), []),
+        //(typeof(ByteString), []),
+        //(typeof(BoolValue), [nameof(BoolValue.Value)]),
+        //(typeof(BytesValue), [nameof(BytesValue.Value)]),
+        //(typeof(DoubleValue), [nameof(DoubleValue.Value)]),
+        //(typeof(FloatValue), [nameof(FloatValue.Value)]),
+        //(typeof(Int32Value), [nameof(Int32Value.Value)]),
+        //(typeof(Int64Value), [nameof(Int64Value.Value)]),
+        //(typeof(StringValue), [nameof(StringValue.Value)]),
+        //(typeof(UInt32Value), [nameof(UInt32Value.Value)]),
+        //(typeof(UInt64Value), [nameof(UInt64Value.Value)])
     ];
 
     static ProtoBufUtils()
@@ -43,7 +49,25 @@ internal static class ProtoBufUtils
                 metaType.AddField(1 + i, wellKnownType.MemberNames[i]);
             }
         }
+
+        typeModel.AutoAddMissingTypes = true;
+
+        // System.InvalidOperationException : For repeated data declared as Google.Protobuf.ByteString,
+        // the *underlying* collection (Google.Protobuf.ByteString) must implement ICollection<T> and must not declare itself read-only;
+        // alternative (more exotic) collections can be used, but must be declared using their well-known form (for example, a member could be declared as ImmutableHashSet<T>)
+
+        //typeModel.SetSurrogate<ByteString, byte[]>(UnderlyingToSurrogate, SurrogateToUnderlying);
+        //typeModel.AddSerializer(typeof(ByteString), x.GetType());
+
+        //var x = RepeatedSerializer.CreateEnumerable<ByteString, byte>();
+        //typeModel.AddSerializer(typeof(ByteString), typeof(EnumerableSerializer<Collection<int>, Collection<int>, int>));
+
+        //typeModel.Serialize()
     }
+
+    private static byte[] UnderlyingToSurrogate(ByteString byteString) => byteString.ToByteArray();
+
+    private static ByteString SurrogateToUnderlying(byte[] bytes) => ByteString.CopyFrom(bytes);
 
     internal static MemoryStream GetMemoryStreamFromBytes(byte[] buffer, bool skipGrpcHeader)
     {
@@ -119,4 +143,39 @@ internal static class ProtoBufUtils
         // If the system is already big-endian, read the bytes in order
         return BitConverter.ToUInt32(buffer, offset);
     }
+
+    //class EnumerableSerializer<TCollection, TCreate, T> : RepeatedSerializer<TCollection, T>
+    //    where TCollection : class, IEnumerable<T>
+    //    where TCreate : TCollection
+    //{
+    //    protected override int TryGetCount(TCollection values)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    protected override TCollection Clear(TCollection values, ISerializationContext context)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    protected override TCollection AddRange(TCollection values, ref ArraySegment<T> newValues, ISerializationContext context)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    protected override void Measure(TCollection values, IMeasuringSerializer<T> serializer, ISerializationContext context, WireType wireType)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    protected override void WritePacked(ref ProtoWriter.State state, TCollection values, IMeasuringSerializer<T> serializer, WireType wireType)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    protected override void Write(ref ProtoWriter.State state, int fieldNumber, SerializerFeatures features, WireType wireType, TCollection values, ISerializer<T> serializer, SerializerFeatures itemFeatures)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 }

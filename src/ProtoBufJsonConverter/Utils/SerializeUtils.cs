@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Newtonsoft.Json;
 using ProtoBuf;
+using ProtoBuf.Meta;
 using ProtoBufJsonConverter.Json;
 using ProtoBufJsonConverter.Models;
 
@@ -14,7 +15,6 @@ internal static class SerializeUtils
     internal static string ConvertObjectToJson(ConvertToProtoBufRequest request)
     {
         return JsonConvert.SerializeObject(request.Input, ProtoMessageConverter);
-        // return JsonConvert.SerializeObject(request.Input);
     }
 
     internal static string ConvertProtoBufToJson(Assembly assembly, string inputTypeFullName, ConvertToJsonRequest request)
@@ -51,6 +51,10 @@ internal static class SerializeUtils
             Converters = [ ProtoMessageConverter ]
         });
 
-        return ProtoBufUtils.Serialize(memoryStream => Serializer.Serialize(memoryStream, instance), addGrpcHeader);
+        return ProtoBufUtils.Serialize(memoryStream =>
+        {
+            RuntimeTypeModel.Default.Serialize(memoryStream, instance);
+            //Serializer.Serialize(memoryStream, instance);
+        }, addGrpcHeader);
     }
 }
