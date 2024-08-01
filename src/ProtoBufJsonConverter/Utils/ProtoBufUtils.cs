@@ -6,6 +6,7 @@ using gpb::Google.Protobuf.WellKnownTypes;
 using ProtoBuf;
 using ProtoBuf.Meta;
 using ProtoBuf.Serializers;
+using ProtoBufJsonConverter.Models;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -49,14 +50,23 @@ internal static class ProtoBufUtils
             }
         }
 
+        RuntimeTypeModel.Default.Add<ByteString>().SetSurrogate(typeof(byte[]));
+
         // typeModel.AutoAddMissingTypes = true;
-        typeModel.SetSurrogate<ByteString, string>(ByteStringToString, StringToByteString);
-        typeModel.AddSerializer(typeof(ByteString), RepeatedSerializer.CreateEnumerable<ByteString, byte>().GetType());
+        // typeModel.SetSurrogate<ByteString, string>(ByteStringToString, StringToByteString);
+        //typeModel.SetSurrogate<ByteString, byte[]>(null, BytesToByteString);
+        //typeModel.AddSerializer(typeof(ByteString), RepeatedSerializer.CreateEnumerable<ByteString, byte>().GetType());
+        //typeModel.MakeDefault();
     }
+
 
     private static string ByteStringToString(ByteString byteString) => byteString.ToStringUtf8();
 
     private static ByteString StringToByteString(string text) => ByteString.CopyFromUtf8(text);
+
+    private static byte[] ByteStringToBytes(ByteString byteString) => byteString.ToByteArray();
+
+    private static ByteString BytesToByteString(byte[] bytes) => ByteString.CopyFrom(bytes);
 
     internal static MemoryStream GetMemoryStreamFromBytes(byte[] buffer, bool skipGrpcHeader)
     {

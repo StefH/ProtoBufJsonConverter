@@ -317,7 +317,7 @@ message MyMessageAny
         var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
 
         // Assert 1
-        Convert.ToBase64String(bytes).Should().Be("CjkKL3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEgYKBHN0ZWY=");
+        Convert.ToBase64String(bytes).Should().Be("Cj0KL3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEAoQBBBzEHQQZRBmEkAKLnR5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUQCBD/ARD/ARD/ARD/ARAH");
 
         // Act 2
         var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
