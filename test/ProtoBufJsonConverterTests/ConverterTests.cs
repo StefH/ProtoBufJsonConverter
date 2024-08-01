@@ -263,7 +263,7 @@ message MyMessage
     public async Task ConvertAsync_WellKnownTypesFromGoogle_ConvertJsonToProtoBufRequest()
     {
         // Arrange
-        const string messageType = "google.protobuf.";
+        const string messageType = "google.protobuf.StringValue";
 
         const string json = @"{ ""value"": ""stef"" }";
 
