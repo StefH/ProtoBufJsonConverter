@@ -21,7 +21,6 @@ internal static class ProtoBufUtils
     internal static readonly (System.Type Type, string[] MemberNames)[] WellKnownTypes =
     [
         (typeof(Any), [nameof(Any.TypeUrl), nameof(Any.Value)]),
-        //(typeof(IEnumerable<byte>), []),
         //(typeof(ByteString), []),
         //(typeof(BoolValue), [nameof(BoolValue.Value)]),
         //(typeof(BytesValue), [nameof(BytesValue.Value)]),
@@ -50,24 +49,14 @@ internal static class ProtoBufUtils
             }
         }
 
-        typeModel.AutoAddMissingTypes = true;
-
-        // System.InvalidOperationException : For repeated data declared as Google.Protobuf.ByteString,
-        // the *underlying* collection (Google.Protobuf.ByteString) must implement ICollection<T> and must not declare itself read-only;
-        // alternative (more exotic) collections can be used, but must be declared using their well-known form (for example, a member could be declared as ImmutableHashSet<T>)
-
-        //typeModel.SetSurrogate<ByteString, byte[]>(UnderlyingToSurrogate, SurrogateToUnderlying);
-        //typeModel.AddSerializer(typeof(ByteString), x.GetType());
-
-        //var x = RepeatedSerializer.CreateEnumerable<ByteString, byte>();
-        //typeModel.AddSerializer(typeof(ByteString), typeof(EnumerableSerializer<Collection<int>, Collection<int>, int>));
-
-        //typeModel.Serialize()
+        // typeModel.AutoAddMissingTypes = true;
+        typeModel.SetSurrogate<ByteString, string>(ByteStringToString, StringToByteString);
+        typeModel.AddSerializer(typeof(ByteString), RepeatedSerializer.CreateEnumerable<ByteString, byte>().GetType());
     }
 
-    private static byte[] UnderlyingToSurrogate(ByteString byteString) => byteString.ToByteArray();
+    private static string ByteStringToString(ByteString byteString) => byteString.ToStringUtf8();
 
-    private static ByteString SurrogateToUnderlying(byte[] bytes) => ByteString.CopyFrom(bytes);
+    private static ByteString StringToByteString(string text) => ByteString.CopyFromUtf8(text);
 
     internal static MemoryStream GetMemoryStreamFromBytes(byte[] buffer, bool skipGrpcHeader)
     {
