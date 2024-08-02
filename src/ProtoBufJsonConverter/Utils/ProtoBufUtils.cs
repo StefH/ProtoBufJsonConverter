@@ -1,12 +1,10 @@
 ﻿extern alias gpb;
 using System.Buffers.Binary;
-using System.Collections.ObjectModel;
 using gpb::Google.Protobuf;
 using gpb::Google.Protobuf.WellKnownTypes;
 using ProtoBuf;
 using ProtoBuf.Meta;
 using ProtoBuf.Serializers;
-using ProtoBufJsonConverter.Models;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -40,6 +38,12 @@ internal static class ProtoBufUtils
         // - https://github.com/protobuf-net/protobuf-net/issues/722
 
         var typeModel = RuntimeTypeModel.Default;
+
+        typeModel.Add<ByteString>();
+        typeModel.AddSerializer(typeof(ByteString), typeof(R));
+
+        //RuntimeTypeModel.Default.Add<ByteString>().SerializerType = typeof(R);
+
         foreach (var wellKnownType in WellKnownTypes)
         {
             var metaType = typeModel.Add(wellKnownType.Type);
@@ -50,15 +54,47 @@ internal static class ProtoBufUtils
             }
         }
 
-        RuntimeTypeModel.Default.Add<ByteString>().SetSurrogate(typeof(byte[]));
+        // RuntimeTypeModel.Default.Add<ByteString>().SetSurrogate(typeof(byte[]));
 
-        // typeModel.AutoAddMissingTypes = true;
-        // typeModel.SetSurrogate<ByteString, string>(ByteStringToString, StringToByteString);
+        //typeModel.AutoAddMissingTypes = false;
+        //typeModel.SetSurrogate<ByteString, string>(ByteStringToString, StringToByteString);
         //typeModel.SetSurrogate<ByteString, byte[]>(null, BytesToByteString);
-        //typeModel.AddSerializer(typeof(ByteString), RepeatedSerializer.CreateEnumerable<ByteString, byte>().GetType());
+        //typeModel.AddSerializer(typeof(ByteString), RepeatedSerializer.CreateEnumerable<ByteString, ByteString, byte>().GetType());
+        
+        //
         //typeModel.MakeDefault();
     }
 
+    
+
+    class R : IRepeatedSerializer<ByteString>
+    {
+        public static IRepeatedSerializer<ByteString> Create()
+        {
+            return new R();
+        }
+
+        public SerializerFeatures Features { get; }
+
+        public ByteString Read(ref ProtoReader.State state, ByteString value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Write(ref ProtoWriter.State state, ByteString value)
+        {
+            throw new NotImplementedException();
+        }
+        public void WriteRepeated(ref ProtoWriter.State state, int fieldNumber, SerializerFeatures features, ByteString values)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ByteString ReadRepeated(ref ProtoReader.State state, SerializerFeatures features, ByteString values)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
     private static string ByteStringToString(ByteString byteString) => byteString.ToStringUtf8();
 
