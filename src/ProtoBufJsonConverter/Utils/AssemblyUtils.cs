@@ -78,6 +78,7 @@ internal static class AssemblyUtils
             "google.protobuf.Empty" => typeof(Empty),
             "google.protobuf.Duration" => typeof(Duration),
             "google.protobuf.Timestamp" => typeof(Timestamp),
+            "google.protobuf.StringValue" => typeof(StringValue),
             _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
         };
     }

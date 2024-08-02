@@ -260,12 +260,34 @@ message MyMessage
     }
 
     [Fact]
-    public async Task ConvertAsync_WellKnownTypesFromGoogle_ConvertJsonToProtoBufRequest()
+    public async Task ConvertAsync_WellKnownTypesFromGoogleStringValue_ConvertJsonToProtoBufRequest()
     {
         // Arrange
         const string messageType = "google.protobuf.StringValue";
+        const string json1 = @"{ ""value"": ""stef"" }";
+        var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, json1);
 
-        const string json = @"{ ""value"": ""stef"" }";
+        // Act 1
+        var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
+
+        // Assert 1
+        Convert.ToBase64String(bytes).Should().Be("CgRzdGVm");
+
+        // Act 2
+        var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
+        var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
+
+        // Assert 2
+        json.Should().Be(@"{""Value"":""stef""}");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesFromGoogle_ConvertJsonToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessage";
+
+        const string json = @"{ ""str"": { ""value"": ""stef"" } }";
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, json);
 
@@ -273,6 +295,6 @@ message MyMessage
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        bytes.Should().BeEmpty();
+        Convert.ToBase64String(bytes).Should().Be("CgkI2NwFELDFsQI=");
     }
 }
