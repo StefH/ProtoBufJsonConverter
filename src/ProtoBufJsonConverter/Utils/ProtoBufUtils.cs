@@ -28,7 +28,7 @@ internal static class ProtoBufUtils
         //(typeof(FloatValue), [nameof(FloatValue.Value)]),
         //(typeof(Int32Value), [nameof(Int32Value.Value)]),
         //(typeof(Int64Value), [nameof(Int64Value.Value)]),
-        (typeof(StringValue), [nameof(StringValue.Value)]),
+        //(typeof(StringValue), [nameof(StringValue.Value)]),
         //(typeof(UInt32Value), [nameof(UInt32Value.Value)]),
         //(typeof(UInt64Value), [nameof(UInt64Value.Value)])
     ];

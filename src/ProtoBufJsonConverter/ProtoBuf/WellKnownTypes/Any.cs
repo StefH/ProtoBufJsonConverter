@@ -7,34 +7,36 @@ using Stef.Validation;
 namespace Google.Protobuf.WellKnownTypes;
 
 [ProtoContract(Name = ".google.protobuf.Any", Serializer = typeof(AnySerializer), Origin = "google/protobuf/any.proto")]
-public struct Any
+public class Any : IWellKnownType
 {
     #region Proto
     [ProtoMember(1, IsRequired = true)]
-    public string TypeUrl { get; set; }
+    public string TypeUrl { get; set; } = string.Empty;
 
     [ProtoMember(2, IsRequired = true)]
-    public ByteString Value { get; set; }
+    public ByteString Value { get; set; } = [];
     #endregion
 
     private const string DefaultPrefix = "type.googleapis.com";
 
-    public object? GetUnderlyingValue()
+    public object? GetUnderlyingValue() => GetUnderlyingValue(TypeUrl, Value);
+
+    public static object? GetUnderlyingValue(string typeUrl, ByteString value)
     {
-        if (string.IsNullOrEmpty(TypeUrl))
+        if (string.IsNullOrEmpty(typeUrl))
         {
             throw new InvalidOperationException("TypeUrl is null or empty.");
         }
 
-        var fullname = $"ProtoBufJsonConverter.ProtoBuf.WellKnownTypes.{TypeUrl.Split('.').LastOrDefault()}";
+        var fullname = $"ProtoBufJsonConverter.ProtoBuf.WellKnownTypes.{typeUrl.Split('.').LastOrDefault()}";
         var welKnownType = Type.GetType(fullname);
         if (welKnownType == null)
         {
             throw new InvalidOperationException($"Type {fullname} not found.");
         }
 
-        var memoryStream = ProtoBufUtils.GetMemoryStreamFromBytes(Value.ToArray(), true);
-        
+        using var memoryStream = ProtoBufUtils.GetMemoryStreamFromBytes(value.ToArray(), true);
+
         return TryFindGenericType(welKnownType, out var genericType) ? Serializer.Deserialize(genericType, memoryStream) : null;
     }
 

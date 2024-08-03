@@ -1,8 +1,10 @@
-extern alias gpb;
+// extern alias gpb;
 
 using FluentAssertions;
+using Google.Protobuf.WellKnownTypes;
 using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
+using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverterTests;
 
@@ -358,21 +360,21 @@ message MyMessage
         // Arrange
         const string messageType = "MyMessageAny";
 
-        //var any1 = Anyy.Pack(new StringValue { Value = "stef" });
-        //var any2 = Anyy.Pack(new Int32Value { Value = int.MaxValue });
+        var any1 = Any.Pack(new StringValue { Value = "stef" });
+        var any2 = Any.Pack(new Int32Value { Value = int.MaxValue });
 
-        //var @object = new
-        //{
-        //    val1 = any1,
-        //    val2 = any2
-        //};
-        //var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
+        var @object = new
+        {
+            val1 = any1,
+            val2 = any2
+        };
+        var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
 
-        //// Act 1
-        //var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
+        // Act 1
+        var bytes1 = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
 
-        //// Assert 1
-        //Convert.ToBase64String(bytes).Should().Be("Cj0KL3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEAoQBBBzEHQQZRBmEkAKLnR5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUQCBD/ARD/ARD/ARD/ARAH");
+        // Assert 1
+        Convert.ToBase64String(bytes1).Should().Be("Cj0KL3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEAoQBBBzEHQQZRBmEkAKLnR5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUQCBD/ARD/ARD/ARD/ARAH");
 
         var bytes = Convert.FromBase64String(
             "Cj0KL3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEAoQBBBzEHQQZRBmEkAKLnR5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUQCBD/ARD/ARD/ARD/ARAH");

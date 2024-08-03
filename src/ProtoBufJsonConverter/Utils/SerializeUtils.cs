@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Newtonsoft.Json;
 using ProtoBuf;
-using ProtoBuf.Meta;
 using ProtoBufJsonConverter.Json;
 using ProtoBufJsonConverter.Models;
 
@@ -25,7 +24,7 @@ internal static class SerializeUtils
         return JsonConvert.SerializeObject(value, new JsonSerializerSettings
         {
             Formatting = request.WriteIndented ? Formatting.Indented : Formatting.None,
-            Converters = [ ProtoMessageConverter ]
+            Converters = [ProtoMessageConverter]
         });
     }
 
@@ -49,9 +48,14 @@ internal static class SerializeUtils
 
         var instance = JsonConvert.DeserializeObject(json, type, new JsonSerializerSettings
         {
-            Converters = [ ProtoMessageConverter ]
+            Converters = [ProtoMessageConverter]
         });
 
+        return Serialize(instance, addGrpcHeader);
+    }
+
+    internal static byte[] Serialize(object? instance, bool addGrpcHeader = false)
+    {
         return ProtoBufUtils.Serialize(memoryStream =>
         {
             Serializer.Serialize(memoryStream, instance);

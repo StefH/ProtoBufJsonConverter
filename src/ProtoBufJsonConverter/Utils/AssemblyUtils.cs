@@ -2,14 +2,14 @@
 //extern alias gpb;
 
 using System.Reflection;
+using Google.Protobuf.WellKnownTypes;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
 using ProtoBuf.WellKnownTypes;
-
-//using GoogleWellKnownTypes = gpb::Google.Protobuf.WellKnownTypes;
+using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -94,9 +94,8 @@ internal static class AssemblyUtils
             "google.protobuf.Empty" => typeof(Empty),
             "google.protobuf.Duration" => typeof(Duration),
             "google.protobuf.Timestamp" => typeof(Timestamp),
-            // "google.protobuf.StringValue" => typeof(StringValue),
-            //"google.protobuf.Any" => typeof(GoogleWellKnownTypes.Any),
-            //"google.protobuf.StringValue" => typeof(GoogleWellKnownTypes.StringValue),
+            "google.protobuf.StringValue" => typeof(StringValue),
+            "google.protobuf.Any" => typeof(Any),
             _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
         };
     }
