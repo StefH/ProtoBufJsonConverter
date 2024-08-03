@@ -1,4 +1,5 @@
 ﻿using ProtoBuf;
+using ProtoBuf.Meta;
 using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 using Stef.Validation;
 
@@ -25,23 +26,26 @@ public struct Any
             throw new InvalidOperationException("TypeUrl is null or empty.");
         }
 
-        var fullname = $"ProtoBufJsonConverter.ProtoBuf.WellKnownTypes.{TypeUrl.Split(".").LastOrDefault()}";
+        var fullname = $"ProtoBufJsonConverter.ProtoBuf.WellKnownTypes.{TypeUrl.Split('.').LastOrDefault()}";
         var type = Type.GetType(fullname);
         if (type == null)
         {
             throw new InvalidOperationException($"Type {fullname} not found.");
         }
 
-        using var ms = new MemoryStream(Value.ToArray());
+        var ms = new MemoryStream(Value.ToArray());
         var value = Serializer.Deserialize(ms, type);
+
+        return null;
     }
 
     public static Any Pack(object type)
     {
         Guard.NotNull(type);
 
-        using var ms = new MemoryStream();
-        Serializer.Serialize(ms, type);
+        var ms = new MemoryStream();
+        RuntimeTypeModel.Default.Serialize(ms, type);
+        //Serializer.Serialize(ms, type);
 
         return new Any
         {
@@ -52,7 +56,7 @@ public struct Any
 
     public T Unpack<T>()
     {
-        using var ms = new MemoryStream(Value.ToArray());
+        var ms = new MemoryStream(Value.ToArray());
         return Serializer.Deserialize<T>(ms);
     }
 }

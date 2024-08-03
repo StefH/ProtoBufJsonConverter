@@ -159,6 +159,21 @@ message MyMessageAny
 }
 ";
 
+    private const string ProtoDefinitionWithEnum = @"
+syntax = ""proto3"";
+
+enum Enum
+{
+    A = 0;
+    B = 1;
+}
+
+message MyMessage
+{
+    Enum e = 1;
+}
+";
+
     private readonly Converter _sut = new();
 
     [Theory]
@@ -220,6 +235,30 @@ message MyMessageAny
 
         // Assert
         Convert.ToBase64String(bytes).Should().Be(expectedBytes);
+    }
+
+    [Fact]
+    public async Task ConvertAsync_ConvertEnumToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessage";
+
+        var @object = new { e = 1 };
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithEnum, messageType, @object);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CAE=");
+
+        // Act 2
+        var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithEnum, messageType, bytes);
+        var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
+
+        // Assert 2
+        json.Should().Be("""{"e":1}""");
     }
 
     [Fact]

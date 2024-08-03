@@ -47,7 +47,7 @@ internal class WellKnownTypesConverter : JsonConverter
 
             writer.WritePropertyName("value");
             
-            any.Unpack<>()
+            //any.Unpack<>()
 
             writer.WriteEndObject();
         }

@@ -3,7 +3,7 @@
 namespace ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 
 [ProtoContract(Name = ".google.protobuf.BytesValue", Origin = "google/protobuf/wrappers.proto")]
-public struct BytesValue
+public struct BytesValue : IWellKnownType<ByteString>
 {
     [ProtoMember(1)]
     public ByteString Value { get; set; }
