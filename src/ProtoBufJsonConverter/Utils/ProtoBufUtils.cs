@@ -1,110 +1,14 @@
-﻿//extern alias gpb;
-using System.Buffers.Binary;
-//using gpb::Google.Protobuf;
-//using gpb::Google.Protobuf.WellKnownTypes;
-using ProtoBuf;
-using ProtoBuf.Meta;
-using ProtoBuf.Serializers;
-using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
+﻿using System.Buffers.Binary;
 
 namespace ProtoBufJsonConverter.Utils;
 
 /// <summary>
-/// Based on https://github.com/pawitp/protobuf-decoder/blob/master/src/protobufDecoder.js
+/// Some code based on https://github.com/pawitp/protobuf-decoder/blob/master/src/protobufDecoder.js
 /// </summary>
 internal static class ProtoBufUtils
 {
     private const int SizeOfUInt32 = 4;
     private const int HeaderSize = 1 + SizeOfUInt32; // 1 (Compression flag) + 4 (UInt32)
-
-    // - https://protobuf.dev/reference/protobuf/google.protobuf/
-    internal static readonly (System.Type Type, string[] MemberNames)[] WellKnownTypes =
-    [
-        //(typeof(Any), [nameof(Any.TypeUrl), nameof(Any.Value)]),
-        //(typeof(ByteString), []),
-        //(typeof(BoolValue), [nameof(BoolValue.Value)]),
-        //(typeof(BytesValue), [nameof(BytesValue.Value)]),
-        //(typeof(DoubleValue), [nameof(DoubleValue.Value)]),
-        //(typeof(FloatValue), [nameof(FloatValue.Value)]),
-        //(typeof(Int32Value), [nameof(Int32Value.Value)]),
-        //(typeof(Int64Value), [nameof(Int64Value.Value)]),
-        //(typeof(StringValue), [nameof(StringValue.Value)]),
-        //(typeof(UInt32Value), [nameof(UInt32Value.Value)]),
-        //(typeof(UInt64Value), [nameof(UInt64Value.Value)])
-    ];
-
-    static ProtoBufUtils()
-    {
-        // Initialization
-        // - https://github.com/protobuf-net/protobuf-net/issues/722
-
-        var typeModel = RuntimeTypeModel.Default;
-
-        //typeModel.Add<ByteString>();
-        //typeModel.AddSerializer(typeof(ByteString), typeof(R));
-
-        //RuntimeTypeModel.Default.Add<ByteString>().SerializerType = typeof(R);
-
-        foreach (var wellKnownType in WellKnownTypes)
-        {
-            var metaType = typeModel.Add(wellKnownType.Type);
-
-            for (var i = 0; i < wellKnownType.MemberNames.Length; i++)
-            {
-                metaType.AddField(1 + i, wellKnownType.MemberNames[i]);
-            }
-        }
-
-        // RuntimeTypeModel.Default.Add<ByteString>().SetSurrogate(typeof(byte[]));
-
-        //typeModel.AutoAddMissingTypes = false;
-        //typeModel.SetSurrogate<ByteString, string>(ByteStringToString, StringToByteString);
-        //typeModel.SetSurrogate<ByteString, byte[]>(null, BytesToByteString);
-        //typeModel.AddSerializer(typeof(ByteString), RepeatedSerializer.CreateEnumerable<ByteString, ByteString, byte>().GetType());
-        
-        //
-        //typeModel.MakeDefault();
-    }
-
-    
-
-    //class R : IRepeatedSerializer<ByteString>
-    //{
-    //    public static IRepeatedSerializer<ByteString> Create()
-    //    {
-    //        return new R();
-    //    }
-
-    //    public SerializerFeatures Features { get; }
-
-    //    public ByteString Read(ref ProtoReader.State state, ByteString value)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public void Write(ref ProtoWriter.State state, ByteString value)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //    public void WriteRepeated(ref ProtoWriter.State state, int fieldNumber, SerializerFeatures features, ByteString values)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public ByteString ReadRepeated(ref ProtoReader.State state, SerializerFeatures features, ByteString values)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
-    //private static string ByteStringToString(ByteString byteString) => byteString.ToStringUtf8();
-
-    //private static ByteString StringToByteString(string text) => ByteString.CopyFromUtf8(text);
-
-    //private static byte[] ByteStringToBytes(ByteString byteString) => byteString.ToByteArray();
-
-    //private static ByteString BytesToByteString(byte[] bytes) => ByteString.CopyFrom(bytes);
-
     internal static MemoryStream GetMemoryStreamFromBytes(byte[] buffer, bool skipGrpcHeader)
     {
         var offset = 0;

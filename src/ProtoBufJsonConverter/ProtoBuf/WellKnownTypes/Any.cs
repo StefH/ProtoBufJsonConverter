@@ -21,6 +21,12 @@ public class Any : IWellKnownType
 
     public object? GetUnderlyingValue() => GetUnderlyingValue(TypeUrl, Value);
 
+    public T Unpack<T>()
+    {
+        using var ms = new MemoryStream(Value.ToArray());
+        return Serializer.Deserialize<T>(ms);
+    }
+
     public static object? GetUnderlyingValue(string typeUrl, ByteString value)
     {
         if (string.IsNullOrEmpty(typeUrl))
@@ -40,16 +46,6 @@ public class Any : IWellKnownType
         return TryFindGenericType(welKnownType, out var genericType) ? Serializer.Deserialize(genericType, memoryStream) : null;
     }
 
-    private static bool TryFindGenericType(Type type, out Type? genericType)
-    {
-        var wellKnownTypeInterface = type.GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IWellKnownType<>));
-
-        genericType = wellKnownTypeInterface?.GetGenericArguments().FirstOrDefault();
-
-        return genericType != null;
-    }
-
     public static Any Pack(object type)
     {
         Guard.NotNull(type);
@@ -64,9 +60,13 @@ public class Any : IWellKnownType
         };
     }
 
-    public T Unpack<T>()
+    private static bool TryFindGenericType(Type type, out Type? genericType)
     {
-        using var ms = new MemoryStream(Value.ToArray());
-        return Serializer.Deserialize<T>(ms);
+        var wellKnownTypeInterface = type.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IWellKnownType<>));
+
+        genericType = wellKnownTypeInterface?.GetGenericArguments().FirstOrDefault();
+
+        return genericType != null;
     }
 }
