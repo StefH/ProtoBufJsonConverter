@@ -1,4 +1,5 @@
-﻿using ProtoBufJsonConverter;
+﻿using Google.Protobuf.WellKnownTypes;
+using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
 
 namespace ConsoleApp;
@@ -7,6 +8,8 @@ public class DynamicProtoLoader
 {
     public static async Task Main()
     {
+        var int64 = Int64Value.Parser.ParseJson("{\"value\":42}");
+
         var protoDefinition = await File.ReadAllTextAsync("greet.proto");
 
         var bytes = Convert.FromBase64String("CgRzdGVm");

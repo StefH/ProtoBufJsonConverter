@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
 using ProtoBuf.WellKnownTypes;
+using ProtoBufJsonConverter.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
