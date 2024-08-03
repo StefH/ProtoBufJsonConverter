@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
-using ProtoBuf.Meta;
 using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
+using ProtoBufJsonConverter.Utils;
 using Stef.Validation;
 
 // ReSharper disable once CheckNamespace
@@ -13,7 +13,7 @@ public struct Any
     [ProtoMember(1, IsRequired = true)]
     public string TypeUrl { get; set; }
 
-    [ProtoMember(2, IsRequired = true)] 
+    [ProtoMember(2, IsRequired = true)]
     public ByteString Value { get; set; }
     #endregion
 
@@ -27,25 +27,33 @@ public struct Any
         }
 
         var fullname = $"ProtoBufJsonConverter.ProtoBuf.WellKnownTypes.{TypeUrl.Split('.').LastOrDefault()}";
-        var type = Type.GetType(fullname);
-        if (type == null)
+        var welKnownType = Type.GetType(fullname);
+        if (welKnownType == null)
         {
             throw new InvalidOperationException($"Type {fullname} not found.");
         }
 
-        var ms = new MemoryStream(Value.ToArray());
-        var value = Serializer.Deserialize(ms, type);
+        var memoryStream = ProtoBufUtils.GetMemoryStreamFromBytes(Value.ToArray(), true);
+        
+        return TryFindGenericType(welKnownType, out var genericType) ? Serializer.Deserialize(genericType, memoryStream) : null;
+    }
 
-        return null;
+    private static bool TryFindGenericType(Type type, out Type? genericType)
+    {
+        var wellKnownTypeInterface = type.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IWellKnownType<>));
+
+        genericType = wellKnownTypeInterface?.GetGenericArguments().FirstOrDefault();
+
+        return genericType != null;
     }
 
     public static Any Pack(object type)
     {
         Guard.NotNull(type);
 
-        var ms = new MemoryStream();
-        RuntimeTypeModel.Default.Serialize(ms, type);
-        //Serializer.Serialize(ms, type);
+        using var ms = new MemoryStream();
+        Serializer.Serialize(ms, type);
 
         return new Any
         {
@@ -56,7 +64,7 @@ public struct Any
 
     public T Unpack<T>()
     {
-        var ms = new MemoryStream(Value.ToArray());
+        using var ms = new MemoryStream(Value.ToArray());
         return Serializer.Deserialize<T>(ms);
     }
 }

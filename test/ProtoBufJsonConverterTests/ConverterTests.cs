@@ -1,11 +1,8 @@
 extern alias gpb;
-using System;
+
 using FluentAssertions;
-using Google.Protobuf.WellKnownTypes;
-using ProtoBuf.Meta;
 using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
-using Anyy = gpb::Google.Protobuf.WellKnownTypes.Any;
 
 namespace ProtoBufJsonConverterTests;
 
@@ -385,6 +382,6 @@ message MyMessage
         var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
 
         // Assert 2
-        json.Should().Be("sss");
+        json.Should().Be("""{"val1":{"@type":"type.googleapis.com/google.protobuf.StringValue","value":"stef"},"val2":{"@type":"type.googleapis.com/google.protobuf.Int32Value","value":2147483647}}""");
     }
 }

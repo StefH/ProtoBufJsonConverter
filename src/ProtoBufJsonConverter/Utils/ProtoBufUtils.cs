@@ -5,6 +5,7 @@ using System.Buffers.Binary;
 using ProtoBuf;
 using ProtoBuf.Meta;
 using ProtoBuf.Serializers;
+using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -27,7 +28,7 @@ internal static class ProtoBufUtils
         //(typeof(FloatValue), [nameof(FloatValue.Value)]),
         //(typeof(Int32Value), [nameof(Int32Value.Value)]),
         //(typeof(Int64Value), [nameof(Int64Value.Value)]),
-        //(typeof(StringValue), [nameof(StringValue.Value)]),
+        (typeof(StringValue), [nameof(StringValue.Value)]),
         //(typeof(UInt32Value), [nameof(UInt32Value.Value)]),
         //(typeof(UInt64Value), [nameof(UInt64Value.Value)])
     ];
@@ -159,7 +160,7 @@ internal static class ProtoBufUtils
         BinaryPrimitives.WriteUInt32BigEndian(headerData.Slice(1), (uint)length);
     }
 
-    private static int BytesLeftInBuffer(Span<byte> buffer, int offset)
+    private static int BytesLeftInBuffer(ReadOnlySpan<byte> buffer, int offset)
     {
         return buffer.Length - offset;
     }
