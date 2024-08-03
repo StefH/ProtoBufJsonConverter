@@ -1,7 +1,7 @@
-﻿extern alias gpb;
+﻿//extern alias gpb;
 using System.Buffers.Binary;
-using gpb::Google.Protobuf;
-using gpb::Google.Protobuf.WellKnownTypes;
+//using gpb::Google.Protobuf;
+//using gpb::Google.Protobuf.WellKnownTypes;
 using ProtoBuf;
 using ProtoBuf.Meta;
 using ProtoBuf.Serializers;
@@ -19,7 +19,7 @@ internal static class ProtoBufUtils
     // - https://protobuf.dev/reference/protobuf/google.protobuf/
     internal static readonly (System.Type Type, string[] MemberNames)[] WellKnownTypes =
     [
-        (typeof(Any), [nameof(Any.TypeUrl), nameof(Any.Value)]),
+        //(typeof(Any), [nameof(Any.TypeUrl), nameof(Any.Value)]),
         //(typeof(ByteString), []),
         //(typeof(BoolValue), [nameof(BoolValue.Value)]),
         //(typeof(BytesValue), [nameof(BytesValue.Value)]),
@@ -39,8 +39,8 @@ internal static class ProtoBufUtils
 
         var typeModel = RuntimeTypeModel.Default;
 
-        typeModel.Add<ByteString>();
-        typeModel.AddSerializer(typeof(ByteString), typeof(R));
+        //typeModel.Add<ByteString>();
+        //typeModel.AddSerializer(typeof(ByteString), typeof(R));
 
         //RuntimeTypeModel.Default.Add<ByteString>().SerializerType = typeof(R);
 
@@ -67,42 +67,42 @@ internal static class ProtoBufUtils
 
     
 
-    class R : IRepeatedSerializer<ByteString>
-    {
-        public static IRepeatedSerializer<ByteString> Create()
-        {
-            return new R();
-        }
+    //class R : IRepeatedSerializer<ByteString>
+    //{
+    //    public static IRepeatedSerializer<ByteString> Create()
+    //    {
+    //        return new R();
+    //    }
 
-        public SerializerFeatures Features { get; }
+    //    public SerializerFeatures Features { get; }
 
-        public ByteString Read(ref ProtoReader.State state, ByteString value)
-        {
-            throw new NotImplementedException();
-        }
+    //    public ByteString Read(ref ProtoReader.State state, ByteString value)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public void Write(ref ProtoWriter.State state, ByteString value)
-        {
-            throw new NotImplementedException();
-        }
-        public void WriteRepeated(ref ProtoWriter.State state, int fieldNumber, SerializerFeatures features, ByteString values)
-        {
-            throw new NotImplementedException();
-        }
+    //    public void Write(ref ProtoWriter.State state, ByteString value)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //    public void WriteRepeated(ref ProtoWriter.State state, int fieldNumber, SerializerFeatures features, ByteString values)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
 
-        public ByteString ReadRepeated(ref ProtoReader.State state, SerializerFeatures features, ByteString values)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    //    public ByteString ReadRepeated(ref ProtoReader.State state, SerializerFeatures features, ByteString values)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 
-    private static string ByteStringToString(ByteString byteString) => byteString.ToStringUtf8();
+    //private static string ByteStringToString(ByteString byteString) => byteString.ToStringUtf8();
 
-    private static ByteString StringToByteString(string text) => ByteString.CopyFromUtf8(text);
+    //private static ByteString StringToByteString(string text) => ByteString.CopyFromUtf8(text);
 
-    private static byte[] ByteStringToBytes(ByteString byteString) => byteString.ToByteArray();
+    //private static byte[] ByteStringToBytes(ByteString byteString) => byteString.ToByteArray();
 
-    private static ByteString BytesToByteString(byte[] bytes) => ByteString.CopyFrom(bytes);
+    //private static ByteString BytesToByteString(byte[] bytes) => ByteString.CopyFrom(bytes);
 
     internal static MemoryStream GetMemoryStreamFromBytes(byte[] buffer, bool skipGrpcHeader)
     {
@@ -178,39 +178,4 @@ internal static class ProtoBufUtils
         // If the system is already big-endian, read the bytes in order
         return BitConverter.ToUInt32(buffer, offset);
     }
-
-    //class EnumerableSerializer<TCollection, TCreate, T> : RepeatedSerializer<TCollection, T>
-    //    where TCollection : class, IEnumerable<T>
-    //    where TCreate : TCollection
-    //{
-    //    protected override int TryGetCount(TCollection values)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    protected override TCollection Clear(TCollection values, ISerializationContext context)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    protected override TCollection AddRange(TCollection values, ref ArraySegment<T> newValues, ISerializationContext context)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    protected override void Measure(TCollection values, IMeasuringSerializer<T> serializer, ISerializationContext context, WireType wireType)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    protected override void WritePacked(ref ProtoWriter.State state, TCollection values, IMeasuringSerializer<T> serializer, WireType wireType)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    protected override void Write(ref ProtoWriter.State state, int fieldNumber, SerializerFeatures features, WireType wireType, TCollection values, ISerializer<T> serializer, SerializerFeatures itemFeatures)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 }

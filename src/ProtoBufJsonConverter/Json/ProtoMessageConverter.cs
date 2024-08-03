@@ -19,7 +19,7 @@ internal class ProtoMessageConverter2 : JsonConverter
 
     public override bool CanConvert(System.Type objectType)
     {
-        return typeof(IMessage).IsAssignableFrom(objectType);
+        return false; // typeof(IMessage).IsAssignableFrom(objectType);
     }
 
     public override object? ReadJson(JsonReader reader, System.Type objectType, object? existingValue, JsonSerializer serializer)

@@ -1,5 +1,5 @@
 ﻿// https://andrewlock.net/disambiguating-types-with-the-same-name-with-extern-alias/
-extern alias gpb;
+//extern alias gpb;
 
 using System.Reflection;
 using MetadataReferenceService.Abstractions;
@@ -8,7 +8,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
 using ProtoBuf.WellKnownTypes;
-using GoogleWellKnownTypes = gpb::Google.Protobuf.WellKnownTypes;
+
+//using GoogleWellKnownTypes = gpb::Google.Protobuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -25,10 +26,12 @@ internal static class AssemblyUtils
         {
             Assembly.Load(assemblySystemRuntime),
             typeof(object).Assembly,
-            typeof(ProtoContractAttribute).Assembly
+            typeof(ProtoContractAttribute).Assembly,
+            typeof(AssemblyUtils).Assembly
         };
     });
-    private static readonly Lazy<Assembly> GoogleAssembly = new(() => typeof(GoogleWellKnownTypes.Any).Assembly);
+    // private static readonly Lazy<Assembly> GoogleAssembly = new(() => typeof(GoogleWellKnownTypes.Any).Assembly);
+    //private static readonly Lazy<Assembly> GoogleAssembly = new(() => typeof(GoogleWellKnownTypes.Any).Assembly);
 
     internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
@@ -72,7 +75,7 @@ internal static class AssemblyUtils
         var requiredAssemblies = RequiredAssemblies.Value.ToList();
         if (includeGoogle)
         {
-            requiredAssemblies.Add(GoogleAssembly.Value);
+            // requiredAssemblies.Add(GoogleAssembly.Value);
         }
 
         var references = new List<MetadataReference>();
@@ -91,7 +94,8 @@ internal static class AssemblyUtils
             "google.protobuf.Empty" => typeof(Empty),
             "google.protobuf.Duration" => typeof(Duration),
             "google.protobuf.Timestamp" => typeof(Timestamp),
-            "google.protobuf.Any" => typeof(GoogleWellKnownTypes.Any),
+            // "google.protobuf.StringValue" => typeof(StringValue),
+            //"google.protobuf.Any" => typeof(GoogleWellKnownTypes.Any),
             //"google.protobuf.StringValue" => typeof(GoogleWellKnownTypes.StringValue),
             _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
         };
