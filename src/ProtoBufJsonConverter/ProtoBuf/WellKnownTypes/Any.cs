@@ -1,5 +1,4 @@
 ﻿using ProtoBuf;
-using ProtoBuf.Meta;
 using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 using Stef.Validation;
 
@@ -18,6 +17,24 @@ public struct Any
     #endregion
 
     private const string DefaultPrefix = "type.googleapis.com";
+
+    public object? GetUnderlyingValue()
+    {
+        if (string.IsNullOrEmpty(TypeUrl))
+        {
+            throw new InvalidOperationException("TypeUrl is null or empty.");
+        }
+
+        var fullname = $"ProtoBufJsonConverter.ProtoBuf.WellKnownTypes.{TypeUrl.Split(".").LastOrDefault()}";
+        var type = Type.GetType(fullname);
+        if (type == null)
+        {
+            throw new InvalidOperationException($"Type {fullname} not found.");
+        }
+
+        using var ms = new MemoryStream(Value.ToArray());
+        var value = Serializer.Deserialize(ms, type);
+    }
 
     public static Any Pack(object type)
     {

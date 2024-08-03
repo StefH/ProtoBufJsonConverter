@@ -1,33 +1,17 @@
-extern alias gpb;
-using gpb::Google.Protobuf;
-using gpb::Google.Protobuf.Reflection;
-using gpb::Google.Protobuf.WellKnownTypes;
+using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Type = System.Type;
+using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Json;
 
 internal class WellKnownTypesConverter : JsonConverter
 {
-    private readonly TypeRegistry _typeRegistry = TypeRegistry.FromMessages(
-    [
-        StringValue.Descriptor,
-        Int32Value.Descriptor
-    ]);
-    private readonly JsonParser _jsonParser;
-    private readonly JsonFormatter _jsonFormatter;
     private readonly ExpandoObjectConverter _converter = new();
-
-    public WellKnownTypesConverter()
-    {
-        _jsonParser = new JsonParser(new JsonParser.Settings(99, _typeRegistry));
-        _jsonFormatter = new JsonFormatter(new JsonFormatter.Settings(true, _typeRegistry));
-    }
 
     public override bool CanConvert(Type objectType)
     {
-        return typeof(IMessage).IsAssignableFrom(objectType); // || objectType == typeof(ByteString);
+        return typeof(Any).IsAssignableFrom(objectType);
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
@@ -37,9 +21,6 @@ internal class WellKnownTypesConverter : JsonConverter
             return null;
         }
 
-        gpb::Google.Protobuf.WellKnownTypes.StringValue sv;
-        gpb::Google.Protobuf.WellKnownTypes.BytesValue bv;
-
         // The only way to find where this json object begins and ends is by reading it in as a generic ExpandoObject.
         // Read an entire object from the reader.
         var expandoObject = _converter.ReadJson(reader, objectType, existingValue, serializer);
@@ -48,18 +29,27 @@ internal class WellKnownTypesConverter : JsonConverter
         var json = JsonConvert.SerializeObject(expandoObject);
 
         // And let protobuf's parser parse the text.
-        var message = (IMessage)Activator.CreateInstance(objectType);
+        //var message = (IMessage)Activator.CreateInstance(objectType);
 
-        var x = _jsonParser.Parse(json, message.Descriptor);
+        //var x = _jsonParser.Parse(json, message.Descriptor);
 
-        return x;
+        return "x";
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        if (value is IMessage message)
+        if (value is Any any)
         {
-            writer.WriteRawValue(_jsonFormatter.Format(message));
+            writer.WriteStartObject();
+
+            writer.WritePropertyName("@type");
+            writer.WriteValue(any.TypeUrl);
+
+            writer.WritePropertyName("value");
+            
+            any.Unpack<>()
+
+            writer.WriteEndObject();
         }
     }
 }
