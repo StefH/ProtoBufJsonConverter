@@ -32,6 +32,10 @@
 		</PackageReference>
 		<PackageReference Include="protobuf-net" Version="3.2.30" />
 		<PackageReference Include="protobuf-net.Reflection" Version="3.2.12" />
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="9.30.0.95878">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Stef.Validation" Version="0.1.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
 	</ItemGroup>

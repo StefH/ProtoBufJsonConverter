@@ -8,9 +8,9 @@ internal class AnySerializer : ISerializer<Any>
 {
     SerializerFeatures ISerializer<Any>.Features => SerializerFeatures.WireTypeStartGroup | SerializerFeatures.CategoryMessage;
 
-    Any ISerializer<Any>.Read(ref ProtoReader.State reader, Any any)
+    Any ISerializer<Any>.Read(ref ProtoReader.State state, Any any)
     {
-        var fh1 = reader.ReadFieldHeader();
+        var fh1 = state.ReadFieldHeader();
         if (fh1 != 1)
         {
             throw new InvalidDataException("Expected Field 1");
@@ -18,29 +18,29 @@ internal class AnySerializer : ISerializer<Any>
 
         any = new Any
         {
-            TypeUrl = reader.ReadString()
+            TypeUrl = state.ReadString()
         };
 
-        var fh2 = reader.ReadFieldHeader();
+        var fh2 = state.ReadFieldHeader();
         if (fh2 != 2)
         {
             throw new InvalidDataException("Expected Field 2");
         }
 
-        any.Value = reader.ReadAny<ByteString>();
+        any.Value = state.ReadAny<ByteString>();
 
         return any;
     }
 
 
-    void ISerializer<Any>.Write(ref ProtoWriter.State writer, Any any)
+    void ISerializer<Any>.Write(ref ProtoWriter.State state, Any any)
     {
-        writer.WriteString(1, any.TypeUrl);
+        state.WriteString(1, any.TypeUrl);
 
         foreach (var @byte in any.Value)
         {
-            writer.WriteFieldHeader(2, WireType.Varint);
-            writer.WriteByte(@byte);
+            state.WriteFieldHeader(2, WireType.Varint);
+            state.WriteByte(@byte);
         }
     }
 }

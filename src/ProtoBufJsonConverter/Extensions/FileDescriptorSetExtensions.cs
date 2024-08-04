@@ -20,13 +20,13 @@ internal static class FileDescriptorSetExtensions
             typeName = messageType.Substring(lastDotIndex + 1);
         }
 
-        var fileDescriptorProto = set.Files.FirstOrDefault(f => f.Package == packageName);
+        var fileDescriptorProto = set.Files.Find(f => f.Package == packageName);
         if (fileDescriptorProto == null)
         {
             throw new ArgumentException($"The package '{packageName}' is not found in the proto definition.");
         }
 
-        var descriptorProto = fileDescriptorProto.MessageTypes.FirstOrDefault(s => s.Name == typeName);
+        var descriptorProto = fileDescriptorProto.MessageTypes.Find(s => s.Name == typeName);
         if (descriptorProto == null)
         {
             throw new ArgumentException($"The message type '{typeName}' is not found in the proto definition.");
@@ -60,19 +60,19 @@ internal static class FileDescriptorSetExtensions
                 throw new ArgumentException($"The method '{method}' is not valid.");
         }
 
-        var fileDescriptorProto = set.Files.FirstOrDefault(f => f.Package == packageName);
+        var fileDescriptorProto = set.Files.Find(f => f.Package == packageName);
         if (fileDescriptorProto == null)
         {
             throw new ArgumentException($"The package '{packageName}' is not found in the proto definition.");
         }
 
-        var serviceDescriptorProto = fileDescriptorProto.Services.FirstOrDefault(s => s.Name == serviceName);
+        var serviceDescriptorProto = fileDescriptorProto.Services.Find(s => s.Name == serviceName);
         if (serviceDescriptorProto == null)
         {
             throw new ArgumentException($"The service '{serviceName}' is not found in the proto definition.");
         }
 
-        var methodDescriptorProto = serviceDescriptorProto.Methods.FirstOrDefault(m => m.Name == methodName);
+        var methodDescriptorProto = serviceDescriptorProto.Methods.Find(m => m.Name == methodName);
         if (methodDescriptorProto == null)
         {
             throw new ArgumentException($"The method '{methodName}' is not found in the proto definition.");

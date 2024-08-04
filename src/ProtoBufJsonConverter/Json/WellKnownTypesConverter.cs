@@ -7,13 +7,11 @@ namespace ProtoBufJsonConverter.Json;
 
 internal class WellKnownTypesConverter : JsonConverter
 {
-    private const string TypeUrlPropertyName = "@type";
-    private const string ValuePropertyName = "value";
-
     private readonly ExpandoObjectConverter _converter = new();
 
     public override bool CanConvert(Type objectType)
     {
+        // Support Any and NullValue
         return typeof(IWellKnownType).IsAssignableFrom(objectType);
     }
 
@@ -30,8 +28,8 @@ internal class WellKnownTypesConverter : JsonConverter
             // Read an entire object from the reader.
             var expandoObject = (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
 
-            var typeUrl = (string)expandoObject[TypeUrlPropertyName]!;
-            var value = expandoObject[ValuePropertyName];
+            var typeUrl = (string)expandoObject[Any.TypeUrlPropertyName]!;
+            var value = expandoObject[Any.ValuePropertyName];
             var bytes = SerializeUtils.Serialize(value);
 
             return new Any
@@ -50,15 +48,19 @@ internal class WellKnownTypesConverter : JsonConverter
         {
             writer.WriteStartObject();
 
-            writer.WritePropertyName(TypeUrlPropertyName);
+            writer.WritePropertyName(Any.TypeUrlPropertyName);
             writer.WriteValue(any.TypeUrl);
 
-            writer.WritePropertyName(ValuePropertyName);
+            writer.WritePropertyName(Any.ValuePropertyName);
 
             var v = any.GetUnderlyingValue();
             writer.WriteValue(v);
 
             writer.WriteEndObject();
+        }
+        else if (value is NullValue)
+        {
+            writer.WriteNull();
         }
     }
 }

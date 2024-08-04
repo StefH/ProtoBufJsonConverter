@@ -28,6 +28,8 @@ internal static class TypeUrlUtils
 
     internal static string BuildTypeUrl(Type type)
     {
+        Guard.NotNull(type);
+
         if (type.GetCustomAttributes(typeof(ProtoContractAttribute), false).FirstOrDefault() is ProtoContractAttribute protoContractAttribute)
         {
             var name = protoContractAttribute.Name;

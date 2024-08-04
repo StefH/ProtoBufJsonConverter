@@ -8,6 +8,9 @@ namespace Google.Protobuf.WellKnownTypes;
 [ProtoContract(Name = ".google.protobuf.Any", Serializer = typeof(AnySerializer), Origin = "google/protobuf/any.proto")]
 public class Any : IWellKnownType
 {
+    internal const string TypeUrlPropertyName = "@type";
+    internal const string ValuePropertyName = "value";
+
     #region Proto
     [ProtoMember(1, IsRequired = true)]
     public string TypeUrl { get; set; } = string.Empty;

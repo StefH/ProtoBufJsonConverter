@@ -63,7 +63,6 @@ public class DynamicProtoLoader
         var convertToProtoBufRequestPerson = new ConvertToProtoBufRequest(protoDefinition, "greet.Person", person);
         var protobuf3PersonBytes = await converter.ConvertAsync(convertToProtoBufRequestPerson);
         var personAsString = ByteArrayToString(protobuf3PersonBytes);
-        int x = 0;
     }
 
     public static string ByteArrayToString(byte[] byteArray)
