@@ -1,6 +1,4 @@
-﻿using Blazorise;
-using JsonConverter.Abstractions;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using ProtoBufJsonConverter.Blazor.Enums;
 using ProtoBufJsonConverter.Models;
 
@@ -71,7 +69,7 @@ public partial class Home
 
         var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
             .WithSkipGrpcHeader(_skipGrpcHeader)
-            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+            .WithWriteIndented(true);
 
         _json = await Converter.ConvertAsync(convertToJsonRequest);
     }

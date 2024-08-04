@@ -1,4 +1,6 @@
-﻿using ProtoBufJsonConverter;
+﻿extern alias gpb;
+using gpb::Google.Protobuf.WellKnownTypes;
+using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
 
 namespace ConsoleApp;
@@ -7,6 +9,12 @@ public class DynamicProtoLoader
 {
     public static async Task Main()
     {
+        //ByteString x;
+        var any1 = Any.Pack(new StringValue { Value = "stef" });
+        var any2 = Any.Pack(new Int32Value { Value = int.MaxValue });
+
+        //any1.TryUnpack()
+
         var protoDefinition = await File.ReadAllTextAsync("greet.proto");
 
         var bytes = Convert.FromBase64String("CgRzdGVm");
@@ -21,8 +29,8 @@ public class DynamicProtoLoader
         var convertToJsonRequest1b = new ConvertToJsonRequest(protoDefinition, messageType, Convert.FromBase64String("AAAAAAYKBHN0ZWY="));
         var json1b = await converter.ConvertAsync(convertToJsonRequest1b);
 
-        var convertToJsonRequest2 = new ConvertToJsonRequest(protoDefinition, messageType, bytes)
-            .WithJsonConverterOptions(o => o.WriteIndented = true);
+        var convertToJsonRequest2 = new ConvertToJsonRequest(protoDefinition, messageType, bytes);
+           // .WithJsonConverterOptions(o => o.WriteIndented = true);
         var json2 = await converter.ConvertAsync(convertToJsonRequest2);
 
         var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, messageType, bytes);

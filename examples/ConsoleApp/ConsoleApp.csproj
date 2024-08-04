@@ -8,7 +8,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Google.Protobuf" Version="3.25.1" />
+	  <Compile Remove="TestMessageProtoC.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Google.Protobuf" Version="3.27.2" Aliases="gpb" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -63,7 +63,7 @@ public class Converter : IConverter
 
         var json = request.Input as string ?? SerializeUtils.ConvertObjectToJson(request);
 
-        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.AddGrpcHeader, request.JsonConverter);
+        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.AddGrpcHeader);
     }
 
     private async Task<(Assembly Assembly, string inputTypeFullName)> ParseAsync(ConvertRequest request, CancellationToken cancellationToken)

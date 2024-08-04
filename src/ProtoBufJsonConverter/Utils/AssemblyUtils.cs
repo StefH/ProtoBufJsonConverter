@@ -4,6 +4,7 @@ using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
+using ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -20,7 +21,8 @@ internal static class AssemblyUtils
         {
             Assembly.Load(assemblySystemRuntime),
             typeof(object).Assembly,
-            typeof(ProtoContractAttribute).Assembly
+            typeof(ProtoContractAttribute).Assembly,
+            typeof(AssemblyUtils).Assembly
         };
     });
 
@@ -35,8 +37,8 @@ internal static class AssemblyUtils
         // Create a compilation
         var compilation = CSharpCompilation.Create(
             assemblyName,
-            new[] { syntaxTree },
-            await CreateMetadataReferences(metadataReferenceService, cancellationToken).ConfigureAwait(false),
+            [syntaxTree],
+            await CreateMetadataReferencesAsync(metadataReferenceService, cancellationToken).ConfigureAwait(false),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
@@ -59,10 +61,11 @@ internal static class AssemblyUtils
         return Assembly.Load(stream.ToArray());
     }
 
-    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferences(IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
+    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferencesAsync(IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
+        var requiredAssemblies = RequiredAssemblies.Value.ToList();
         var references = new List<MetadataReference>();
-        foreach (var requiredAssembly in RequiredAssemblies.Value)
+        foreach (var requiredAssembly in requiredAssemblies)
         {
             references.Add(await metadataReferenceService.CreateAsync(AssemblyDetails.FromAssembly(requiredAssembly), cancellationToken).ConfigureAwait(false));
         }
@@ -72,12 +75,14 @@ internal static class AssemblyUtils
 
     internal static Type GetType(Assembly assembly, string inputTypeFullName)
     {
-        var type = assembly.GetType(inputTypeFullName);
-        if (type == null)
+        return inputTypeFullName switch
         {
-            throw new ArgumentException($"The type '{type}' cannot be found in the assembly.");
-        }
-
-        return type;
+            "google.protobuf.Empty" => typeof(Empty),
+            "google.protobuf.Duration" => typeof(Duration),
+            "google.protobuf.Timestamp" => typeof(Timestamp),
+            //"google.protobuf.StringValue" => typeof(StringValue),
+            //"google.protobuf.Any" => typeof(Any),
+            _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
+        };
     }
 }
