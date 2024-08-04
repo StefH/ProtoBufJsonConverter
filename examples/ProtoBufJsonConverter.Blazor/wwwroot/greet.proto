@@ -4,7 +4,6 @@ package greet;
 
 import "google/protobuf/empty.proto";
 
-// The greeting service definition.
 service Greeter {
   rpc Nothing (google.protobuf.Empty) returns (google.protobuf.Empty);
   
@@ -13,7 +12,6 @@ service Greeter {
   rpc SayOther (Other) returns (HelloReply);
 }
 
-// The request message containing the user's name.
 message HelloRequest {
   string name = 1;
 }
@@ -22,13 +20,12 @@ message Other {
   string name = 1;
 }
 
-// The response message containing the greetings
 message HelloReply {
   string message = 1;
 }
 
 message Person {
-  optional string name = 1;
-  optional int32 id = 2;
-  optional string email = 3;
+  string name = 1;
+  int32 id = 2;
+  string email = 3;
 }

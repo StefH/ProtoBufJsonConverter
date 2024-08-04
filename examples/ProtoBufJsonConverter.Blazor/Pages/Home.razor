@@ -1,5 +1,9 @@
 ﻿@page "/"
 
+@code {
+    private const ThemeMirrorTheme theme = ThemeMirrorTheme.Copilot;
+}
+
 <PageTitle>ProtoBuf Converter</PageTitle>
 
 <Card>
@@ -11,7 +15,16 @@
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is1">ProtoDefinition</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is11">
-                <MemoEdit @bind-Text="@_protoDefinition" Rows="30" Size="Size.Small" />
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <CodeMirror6Wrapper 
+                        IsWASM=true
+                        @bind-Doc=@_protoDefinition
+                        Theme=theme
+                        Language=@CodeMirrorLanguage.ProtoBuf
+                        AllowHorizontalResize=false
+                        ScrollPastEnd=false
+                        AllowVerticalResize=true />
+                </FieldBody>
             </FieldBody>
         </Field>
 
@@ -55,7 +68,14 @@
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">Json</FieldLabel>
                 <FieldBody ColumnSize="ColumnSize.Is11">
-                    <MemoEdit @bind-Text="@_json" Rows="10" />
+                    <CodeMirror6Wrapper 
+                        IsWASM=true
+                        @bind-Doc=@_json
+                        Theme=theme
+                        Language=@CodeMirrorLanguage.Json
+                        AllowHorizontalResize=false
+                        ScrollPastEnd=false
+                        AllowVerticalResize=true />
                 </FieldBody>
             </Field>
 
@@ -89,7 +109,16 @@
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">Json</FieldLabel>
                 <FieldBody ColumnSize="ColumnSize.Is4">
-                    <CodeHighlight Indent="true" CodeLanguage="json" Code="@_json" />
+                    <CodeMirror6Wrapper
+                        IsWASM=true
+                        Editable=false
+                        ReadOnly=true
+                        @bind-Doc=@_json
+                        Theme=theme
+                        Language=@CodeMirrorLanguage.Json
+                        AllowHorizontalResize=false
+                        AllowVerticalResize=true
+                        ScrollPastEnd=false />
                 </FieldBody>
             </Field>
         }
@@ -104,7 +133,16 @@
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">ProtoBuf (Byte Array)</FieldLabel>
                 <FieldBody ColumnSize="ColumnSize.Is11">
-                    <CodeHighlight Indent="false" CodeLanguage="csharp" Code="@_protobufAsByteArray" />
+                    <CodeMirror6Wrapper
+                        IsWASM=true
+                        Editable=false
+                        ReadOnly=true
+                        @bind-Doc=@_protobufAsByteArray
+                        Theme=theme
+                        Language=@CodeMirrorLanguage.Csharp
+                        AllowHorizontalResize=false
+                        AllowVerticalResize=true
+                        ScrollPastEnd=false/>
                 </FieldBody>
             </Field>
         }
