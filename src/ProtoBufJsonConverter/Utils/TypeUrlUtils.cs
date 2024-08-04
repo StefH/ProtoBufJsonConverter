@@ -26,33 +26,18 @@ internal static class TypeUrlUtils
         return ReflectionUtils.TryFindGenericType(welKnownType, out var genericType) ? Serializer.Deserialize(genericType, memoryStream) : null;
     }
 
-    internal static string BuildTypeUrl(object value)
-    {
-        Guard.NotNull(value);
-        var type = value.GetType();
-
-        if (typeof(IWellKnownType).IsAssignableFrom(type))
-        {
-            return $"{TypeGoogleApisComPrefix}/google.protobuf.{type.Name}";
-        }
-
-        return $"{CustomPrefix}/{type.FullName}";
-    }
-
-    internal static string GetFindTypeUrl(Type type, string defaultTypeUrl)
+    internal static string BuildTypeUrl(Type type)
     {
         if (type.GetCustomAttributes(typeof(ProtoContractAttribute), false).FirstOrDefault() is ProtoContractAttribute protoContractAttribute)
         {
             var name = protoContractAttribute.Name;
-            if (string.IsNullOrEmpty(name))
-            {
-                name = type.Name;
-            }
 
-            if (typeof(IWellKnownType).IsAssignableFrom(type))
+            if (typeof(IWellKnownType).IsAssignableFrom(type) && !string.IsNullOrEmpty(name))
             {
                 return $"{TypeGoogleApisComPrefix}/{name.TrimStart('.')}";
             }
+
+            return $"{CustomPrefix}/{name.TrimStart('.')}";
         }
 
         return $"{CustomPrefix}/{type.FullName}";

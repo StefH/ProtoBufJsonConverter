@@ -31,7 +31,7 @@ public class Any : IWellKnownType
 
         return new Any
         {
-            TypeUrl = TypeUrlUtils.BuildTypeUrl(value),
+            TypeUrl = TypeUrlUtils.BuildTypeUrl(value.GetType()),
             Value = new ByteString(SerializeUtils.Serialize(value))
         };
     }
