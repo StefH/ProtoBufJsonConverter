@@ -116,17 +116,6 @@ message MyMessageDuration
 }
 ";
 
-    private const string ProtoDefinitionWithWellKnownTypesFromGoogle1 = @"
-syntax = ""proto3"";
-
-import ""google/protobuf/wrappers.proto"";
-
-message MyMessageStringValue
-{
-    google.protobuf.StringValue val = 1;
-}
-";
-
     private const string ProtoDefinitionWithWellKnownTypesFromGoogle = @"
 syntax = ""proto3"";
 
@@ -386,7 +375,7 @@ message MyMessage
 
         // Assert 1
         Convert.ToBase64String(bytes).Should().Be(expectedBytes);
-        
+
         // Act 2
         var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
         var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
@@ -412,13 +401,10 @@ message MyMessage
         var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
 
         // Act 1
-        var bytes1 = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
+        var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
 
         // Assert 1
-        Convert.ToBase64String(bytes1).Should().Be("Cj0KL3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEAoQBBBzEHQQZRBmEkAKLnR5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUQCBD/ARD/ARD/ARD/ARAH");
-
-        var bytes = Convert.FromBase64String(
-            "Cj0KL3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEAoQBBBzEHQQZRBmEkAKLnR5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUQCBD/ARD/ARD/ARD/ARAH");
+        Convert.ToBase64String(bytes).Should().Be("Cj0KL3R5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLlN0cmluZ1ZhbHVlEAoQBBBzEHQQZRBmEkAKLnR5cGUuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLnByb3RvYnVmLkludDMyVmFsdWUQCBD/ARD/ARD/ARD/ARAH");
 
         // Act 2
         var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
