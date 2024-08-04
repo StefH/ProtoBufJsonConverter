@@ -1,5 +1,4 @@
-# 0.3.0 (06 March 2024)
-- #11 Fix for when proto package name contains dot(s) [bug]
-- #10 Error when proto package name contains dot(s) [bug]
+# 0.4.0 (04 August 2024)
+- #18 Add WellKnownTypes [enhancement]
 
 The full release notes can be found here: https://github.com/StefH/ProtoBufJsonConverter/blob/main/ReleaseNotes.md

@@ -29,8 +29,8 @@ public class DynamicProtoLoader
         var convertToJsonRequest1b = new ConvertToJsonRequest(protoDefinition, messageType, Convert.FromBase64String("AAAAAAYKBHN0ZWY="));
         var json1b = await converter.ConvertAsync(convertToJsonRequest1b);
 
-        var convertToJsonRequest2 = new ConvertToJsonRequest(protoDefinition, messageType, bytes);
-           // .WithJsonConverterOptions(o => o.WriteIndented = true);
+        var convertToJsonRequest2 = new ConvertToJsonRequest(protoDefinition, messageType, bytes)
+           .WithWriteIndented();
         var json2 = await converter.ConvertAsync(convertToJsonRequest2);
 
         var convertToObjectRequest = new ConvertToObjectRequest(protoDefinition, messageType, bytes);

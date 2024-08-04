@@ -199,7 +199,7 @@ public partial class Home
 
         var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
             .WithSkipGrpcHeader(_skipGrpcHeader)
-            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+            .WithWriteIndented();
 
         _json = await Converter.ConvertAsync(convertToJsonRequest);
     }
