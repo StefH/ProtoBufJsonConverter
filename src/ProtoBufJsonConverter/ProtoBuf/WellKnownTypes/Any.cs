@@ -17,56 +17,22 @@ public class Any : IWellKnownType
     public ByteString Value { get; set; } = [];
     #endregion
 
-    private const string DefaultPrefix = "type.googleapis.com";
-
-    public object? GetUnderlyingValue() => GetUnderlyingValue(TypeUrl, Value);
+    public object? GetUnderlyingValue() => TypeUrlUtils.GetUnderlyingValue(TypeUrl, Value);
 
     public T Unpack<T>()
     {
         using var ms = new MemoryStream(Value.ToArray());
         return Serializer.Deserialize<T>(ms);
     }
-
-    public static object? GetUnderlyingValue(string typeUrl, ByteString value)
+    
+    public static Any Pack(object value)
     {
-        if (string.IsNullOrEmpty(typeUrl))
-        {
-            throw new InvalidOperationException("TypeUrl is null or empty.");
-        }
-
-        var fullname = $"ProtoBufJsonConverter.ProtoBuf.WellKnownTypes.{typeUrl.Split('.').LastOrDefault()}";
-        var welKnownType = Type.GetType(fullname);
-        if (welKnownType == null)
-        {
-            throw new InvalidOperationException($"Type {fullname} not found.");
-        }
-
-        using var memoryStream = ProtoBufUtils.GetMemoryStreamFromBytes(value.ToArray(), true);
-
-        return TryFindGenericType(welKnownType, out var genericType) ? Serializer.Deserialize(genericType, memoryStream) : null;
-    }
-
-    public static Any Pack(object type)
-    {
-        Guard.NotNull(type);
-
-        using var ms = new MemoryStream();
-        Serializer.Serialize(ms, type);
+        Guard.NotNull(value);
 
         return new Any
         {
-            TypeUrl = $"{DefaultPrefix}/google.protobuf.{type.GetType().Name}",
-            Value = new ByteString(ms.ToArray())
+            TypeUrl = TypeUrlUtils.BuildTypeUrl(value),
+            Value = new ByteString(SerializeUtils.Serialize(value))
         };
-    }
-
-    private static bool TryFindGenericType(Type type, out Type? genericType)
-    {
-        var wellKnownTypeInterface = type.GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IWellKnownType<>));
-
-        genericType = wellKnownTypeInterface?.GetGenericArguments().FirstOrDefault();
-
-        return genericType != null;
     }
 }

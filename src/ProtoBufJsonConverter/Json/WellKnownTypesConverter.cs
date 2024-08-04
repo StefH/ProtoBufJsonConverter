@@ -1,7 +1,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using ProtoBuf;
 using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 using ProtoBufJsonConverter.Utils;
 
@@ -30,9 +29,9 @@ internal class WellKnownTypesConverter : JsonConverter
         {
             // The only way to find where this json object begins and ends is by reading it in as a generic ExpandoObject.
             // Read an entire object from the reader.
-            var expandoObject = (IDictionary<string, object?>) _converter.ReadJson(reader, objectType, existingValue, serializer)!;
+            var expandoObject = (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
 
-            var typeUrl = (string) expandoObject[TypeUrlPropertyName]!;
+            var typeUrl = (string)expandoObject[TypeUrlPropertyName]!;
             var value = expandoObject[ValuePropertyName];
             var bytes = SerializeUtils.Serialize(value);
 
@@ -61,10 +60,6 @@ internal class WellKnownTypesConverter : JsonConverter
             writer.WriteValue(v);
 
             writer.WriteEndObject();
-        }
-        else
-        {
-            int x = 9;
         }
     }
 }
