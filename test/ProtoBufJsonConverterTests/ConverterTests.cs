@@ -10,18 +10,15 @@ public class ConverterTests
     private const string ProtoDefinitionNoPackage = @"
 syntax = ""proto3"";
 
-service Greeter
-{
+service Greeter {
     rpc SayHello (HelloRequest) returns(HelloReply);
 }
 
-message HelloRequest
-{
+message HelloRequest {
     string name = 1;
 }
 
-message HelloReply
-{
+message HelloReply {
     string message = 1;
 }
 ";
@@ -33,20 +30,17 @@ import ""google/protobuf/empty.proto"";
 
 package greet;
 
-service Greeter
-{
+service Greeter {
     rpc SayHello (HelloRequest) returns(HelloReply);
 
     rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
-message HelloRequest
-{
+message HelloRequest {
     string name = 1;
 }
 
-message HelloReply
-{
+message HelloReply {
     string message = 1;
 }
 ";
@@ -56,18 +50,15 @@ syntax = ""proto3"";
 
 package greet.foo;
 
-service Greeter
-{
+service Greeter {
     rpc SayHello (HelloRequest) returns(HelloReply);
 }
 
-message HelloRequest
-{
+message HelloRequest {
     string name = 1;
 }
 
-message HelloReply
-{
+message HelloReply {
     string message = 1;
 }
 ";
@@ -77,18 +68,15 @@ syntax = ""proto3"";
 
 package greet.foo.bar;
 
-service Greeter
-{
+service Greeter {
     rpc SayHello (HelloRequest) returns(HelloReply);
 }
 
-message HelloRequest
-{
+message HelloRequest {
     string name = 1;
 }
 
-message HelloReply
-{
+message HelloReply {
     string message = 1;
 }
 ";
@@ -100,18 +88,15 @@ import ""google/protobuf/empty.proto"";
 import ""google/protobuf/timestamp.proto"";
 import ""google/protobuf/duration.proto"";
 
-service Greeter
-{
+service Greeter {
     rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
-message MyMessageTimestamp
-{
+message MyMessageTimestamp {
     google.protobuf.Timestamp ts = 1;
 }
 
-message MyMessageDuration
-{
+message MyMessageDuration {
     google.protobuf.Duration du = 1;
 }
 ";
@@ -123,28 +108,23 @@ import ""google/protobuf/wrappers.proto"";
 import ""google/protobuf/any.proto"";
 import ""google/protobuf/struct.proto"";
 
-message MyMessageStringValue
-{
+message MyMessageStringValue {
     google.protobuf.StringValue val = 1;
 }
 
-message MyMessageInt64Value
-{
+message MyMessageInt64Value {
     google.protobuf.Int64Value val = 1; 
 }
 
-message MyMessageInt32Value
-{
+message MyMessageInt32Value {
     google.protobuf.Int32Value val = 1; 
 }
 
-message MyMessageNullValue
-{
+message MyMessageNullValue {
     google.protobuf.NullValue val = 1; 
 }
 
-message MyMessageAny
-{
+message MyMessageAny {
     google.protobuf.Any val1 = 1;
     google.protobuf.Any val2 = 2;
 }
@@ -153,14 +133,12 @@ message MyMessageAny
     private const string ProtoDefinitionWithEnum = @"
 syntax = ""proto3"";
 
-enum Enum
-{
+enum Enum {
     A = 0;
     B = 1;
 }
 
-message MyMessage
-{
+message MyMessage {
     Enum e = 1;
 }
 ";
@@ -168,8 +146,7 @@ message MyMessage
     private const string ProtoDefinitionWithOneOf = @"
 syntax = ""proto3"";
 
-message MyMessage
-{
+message MyMessage {
   oneof test
   {
     string name = 1;
