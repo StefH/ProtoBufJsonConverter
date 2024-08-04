@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Google.Protobuf.WellKnownTypes;
 using ProtoBuf;
-using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Utils;
@@ -9,7 +9,7 @@ internal static class TypeUrlUtils
 {
     private const string CustomPrefix = "custom";
     private const string TypeGoogleApisComPrefix = "type.googleapis.com";
-    private const string WellKnownTypesNamespace = "ProtoBufJsonConverter.ProtoBuf.WellKnownTypes";
+    private const string WellKnownTypesNamespace = "Google.Protobuf.WellKnownTypes";
 
     internal static object? GetUnderlyingValue(string typeUrl, ByteString value)
     {
@@ -32,12 +32,17 @@ internal static class TypeUrlUtils
         {
             var name = protoContractAttribute.Name;
 
-            if (typeof(IWellKnownType).IsAssignableFrom(type) && !string.IsNullOrEmpty(name))
+            if (typeof(IWellKnownType).IsAssignableFrom(type))
             {
                 return $"{TypeGoogleApisComPrefix}/{name.TrimStart('.')}";
             }
 
-            return $"{CustomPrefix}/{name.TrimStart('.')}";
+            if (string.IsNullOrEmpty(name))
+            {
+                name = type.FullName;
+            }
+
+            return $"{CustomPrefix}/{name!.TrimStart('.')}";
         }
 
         return $"{CustomPrefix}/{type.FullName}";

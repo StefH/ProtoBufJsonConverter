@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 
-namespace ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
+// ReSharper disable once CheckNamespace
+namespace Google.Protobuf.WellKnownTypes;
 
 [ProtoContract(Name = ".google.protobuf.Int32Value", Origin = "google/protobuf/wrappers.proto")]
 public struct Int32Value : IWellKnownType<int>

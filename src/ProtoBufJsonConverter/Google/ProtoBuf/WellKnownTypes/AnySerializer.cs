@@ -1,6 +1,5 @@
 ﻿using ProtoBuf;
 using ProtoBuf.Serializers;
-using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 
 // ReSharper disable once CheckNamespace
 namespace Google.Protobuf.WellKnownTypes;

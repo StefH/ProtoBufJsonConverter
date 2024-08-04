@@ -1,6 +1,7 @@
 ﻿using ProtoBuf;
 
-namespace ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
+// ReSharper disable once CheckNamespace
+namespace Google.Protobuf.WellKnownTypes;
 
 [ProtoContract(Name = ".google.protobuf.ByteString", Origin = "google/protobuf/wrappers.proto")]
 public class ByteString : List<byte>

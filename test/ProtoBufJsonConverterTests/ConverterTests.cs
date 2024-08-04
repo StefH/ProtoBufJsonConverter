@@ -2,7 +2,6 @@ using FluentAssertions;
 using Google.Protobuf.WellKnownTypes;
 using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
-using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverterTests;
 
@@ -133,6 +132,7 @@ syntax = ""proto3"";
 
 import ""google/protobuf/wrappers.proto"";
 import ""google/protobuf/any.proto"";
+import ""google/protobuf/struct.proto"";
 
 message MyMessageStringValue
 {
@@ -147,6 +147,11 @@ message MyMessageInt64Value
 message MyMessageInt32Value
 {
     google.protobuf.Int32Value val = 1; 
+}
+
+message MyMessageNullValue
+{
+    google.protobuf.NullValue val = 1; 
 }
 
 message MyMessageAny
@@ -369,7 +374,8 @@ message MyMessage
     [InlineData("MyMessageStringValue", "stef", "CgYKBHN0ZWY=", """{"val":"stef"}""")]
     [InlineData("MyMessageInt64Value", long.MaxValue, "CgoI//////////9/", """{"val":9223372036854775807}""")]
     [InlineData("MyMessageInt32Value", int.MaxValue, "CgYI/////wc=", """{"val":2147483647}""")]
-    public async Task ConvertAsync_WellKnownTypes_ConvertObjectToProtoBufRequest(string messageType, object val, string expectedBytes, string expectedJson)
+    [InlineData("MyMessageNullValue", null, "CgA=", """{"val":null}""")]
+    public async Task ConvertAsync_WellKnownTypes_ConvertObjectToProtoBufRequest(string messageType, object? val, string expectedBytes, string expectedJson)
     {
         // Arrange
         var @object = new { val };
