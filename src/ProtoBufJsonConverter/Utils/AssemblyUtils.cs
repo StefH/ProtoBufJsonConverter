@@ -1,15 +1,10 @@
-﻿// https://andrewlock.net/disambiguating-types-with-the-same-name-with-extern-alias/
-//extern alias gpb;
-
-using System.Reflection;
-using Google.Protobuf.WellKnownTypes;
+﻿using System.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
 using ProtoBuf.WellKnownTypes;
-using ProtoBufJsonConverter.ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -30,13 +25,9 @@ internal static class AssemblyUtils
             typeof(AssemblyUtils).Assembly
         };
     });
-    // private static readonly Lazy<Assembly> GoogleAssembly = new(() => typeof(GoogleWellKnownTypes.Any).Assembly);
-    //private static readonly Lazy<Assembly> GoogleAssembly = new(() => typeof(GoogleWellKnownTypes.Any).Assembly);
 
     internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
-        var includeGoogle = code.IndexOf("global::Google.Protobuf.WellKnownTypes", StringComparison.OrdinalIgnoreCase) >= 0;
-
         // Specify the assembly name
         var assemblyName = Path.GetRandomFileName();
 
@@ -47,7 +38,7 @@ internal static class AssemblyUtils
         var compilation = CSharpCompilation.Create(
             assemblyName,
             [syntaxTree],
-            await CreateMetadataReferencesAsync(metadataReferenceService, includeGoogle, cancellationToken).ConfigureAwait(false),
+            await CreateMetadataReferencesAsync(metadataReferenceService, cancellationToken).ConfigureAwait(false),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
@@ -70,14 +61,9 @@ internal static class AssemblyUtils
         return Assembly.Load(stream.ToArray());
     }
 
-    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferencesAsync(IMetadataReferenceService metadataReferenceService, bool includeGoogle, CancellationToken cancellationToken)
+    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferencesAsync(IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
         var requiredAssemblies = RequiredAssemblies.Value.ToList();
-        if (includeGoogle)
-        {
-            // requiredAssemblies.Add(GoogleAssembly.Value);
-        }
-
         var references = new List<MetadataReference>();
         foreach (var requiredAssembly in requiredAssemblies)
         {
@@ -94,8 +80,8 @@ internal static class AssemblyUtils
             "google.protobuf.Empty" => typeof(Empty),
             "google.protobuf.Duration" => typeof(Duration),
             "google.protobuf.Timestamp" => typeof(Timestamp),
-            "google.protobuf.StringValue" => typeof(StringValue),
-            "google.protobuf.Any" => typeof(Any),
+            //"google.protobuf.StringValue" => typeof(StringValue),
+            //"google.protobuf.Any" => typeof(Any),
             _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
         };
     }

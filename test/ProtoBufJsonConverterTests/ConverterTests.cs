@@ -1,5 +1,3 @@
-// extern alias gpb;
-
 using FluentAssertions;
 using Google.Protobuf.WellKnownTypes;
 using ProtoBufJsonConverter;
@@ -173,6 +171,19 @@ message MyMessage
 }
 ";
 
+    private const string ProtoDefinitionWithOneOf = @"
+syntax = ""proto3"";
+
+message MyMessage
+{
+  oneof test
+  {
+    string name = 1;
+    int32 age = 2;
+  }
+}
+";
+
     private readonly Converter _sut = new();
 
     [Theory]
@@ -195,7 +206,7 @@ message MyMessage
         var json = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        json.Should().Be(@"{""name"":""stef""}");
+        json.Should().Be("""{"name":"stef"}""");
     }
 
     [Theory]
@@ -258,6 +269,30 @@ message MyMessage
 
         // Assert 2
         json.Should().Be("""{"e":1}""");
+    }
+
+    [Theory]
+    [InlineData("""{"name":"stef"}""", "CgRzdGVm")]
+    [InlineData("""{"age":99}""", "EGM=")]
+    public async Task ConvertAsync_ConvertOneOfToProtoBufRequest(string text, string expectedBytes)
+    {
+        // Arrange
+        const string messageType = "MyMessage";
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithOneOf, messageType, text);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be(expectedBytes);
+
+        // Act 2
+        var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithOneOf, messageType, bytes);
+        var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
+
+        // Assert 2
+        json.Should().Be(text);
     }
 
     [Fact]
