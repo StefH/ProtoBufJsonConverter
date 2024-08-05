@@ -27,8 +27,30 @@ internal static class AssemblyUtils
             typeof(AssemblyUtils).Assembly
         };
     });
+    private static readonly Lazy<ConcurrentDictionary<string, Type>> AllTypesWithProtoContractAttribute = new(() =>
+    {
+        var allTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
+            .ToArray();
+        var allTypesWithAttribute = allTypes
+            .Select(t => new 
+            {
+                Type = t,
+                ProtoContractAttribute = t.GetCustomAttribute<ProtoContractAttribute>()
+            })
+            .Where(t => t.ProtoContractAttribute != null)
+            .ToArray();
+
+        var dict = new ConcurrentDictionary<string, Type>();
+        foreach (var t in allTypesWithAttribute)
+        {
+            Add(dict, t.Type, t.ProtoContractAttribute!.Name);
+        }
+
+        return dict;
+    });
     private static readonly ConcurrentDictionary<string, Type> ExtraTypesFromCompiledCode = new();
-    private static readonly ConcurrentDictionary<string, Type> ExtraTypesFromAllAssemblies = new();
+    // private static readonly ConcurrentDictionary<string, Type> ExtraTypesFromAllAssemblies = new();
 
     internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
@@ -96,15 +118,8 @@ internal static class AssemblyUtils
         }
 
         // Last resort, search all loaded assemblies for the type
-        var allTypesWithProtoContractAttribute = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(type => type.GetCustomAttribute<ProtoContractAttribute>(false) != null)
-            .ToArray();
-
-        type = allTypesWithProtoContractAttribute.FirstOrDefault(t => t.FullName == name || t.Name == name);
-        if (type != null)
+        if (AllTypesWithProtoContractAttribute.Value.TryGetValue(name, out type))
         {
-            Add(ExtraTypesFromAllAssemblies, type, name);
             return true;
         }
 

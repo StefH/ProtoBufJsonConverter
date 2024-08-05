@@ -97,7 +97,7 @@ public partial class AnyTests
         var any = Any.Pack(value);
 
         // Assert 1
-        any.TypeUrl.Should().Be("type.googleapis.com/ProtoBufJsonConverterTests.AnyTests.AnyTests+MyValueWithoutName");
+        any.TypeUrl.Should().Be("type.googleapis.com/ProtoBufJsonConverterTests.AnyTests.MyValueWithoutName");
         Convert.ToBase64String(any.Value.ToArray()).Should().Be("CgRUZXN0");
 
         // Act 2
