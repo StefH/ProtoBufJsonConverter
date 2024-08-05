@@ -14,7 +14,7 @@ namespace ProtoBufJsonConverter;
 /// <summary>
 /// The Converter
 /// </summary>
-public class Converter : IConverter
+public class Converter(IMetadataReferenceService metadataReferenceService) : IConverter
 {
     private static readonly Dictionary<string, string> CodeGenerateOptions = new()
     {
@@ -23,15 +23,10 @@ public class Converter : IConverter
 
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
-    private readonly IMetadataReferenceService _metadataReferenceService;
+    private readonly IMetadataReferenceService _metadataReferenceService = Guard.NotNull(metadataReferenceService);
 
     public Converter() : this(new CreateFromFileMetadataReferenceService())
     {
-    }
-
-    public Converter(IMetadataReferenceService metadataReferenceService)
-    {
-        _metadataReferenceService = Guard.NotNull(metadataReferenceService);
     }
 
     /// <inheritdoc />

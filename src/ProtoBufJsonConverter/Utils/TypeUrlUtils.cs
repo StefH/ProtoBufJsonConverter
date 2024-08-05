@@ -7,30 +7,47 @@ namespace ProtoBufJsonConverter.Utils;
 
 internal static class TypeUrlUtils
 {
-    private const string CustomPrefix = "custom";
     private const string TypeGoogleApisComPrefix = "type.googleapis.com";
-    private const string WellKnownTypesNamespace = "Google.Protobuf.WellKnownTypes";
+    private static readonly Lazy<Dictionary<string, Type>> WellKnownTypes = new(InitializeWellKnownTypes);
 
-    internal static object? GetUnderlyingValue(string typeUrl, ByteString value)
+    internal static bool TryGetUnwrappedValue<T>(string typeUrl, ByteString value, [NotNullWhen(true)] out T? result)
+        where T : notnull
+    {
+        var unwrapped = GetUnwrappedValue(typeUrl, value);
+        if (unwrapped == null)
+        {
+            result = default;
+            return false;
+        }
+
+        result = (T)unwrapped;
+        return true;
+    }
+
+    internal static object? GetUnwrappedValue(string typeUrl, ByteString value)
     {
         Guard.NotNull(typeUrl);
         Guard.NotNull(value);
 
-        using var memoryStream = ProtoBufUtils.GetMemoryStreamFromBytes(value.ToArray(), true);
-
-        if (!TryGetTypeFromTypeUrl(typeUrl, out var welKnownType))
+        if (!TryGetTypeFromTypeUrl(typeUrl, out var type))
         {
             throw new InvalidOperationException($"No type found for TypeUrl: {typeUrl}.");
         }
 
-        return ReflectionUtils.TryFindGenericType(welKnownType, out var genericType) ? Serializer.Deserialize(genericType, memoryStream) : null;
+        using var memoryStream = ProtoBufUtils.GetMemoryStreamFromBytes(value.ToArray(), true);
+        if (ReflectionUtils.TryFindGenericType(type, out var genericType))
+        {
+            return Serializer.Deserialize(genericType, memoryStream);
+        }
+
+        return Serializer.Deserialize(type, memoryStream);
     }
 
     internal static string BuildTypeUrl(Type type)
     {
         Guard.NotNull(type);
 
-        if (type.GetCustomAttributes(typeof(ProtoContractAttribute), false).FirstOrDefault() is ProtoContractAttribute protoContractAttribute)
+        if (ReflectionUtils.TryGetProtoContractAttribute(type, out var protoContractAttribute))
         {
             var name = protoContractAttribute.Name;
 
@@ -44,31 +61,58 @@ internal static class TypeUrlUtils
                 name = type.FullName;
             }
 
-            return $"{CustomPrefix}/{name!.TrimStart('.')}";
+            return $"{TypeGoogleApisComPrefix}/{name!.TrimStart('.')}";
         }
 
-        return $"{CustomPrefix}/{type.FullName}";
+        return $"{TypeGoogleApisComPrefix}/{type.FullName}";
     }
 
     internal static bool TryGetTypeFromTypeUrl(string typeUrl, [NotNullWhen(true)] out Type? type)
     {
         Guard.NotNull(typeUrl);
 
-        type = null;
-
-        if (typeUrl.StartsWith(CustomPrefix))
+        if (typeUrl.StartsWith(TypeGoogleApisComPrefix) && typeUrl.Contains('/'))
         {
-            type = Type.GetType(typeUrl.Substring(CustomPrefix.Length + 1));
-            return type != null;
-        }
+            var typeName = typeUrl.Split('/').Last();
 
-        if (typeUrl.StartsWith(TypeGoogleApisComPrefix))
-        {
-            var typeName = $"{WellKnownTypesNamespace}.{typeUrl.Split('.').Last()}";
+            // First try the WellKnownTypes
+            if (WellKnownTypes.Value.TryGetValue(typeName, out type))
+            {
+                return true;
+            }
+
+            // Else try to find the type in the generated protobuf assemblies or if not found, search all types.
+            if (AssemblyUtils.TryGetType(typeName, out type))
+            {
+                return true;
+            }
+
+            // Try to get the type based on the fully qualified name
             type = Type.GetType(typeName);
             return type != null;
         }
 
+        type = null;
         return false;
     }
+
+    private static Dictionary<string, Type> InitializeWellKnownTypes()
+    {
+        var types = typeof(IWellKnownType).Assembly
+            .GetTypes()
+            .Where(type => typeof(IWellKnownType).IsAssignableFrom(type) || type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IWellKnownType<>)));
+
+        var wellKnownTypes = new Dictionary<string, Type>();
+        foreach (var type in types)
+        {
+            if (ReflectionUtils.TryGetProtoContractAttribute(type, out var protoContractAttribute))
+            {
+                wellKnownTypes[protoContractAttribute.Name.TrimStart('.')] = type;
+            }
+        }
+
+        return wellKnownTypes;
+    }
+
+
 }

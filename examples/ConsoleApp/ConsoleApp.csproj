@@ -8,14 +8,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="TestMessageProtoC.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="Google.Protobuf" Version="3.27.2" Aliases="gpb" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\..\src\ProtoBufJsonConverter\ProtoBufJsonConverter.csproj" />
 	</ItemGroup>
 

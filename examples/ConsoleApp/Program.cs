@@ -1,6 +1,4 @@
-﻿extern alias gpb;
-using gpb::Google.Protobuf.WellKnownTypes;
-using ProtoBufJsonConverter;
+﻿using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
 
 namespace ConsoleApp;
@@ -9,12 +7,6 @@ public class DynamicProtoLoader
 {
     public static async Task Main()
     {
-        //ByteString x;
-        var any1 = Any.Pack(new StringValue { Value = "stef" });
-        var any2 = Any.Pack(new Int32Value { Value = int.MaxValue });
-
-        //any1.TryUnpack()
-
         var protoDefinition = await File.ReadAllTextAsync("greet.proto");
 
         var bytes = Convert.FromBase64String("CgRzdGVm");
