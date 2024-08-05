@@ -1,4 +1,7 @@
-﻿using Google.Protobuf.WellKnownTypes;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using Google.Protobuf.WellKnownTypes;
+using ProtoBuf;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -15,5 +18,11 @@ internal static class ReflectionUtils
             .FirstOrDefault();
 
         return genericType != null;
+    }
+
+    internal static bool TryGetProtoContractAttribute(Type type, [NotNullWhen(true)] out ProtoContractAttribute? protoContractAttribute)
+    {
+        protoContractAttribute = type.GetCustomAttribute<ProtoContractAttribute>(false);
+        return protoContractAttribute != null;
     }
 }

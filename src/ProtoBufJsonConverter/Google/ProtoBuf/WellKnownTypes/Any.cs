@@ -5,6 +5,9 @@ using Stef.Validation;
 // ReSharper disable once CheckNamespace
 namespace Google.Protobuf.WellKnownTypes;
 
+/// <summary>
+/// This Any class contains an arbitrary serialized protocol buffer message along with a URL that describes the type of the serialized message.
+/// </summary>
 [ProtoContract(Name = ".google.protobuf.Any", Serializer = typeof(AnySerializer), Origin = "google/protobuf/any.proto")]
 public class Any : IWellKnownType
 {
@@ -19,22 +22,36 @@ public class Any : IWellKnownType
     public ByteString Value { get; set; } = [];
     #endregion
 
-    public object? GetUnderlyingValue() => TypeUrlUtils.GetUnderlyingValue(TypeUrl, Value);
+    /// <summary>
+    /// Gets the real / unwrapped value
+    /// </summary>
+    /// <returns>The real/unwrapped value as an object.</returns>
+    public object? GetUnwrappedValue() => TypeUrlUtils.GetUnwrappedValue(TypeUrl, Value);
 
+    /// <summary>
+    /// Unpacks the content of this Any message into the target message type, which must match the type URL within this Any message.
+    /// </summary>
+    /// <typeparam name="T">The type of message to unpack the content into.</typeparam>
+    /// <returns>The unpacked message.</returns>
     public T Unpack<T>()
     {
         using var ms = new MemoryStream(Value.ToArray());
         return Serializer.Deserialize<T>(ms);
     }
-    
-    public static Any Pack(object value)
+
+    /// <summary>
+    /// Packs the specified message into an Any message using a type URL prefix of "type.googleapis.com".
+    /// </summary>
+    /// <param name="message">The message to pack.</param>
+    /// <returns>An Any message with the content and type URL of message.</returns>
+    public static Any Pack(object message)
     {
-        Guard.NotNull(value);
+        Guard.NotNull(message);
 
         return new Any
         {
-            TypeUrl = TypeUrlUtils.BuildTypeUrl(value.GetType()),
-            Value = new ByteString(SerializeUtils.Serialize(value))
+            TypeUrl = TypeUrlUtils.BuildTypeUrl(message.GetType()),
+            Value = new ByteString(SerializeUtils.Serialize(message))
         };
     }
 }

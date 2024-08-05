@@ -1,0 +1,34 @@
+﻿syntax = "proto3";
+
+package greet;
+
+import "google/protobuf/empty.proto";
+
+// The greeting service definition.
+service Greeter {
+  rpc Nothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+  
+  rpc SayHello (HelloRequest) returns (HelloReply);
+
+  rpc SayOther (Other) returns (HelloReply);
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+message Other {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+
+message Person {
+  string name = 1;
+  int32 id = 2;
+  string email = 3;
+}
