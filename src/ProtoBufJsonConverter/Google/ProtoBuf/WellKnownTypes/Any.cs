@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using System.Diagnostics.CodeAnalysis;
+using ProtoBuf;
 using ProtoBufJsonConverter.Utils;
 using Stef.Validation;
 
@@ -27,6 +28,16 @@ public class Any : IWellKnownType
     /// </summary>
     /// <returns>The real/unwrapped value as an object.</returns>
     public object? GetUnwrappedValue() => TypeUrlUtils.GetUnwrappedValue(TypeUrl, Value);
+
+    /// <summary>
+    /// Gets the real / unwrapped value
+    /// </summary>
+    /// <typeparam name="T">The type of message to unpack the content into.</typeparam>
+    /// <returns>The real/unwrapped value as T.</returns>
+    public bool TryGetUnwrappedValue<T>([NotNullWhen(true)] out T? result) where T : notnull
+    {
+        return TypeUrlUtils.TryGetUnwrappedValue(TypeUrl, Value, out result);
+    }
 
     /// <summary>
     /// Unpacks the content of this Any message into the target message type, which must match the type URL within this Any message.

@@ -74,16 +74,17 @@ public partial class AnyTests
         Convert.ToBase64String(any.Value.ToArray()).Should().Be("CgRUZXN0");
 
         // Act 2
-        var unpackedStringValue = any.Unpack<MyValueWithName>();
+        var unpackedValue = any.Unpack<MyValueWithName>();
 
         // Assert 2
-        unpackedStringValue.Value.Should().Be(test);
+        unpackedValue.Value.Should().Be(test);
 
         // Act 3
-        var unwrapped = any.GetUnwrappedValue();
+        var result = any.TryGetUnwrappedValue<MyValueWithName>(out var unwrapped);
 
         // Assert 3
-        unwrapped.Should().Be(test);
+        result.Should().BeTrue();
+        unwrapped.Value.Should().Be(test);
     }
 
     [Fact]
@@ -101,16 +102,17 @@ public partial class AnyTests
         Convert.ToBase64String(any.Value.ToArray()).Should().Be("CgRUZXN0");
 
         // Act 2
-        var unpackedStringValue = any.Unpack<MyValueWithoutName>();
+        var unpackedValue = any.Unpack<MyValueWithoutName>();
 
         // Assert 2
-        unpackedStringValue.Value.Should().Be(value.Value);
+        unpackedValue.Value.Should().Be(value.Value);
 
         // Act 3
-        var unwrapped = any.GetUnwrappedValue();
+        var result = any.TryGetUnwrappedValue<MyValueWithoutName>(out var unwrapped);
 
         // Assert 3
-        unwrapped.Should().Be(test);
+        result.Should().BeTrue();
+        unwrapped.Value.Should().Be(test);
     }
 
     [Fact]

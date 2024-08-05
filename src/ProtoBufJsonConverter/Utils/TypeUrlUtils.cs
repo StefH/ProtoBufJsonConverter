@@ -9,7 +9,20 @@ internal static class TypeUrlUtils
 {
     private const string TypeGoogleApisComPrefix = "type.googleapis.com";
     private static readonly Lazy<Dictionary<string, Type>> WellKnownTypes = new(InitializeWellKnownTypes);
-    // private static readonly ConcurrentDictionary<string, Type> AdditionalTypes = new();
+
+    internal static bool TryGetUnwrappedValue<T>(string typeUrl, ByteString value, [NotNullWhen(true)] out T? result)
+        where T : notnull
+    {
+        var unwrapped = GetUnwrappedValue(typeUrl, value);
+        if (unwrapped == null)
+        {
+            result = default;
+            return false;
+        }
+
+        result = (T)unwrapped;
+        return true;
+    }
 
     internal static object? GetUnwrappedValue(string typeUrl, ByteString value)
     {
@@ -22,7 +35,12 @@ internal static class TypeUrlUtils
         }
 
         using var memoryStream = ProtoBufUtils.GetMemoryStreamFromBytes(value.ToArray(), true);
-        return ReflectionUtils.TryFindGenericType(type, out var genericType) ? Serializer.Deserialize(genericType, memoryStream) : null;
+        if (ReflectionUtils.TryFindGenericType(type, out var genericType))
+        {
+            return Serializer.Deserialize(genericType, memoryStream);
+        }
+
+        return Serializer.Deserialize(type, memoryStream);
     }
 
     internal static string BuildTypeUrl(Type type)
