@@ -133,6 +133,13 @@ public partial class AnyTests
 
         // Assert 2
         unpackedHelloRequest.name.Should().Be(helloRequest.name);
+
+        // Act 3
+        var result = any.TryGetUnwrappedValue<HelloRequest>(out var unwrapped);
+
+        // Assert 3
+        result.Should().BeTrue();
+        unwrapped.Should().BeEquivalentTo(helloRequest);
     }
 
     [Fact]
@@ -153,5 +160,12 @@ public partial class AnyTests
 
         // Assert 2
         unpackedHelloRequest.name.Should().Be(helloRequest.name);
+
+        // Act 3
+        var result = any.TryGetUnwrappedValue<greet.HelloRequest>(out var unwrapped);
+
+        // Assert 3
+        result.Should().BeTrue();
+        unwrapped.Should().BeEquivalentTo(helloRequest);
     }
 }

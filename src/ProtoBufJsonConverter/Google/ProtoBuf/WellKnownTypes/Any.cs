@@ -24,13 +24,13 @@ public class Any : IWellKnownType
     #endregion
 
     /// <summary>
-    /// Gets the real / unwrapped value
+    /// Gets the real / unwrapped value.
     /// </summary>
     /// <returns>The real/unwrapped value as an object.</returns>
     public object? GetUnwrappedValue() => TypeUrlUtils.GetUnwrappedValue(TypeUrl, Value);
 
     /// <summary>
-    /// Gets the real / unwrapped value
+    /// Gets the real / unwrapped value.
     /// </summary>
     /// <typeparam name="T">The type of message to unpack the content into.</typeparam>
     /// <returns>The real/unwrapped value as T.</returns>
