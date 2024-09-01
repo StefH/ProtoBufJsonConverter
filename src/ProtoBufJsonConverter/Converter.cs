@@ -1,12 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Text;
 using Google.Protobuf.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Default;
 using ProtoBuf.Reflection;
 using ProtoBufJsonConverter.Extensions;
+using ProtoBufJsonConverter.IO;
 using ProtoBufJsonConverter.Models;
 using ProtoBufJsonConverter.Utils;
 using Stef.Validation;
@@ -16,7 +16,7 @@ namespace ProtoBufJsonConverter;
 /// <summary>
 /// The Converter
 /// </summary>
-public class Converter(IMetadataReferenceService metadataReferenceService) : IConverter
+public class Converter : IConverter
 {
     private static readonly Dictionary<string, string> CodeGenerateOptions = new()
     {
@@ -25,10 +25,26 @@ public class Converter(IMetadataReferenceService metadataReferenceService) : ICo
 
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
-    private readonly IMetadataReferenceService _metadataReferenceService = Guard.NotNull(metadataReferenceService);
+    private readonly IMetadataReferenceService _metadataReferenceService;
+    private readonly IProtoFileResolver? _protoFileResolver;
 
-    public Converter() : this(new CreateFromFileMetadataReferenceService())
+    /// <summary>
+    /// Create a new instance of the Converter.
+    /// </summary>
+    /// <param name="protoFileResolver">Provides an optional virtual file system (used for resolving .proto files).</param>
+    public Converter(IProtoFileResolver? protoFileResolver = null) : this(new CreateFromFileMetadataReferenceService(), protoFileResolver)
     {
+    }
+
+    /// <summary>
+    /// Create a new instance of the Converter.
+    /// </summary>
+    /// <param name="metadataReferenceService">The <see cref="IMetadataReferenceService"/> to use.</param>
+    /// <param name="protoFileResolver">Provides an optional virtual file system (used for resolving .proto files).</param>
+    public Converter(IMetadataReferenceService metadataReferenceService, IProtoFileResolver? protoFileResolver = null)
+    {
+        _protoFileResolver = protoFileResolver;
+        _metadataReferenceService = Guard.NotNull(metadataReferenceService);
     }
 
     /// <inheritdoc />
@@ -83,14 +99,20 @@ public class Converter(IMetadataReferenceService metadataReferenceService) : ICo
     {
         var set = new FileDescriptorSet();
         set.Add($"{key}.proto", true, new StringReader(protoDefinition));
+
+        if (_protoFileResolver is not null)
+        {
+            set.FileSystem = new ProtobufJsonConverterFileSystem(_protoFileResolver);
+        }
+
         set.AddImportPath(string.Empty);
         set.ApplyFileDependencyOrder();
         set.Process();
-        
+
         var errors = set.GetErrors();
         if (errors.Any())
         {
-            throw new ArgumentException($"Error parsing proto definition. Errors = {string.Join(",", errors.Select(e => e.Message))}", nameof(protoDefinition));
+            throw new ArgumentException($"Error parsing proto definition. Errors: {string.Join(",", errors.Select(e => e.Message))}", nameof(protoDefinition));
         }
 
         var code = GenerateCSharpCode(set);

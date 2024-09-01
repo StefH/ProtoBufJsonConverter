@@ -5,6 +5,19 @@ namespace ConsoleApp;
 
 public class DynamicProtoLoader
 {
+    private class MyProtoFileResolver : IProtoFileResolver
+    {
+        public bool Exists(string path)
+        {
+            return true;
+        }
+
+        public TextReader OpenText(string path)
+        {
+            return File.OpenText(path);
+        }
+    }
+
     public static async Task Main()
     {
         var protoDefinition = await File.ReadAllTextAsync("greet.proto");
@@ -13,8 +26,14 @@ public class DynamicProtoLoader
 
         var messageType = "greet.HelloRequest";
 
-        var converter = new Converter();
+        var converter0 = new Converter(new MyProtoFileResolver());
 
+        var convertToJsonRequest0 = new ConvertToJsonRequest(protoDefinition, messageType, bytes);
+        var json0 = await converter0.ConvertAsync(convertToJsonRequest0);
+
+
+        var converter = new Converter();
+        
         var convertToJsonRequest1 = new ConvertToJsonRequest(protoDefinition, messageType, bytes);
         var json1 = await converter.ConvertAsync(convertToJsonRequest1);
 
