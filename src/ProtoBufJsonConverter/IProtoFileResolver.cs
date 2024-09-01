@@ -11,7 +11,7 @@ public interface IProtoFileResolver
     bool Exists(string path);
 
     /// <summary>
-    /// Opens the specified file for text parsing
+    /// Opens the specified file for text parsing.
     /// </summary>
     TextReader OpenText(string path);
 }
