@@ -1,7 +1,4 @@
-﻿using JsonConverter.Abstractions;
-using JsonConverter.Newtonsoft.Json;
-using Newtonsoft.Json;
-using Stef.Validation;
+﻿using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Models;
 
@@ -11,10 +8,7 @@ public class ConvertToJsonRequest : ConvertRequest
 
     public bool SkipGrpcHeader { get; private set; }
 
-    [JsonIgnore]
-    public IJsonConverter? JsonConverter { get; private set; }
-
-    public JsonConverterOptions? JsonConverterOptions { get; set; }
+    public bool WriteIndented { get; private set; }
 
     /// <summary>
     /// Create a ConvertToJsonRequest.
@@ -24,8 +18,8 @@ public class ConvertToJsonRequest : ConvertRequest
     /// <param name="protoBufBytes">The ProtoBuf byte array to convert.</param>
     /// <param name="skipGrpcHeader">Skip the Grpc Header bytes [default value is true].</param>
     public ConvertToJsonRequest(
-        string protoDefinition, 
-        string messageType, 
+        string protoDefinition,
+        string messageType,
         byte[] protoBufBytes,
         bool skipGrpcHeader = true
     ) : base(protoDefinition, messageType)
@@ -35,35 +29,12 @@ public class ConvertToJsonRequest : ConvertRequest
     }
 
     /// <summary>
-    /// Set the <see cref="IJsonConverter"/>. Default value is <see cref="NewtonsoftJsonConverter"/>.
+    /// Set the SkipGrpcHeader.
     /// </summary>
-    /// <param name="jsonConverter">The JsonConverter to use.</param>
-    public ConvertToJsonRequest WithJsonConverter(IJsonConverter jsonConverter)
+    /// <param name="writeIndented">Write the Json as Indented [default is <c>true</c>]</param>
+    public ConvertToJsonRequest WithWriteIndented(bool writeIndented = true)
     {
-        JsonConverter = Guard.NotNull(jsonConverter);
-        return this;
-    }
-
-    /// <summary>
-    /// Set the <see cref="JsonConverterOptions"/>.
-    /// </summary>
-    /// <param name="jsonConverterOptions">The JsonConverterOptions to use when serializing an object to a JSON string.</param>
-    public ConvertToJsonRequest WithJsonConverterOptions(JsonConverterOptions jsonConverterOptions)
-    {
-        JsonConverterOptions = Guard.NotNull(jsonConverterOptions);
-        return this;
-    }
-
-    /// <summary>
-    /// Set the <see cref="JsonConverterOptions"/>.
-    /// </summary>
-    /// <param name="action">The action to configure the JsonConverterOptions to use when serializing an object to a JSON string.</param>
-    public ConvertToJsonRequest WithJsonConverterOptions(Action<JsonConverterOptions> action)
-    {
-        Guard.NotNull(action);
-
-        JsonConverterOptions = new JsonConverterOptions();
-        action(JsonConverterOptions);
+        WriteIndented = writeIndented;
         return this;
     }
 

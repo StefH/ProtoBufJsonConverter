@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>0.3.0</Version>
+		<Version>0.4.0-preview-02</Version>
 		<TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -20,8 +20,16 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" Version="8.0.0" />
-		<PackageReference Include="JsonConverter.Newtonsoft.Json" Version="0.5.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Nullable" Version="1.3.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="protobuf-net" Version="3.2.30" />
+		<PackageReference Include="SonarAnalyzer.CSharp" Version="9.30.0.95878">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="protobuf-net.Reflection" Version="3.2.12" Aliases="ProtobufNetReflectionAlias" />
 		<PackageReference Include="Stef.Validation" Version="0.1.1" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
@@ -32,7 +40,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src-webcil\MetadataReferenceService.Default\MetadataReferenceService.Default.csproj" />
+		<ProjectReference Include="..\..\src-webcil\MetadataReferenceService.Default\MetadataReferenceService.Default.csproj" />
 	</ItemGroup>
 
 </Project>

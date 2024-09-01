@@ -2,25 +2,18 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using JsonConverter.Abstractions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Newtonsoft.Json;
 using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
 using Stef.Validation;
 
 namespace Api;
 
-internal class ProtoBufConverterFunction
+internal class ProtoBufConverterFunction(IConverter protoBufConverter)
 {
-    private readonly IConverter _protoBufConverter;
-    private readonly IJsonConverter _jsonConverter;
-
-    public ProtoBufConverterFunction(IConverter protoBufConverter, IJsonConverter jsonConverter)
-    {
-        _protoBufConverter = Guard.NotNull(protoBufConverter);
-        _jsonConverter = Guard.NotNull(jsonConverter);
-    }
+    private readonly IConverter _protoBufConverter = Guard.NotNull(protoBufConverter);
 
     [Function("ConvertToJson")]
     public async Task<string> ConvertToJsonAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, CancellationToken cancellationToken)
@@ -46,6 +39,6 @@ internal class ProtoBufConverterFunction
         var requestBody = await new StreamReader(req.Body).ReadToEndAsync(cancellationToken);
 
         // Deserialize the JSON string into an object
-        return _jsonConverter.Deserialize<T>(requestBody);
+        return JsonConvert.DeserializeObject<T>(requestBody);
     }
 }
