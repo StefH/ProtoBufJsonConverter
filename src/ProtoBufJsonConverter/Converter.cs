@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text;
 using Google.Protobuf.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Default;
@@ -70,19 +72,21 @@ public class Converter(IMetadataReferenceService metadataReferenceService) : ICo
         return (data.Assembly, inputTypeFullName);
     }
 
-    private async Task<Data> GetCachedFileDescriptorSetAsync(string protoDefinition, CancellationToken cancellationToken)
+    private Task<Data> GetCachedFileDescriptorSetAsync(string protoDefinition, CancellationToken cancellationToken)
     {
-        var protoDefinitionHashCode = protoDefinition.GetDeterministicHashCode();
+        var protoDefinitionsHashCode = protoDefinition.GetDeterministicHashCode();
 
-        if (DataDictionary.TryGetValue(protoDefinitionHashCode, out var data))
-        {
-            return data;
-        }
-        
+        return DataDictionary.GetOrAddAsync(protoDefinitionsHashCode, key => GetValueAsync(key, protoDefinition, cancellationToken));
+    }
+
+    private async Task<Data> GetValueAsync(int key, string protoDefinition, CancellationToken cancellationToken)
+    {
         var set = new FileDescriptorSet();
-        set.Add($"{protoDefinitionHashCode}.proto", true, new StringReader(protoDefinition));
+        set.Add($"{key}.proto", true, new StringReader(protoDefinition));
+        set.AddImportPath(string.Empty);
+        set.ApplyFileDependencyOrder();
         set.Process();
-
+        
         var errors = set.GetErrors();
         if (errors.Any())
         {
@@ -91,14 +95,26 @@ public class Converter(IMetadataReferenceService metadataReferenceService) : ICo
 
         var code = GenerateCSharpCode(set);
 
-        data = new Data
+        var data = new Data
         {
-            HashCode = protoDefinitionHashCode,
+            HashCode = key,
             Set = set,
             Assembly = await AssemblyUtils.CompileCodeToAssemblyAsync(code, _metadataReferenceService, cancellationToken).ConfigureAwait(false)
         };
-        DataDictionary[protoDefinitionHashCode] = data;
+
         return data;
+    }
+
+    private bool TryGet(string protoDefinition, [NotNullWhen(true)] out FileDescriptorSet? set)
+    {
+        var protoDefinitionHashCode = protoDefinition.GetDeterministicHashCode();
+
+        set = new FileDescriptorSet();
+        set.Add($"{protoDefinitionHashCode}.proto", true, new StringReader(protoDefinition));
+        set.Process();
+
+        var errors = set.GetErrors();
+        return !errors.Any();
     }
 
     private static string GenerateCSharpCode(FileDescriptorSet set)
