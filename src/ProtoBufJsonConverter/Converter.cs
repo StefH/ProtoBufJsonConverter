@@ -25,13 +25,13 @@ public class Converter : IConverter
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
     private readonly IMetadataReferenceService _metadataReferenceService;
-    private readonly IProtoFileResolver? _protoFileResolver;
+    private readonly IProtoFileResolver? _globalProtoFileResolver;
 
     /// <summary>
     /// Create a new instance of the Converter.
     /// </summary>
-    /// <param name="protoFileResolver">Provides an optional virtual file system (used for resolving .proto files).</param>
-    public Converter(IProtoFileResolver? protoFileResolver = null) : this(new CreateFromFileMetadataReferenceService(), protoFileResolver)
+    /// <param name="globalProtoFileResolver">Provides an optional virtual file system (used for resolving all .proto files).</param>
+    public Converter(IProtoFileResolver? globalProtoFileResolver = null) : this(new CreateFromFileMetadataReferenceService(), globalProtoFileResolver)
     {
     }
 
@@ -39,10 +39,10 @@ public class Converter : IConverter
     /// Create a new instance of the Converter.
     /// </summary>
     /// <param name="metadataReferenceService">The <see cref="IMetadataReferenceService"/> to use.</param>
-    /// <param name="protoFileResolver">Provides an optional virtual file system (used for resolving .proto files).</param>
-    public Converter(IMetadataReferenceService metadataReferenceService, IProtoFileResolver? protoFileResolver = null)
+    /// <param name="globalProtoFileResolver">Provides an optional virtual file system (used for resolving all .proto files).</param>
+    public Converter(IMetadataReferenceService metadataReferenceService, IProtoFileResolver? globalProtoFileResolver = null)
     {
-        _protoFileResolver = protoFileResolver;
+        _globalProtoFileResolver = globalProtoFileResolver;
         _metadataReferenceService = Guard.NotNull(metadataReferenceService);
     }
 
@@ -80,28 +80,30 @@ public class Converter : IConverter
 
     private async Task<(Assembly Assembly, string inputTypeFullName)> ParseAsync(ConvertRequest request, CancellationToken cancellationToken)
     {
-        var data = await GetCachedFileDescriptorSetAsync(request.ProtoDefinition, cancellationToken).ConfigureAwait(false);
+        var data = await GetCachedFileDescriptorSetAsync(request.ProtoDefinition, request.ProtoFileResolver, cancellationToken).ConfigureAwait(false);
 
         var inputTypeFullName = data.Set.GetInputTypeFromMessageType(request.MessageType);
 
         return (data.Assembly, inputTypeFullName);
     }
 
-    private Task<Data> GetCachedFileDescriptorSetAsync(string protoDefinition, CancellationToken cancellationToken)
+    private Task<Data> GetCachedFileDescriptorSetAsync(string protoDefinition, IProtoFileResolver? requestProtoFileResolver, CancellationToken cancellationToken)
     {
-        var protoDefinitionsHashCode = protoDefinition.GetDeterministicHashCode();
+        var hashCode = protoDefinition.GetDeterministicHashCode();
 
-        return DataDictionary.GetOrAddAsync(protoDefinitionsHashCode, key => GetValueAsync(key, protoDefinition, cancellationToken));
+        var protoFileResolver = requestProtoFileResolver ?? _globalProtoFileResolver;
+
+        return DataDictionary.GetOrAddAsync(hashCode, key => GetValueAsync(key, protoDefinition, protoFileResolver, cancellationToken));
     }
 
-    private async Task<Data> GetValueAsync(int key, string protoDefinition, CancellationToken cancellationToken)
+    private async Task<Data> GetValueAsync(int key, string protoDefinition, IProtoFileResolver? protoFileResolver, CancellationToken cancellationToken)
     {
         var set = new FileDescriptorSet();
         set.Add($"{key}.proto", true, new StringReader(protoDefinition));
 
-        if (_protoFileResolver is not null)
+        if (protoFileResolver is not null)
         {
-            set.FileSystem = new ProtobufJsonConverterFileSystem(_protoFileResolver);
+            set.FileSystem = new ProtobufJsonConverterFileSystem(protoFileResolver);
         }
 
         set.AddImportPath(string.Empty);

@@ -31,9 +31,15 @@ public class DynamicProtoLoader
         var convertToJsonRequest0 = new ConvertToJsonRequest(protoDefinition, messageType, bytes);
         var json0 = await converter0.ConvertAsync(convertToJsonRequest0);
 
+        var converter00 = new Converter();
+
+        var convertToJsonRequest00 = new ConvertToJsonRequest(protoDefinition, messageType, bytes)
+            .WithProtoFileResolver(new MyProtoFileResolver());
+        var json00 = await converter00.ConvertAsync(convertToJsonRequest00);
+
 
         var converter = new Converter();
-        
+
         var convertToJsonRequest1 = new ConvertToJsonRequest(protoDefinition, messageType, bytes);
         var json1 = await converter.ConvertAsync(convertToJsonRequest1);
 
