@@ -30,6 +30,13 @@ public class Converter : IConverter
     /// <summary>
     /// Create a new instance of the Converter.
     /// </summary>
+    public Converter() : this(new CreateFromFileMetadataReferenceService())
+    {
+    }
+
+    /// <summary>
+    /// Create a new instance of the Converter.
+    /// </summary>
     /// <param name="globalProtoFileResolver">Provides an optional virtual file system (used for resolving all .proto files).</param>
     public Converter(IProtoFileResolver? globalProtoFileResolver = null) : this(new CreateFromFileMetadataReferenceService(), globalProtoFileResolver)
     {
