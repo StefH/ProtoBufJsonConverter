@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Google.Protobuf.Reflection;
 using MetadataReferenceService.Abstractions;
@@ -125,18 +124,6 @@ public class Converter : IConverter
         };
 
         return data;
-    }
-
-    private bool TryGet(string protoDefinition, [NotNullWhen(true)] out FileDescriptorSet? set)
-    {
-        var protoDefinitionHashCode = protoDefinition.GetDeterministicHashCode();
-
-        set = new FileDescriptorSet();
-        set.Add($"{protoDefinitionHashCode}.proto", true, new StringReader(protoDefinition));
-        set.Process();
-
-        var errors = set.GetErrors();
-        return !errors.Any();
     }
 
     private static string GenerateCSharpCode(FileDescriptorSet set)
