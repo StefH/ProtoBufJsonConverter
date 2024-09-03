@@ -26,6 +26,7 @@ public class Converter : IConverter
 
     private readonly IMetadataReferenceService _metadataReferenceService;
     private readonly IProtoFileResolver? _globalProtoFileResolver;
+    private readonly IDependencyAwareFileSystem _defaultFileSystem = new DefaultFileSystem();
 
     /// <summary>
     /// Create a new instance of the Converter.
@@ -108,10 +109,8 @@ public class Converter : IConverter
         var set = new FileDescriptorSet();
         set.Add($"{key}.proto", true, new StringReader(protoDefinition));
 
-        if (protoFileResolver is not null)
-        {
-            set.FileSystem = new ProtobufJsonConverterFileSystem(protoFileResolver);
-        }
+        var dependencyAwareFileSystem = protoFileResolver != null ? new ProtobufJsonConverterFileSystem(protoFileResolver) : _defaultFileSystem;
+        set.FileSystem = dependencyAwareFileSystem;
 
         set.AddImportPath(string.Empty);
         set.ApplyFileDependencyOrder();
@@ -123,22 +122,28 @@ public class Converter : IConverter
             throw new ArgumentException($"Error parsing proto definition. Errors: {string.Join(",", errors.Select(e => e.Message))}", nameof(protoDefinition));
         }
 
-        var code = GenerateCSharpCode(set);
+        // For each file that is a dependency, include it in the output c# code file
+        foreach (var file in set.Files.Where(file => dependencyAwareFileSystem.Dependencies.Contains(file.Name)))
+        {
+            file.IncludeInOutput = true;
+        }
+
+        var codes = GenerateCSharpCodes(set);
 
         var data = new Data
         {
             HashCode = key,
             Set = set,
-            Assembly = await AssemblyUtils.CompileCodeToAssemblyAsync(code, _metadataReferenceService, cancellationToken).ConfigureAwait(false)
+            Assembly = await AssemblyUtils.CompileCodeToAssemblyAsync(codes, _metadataReferenceService, cancellationToken).ConfigureAwait(false)
         };
 
         return data;
     }
 
-    private static string GenerateCSharpCode(FileDescriptorSet set)
+    private static string[] GenerateCSharpCodes(FileDescriptorSet set)
     {
         var files = CSharpCodeGenerator.Default.Generate(set, NameNormalizer.Null, CodeGenerateOptions);
 
-        return string.Join(Environment.NewLine, files.Select(f => f.Text));
+        return files.Select(f => f.Text).ToArray();
     }
 }

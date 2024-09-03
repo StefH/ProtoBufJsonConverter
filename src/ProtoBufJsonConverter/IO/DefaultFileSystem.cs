@@ -1,6 +1,8 @@
-﻿namespace ProtoBufJsonConverter.IO;
+﻿using Google.Protobuf.Reflection;
 
-internal class ProtobufJsonConverterFileSystem(IProtoFileResolver resolver) : IDependencyAwareFileSystem
+namespace ProtoBufJsonConverter.IO;
+
+internal class DefaultFileSystem : IDependencyAwareFileSystem
 {
     public List<string> Dependencies { get; } = [];
 
@@ -11,12 +13,12 @@ internal class ProtobufJsonConverterFileSystem(IProtoFileResolver resolver) : ID
             return false;
         }
         
-        return resolver.Exists(path);
+        return File.Exists(path);
     }
 
     public TextReader OpenText(string path)
     {
         Dependencies.Add(path);
-        return resolver.OpenText(path);
+        return File.OpenText(path);
     }
 }

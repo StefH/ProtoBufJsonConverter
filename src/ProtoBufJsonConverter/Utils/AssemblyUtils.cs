@@ -50,20 +50,19 @@ internal static class AssemblyUtils
         return dict;
     });
     private static readonly ConcurrentDictionary<string, Type> ExtraTypesFromCompiledCode = new();
-    // private static readonly ConcurrentDictionary<string, Type> ExtraTypesFromAllAssemblies = new();
 
-    internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
+    internal static async Task<Assembly> CompileCodeToAssemblyAsync(string[] codes, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
         // Specify the assembly name
         var assemblyName = Path.GetRandomFileName();
 
-        // Parse the source code
-        var syntaxTree = CSharpSyntaxTree.ParseText(code, cancellationToken: cancellationToken);
+        // Parse the source codes
+        var syntaxTrees = codes.Select(code => CSharpSyntaxTree.ParseText(code, cancellationToken: cancellationToken));
 
         // Create a compilation
         var compilation = CSharpCompilation.Create(
             assemblyName,
-            [syntaxTree],
+            syntaxTrees,
             await CreateMetadataReferencesAsync(metadataReferenceService, cancellationToken).ConfigureAwait(false),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
