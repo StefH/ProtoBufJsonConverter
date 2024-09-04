@@ -6,12 +6,7 @@ internal class ProtobufJsonConverterFileSystem(IProtoFileResolver resolver) : ID
 
     public bool Exists(string path)
     {
-        if (path.StartsWith("google/") || path.StartsWith("protobuf-net/"))
-        {
-            return false;
-        }
-        
-        return resolver.Exists(path);
+        return PathChecker.IncludeFile(path) && resolver.Exists(path);
     }
 
     public TextReader OpenText(string path)

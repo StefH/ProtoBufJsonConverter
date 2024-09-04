@@ -25,8 +25,7 @@ public class Converter : IConverter
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
     private readonly IMetadataReferenceService _metadataReferenceService;
-    private readonly IProtoFileResolver? _globalProtoFileResolver;
-    private readonly IDependencyAwareFileSystem _defaultFileSystem = new DefaultFileSystem();
+    private readonly IProtoFileResolver? _globalProtoFileResolver;    
 
     /// <summary>
     /// Create a new instance of the Converter.
@@ -38,8 +37,8 @@ public class Converter : IConverter
     /// <summary>
     /// Create a new instance of the Converter.
     /// </summary>
-    /// <param name="globalProtoFileResolver">Provides an optional virtual file system (used for resolving all .proto files).</param>
-    public Converter(IProtoFileResolver? globalProtoFileResolver = null) : this(new CreateFromFileMetadataReferenceService(), globalProtoFileResolver)
+    /// <param name="globalProtoFileResolver">Provides a virtual file system (used for resolving all .proto files).</param>
+    public Converter(IProtoFileResolver globalProtoFileResolver) : this(new CreateFromFileMetadataReferenceService(), globalProtoFileResolver)
     {
     }
 
@@ -109,9 +108,16 @@ public class Converter : IConverter
         var set = new FileDescriptorSet();
         set.Add($"{key}.proto", true, new StringReader(protoDefinition));
 
-        var dependencyAwareFileSystem = protoFileResolver != null ? new ProtobufJsonConverterFileSystem(protoFileResolver) : _defaultFileSystem;
+        IDependencyAwareFileSystem dependencyAwareFileSystem;
+        if (protoFileResolver != null)
+        {
+            dependencyAwareFileSystem = new ProtobufJsonConverterFileSystem(protoFileResolver);
+        }
+        else
+        {
+            dependencyAwareFileSystem = new DefaultDependencyAwareFileSystem();
+        }
         set.FileSystem = dependencyAwareFileSystem;
-
         set.AddImportPath(string.Empty);
         set.ApplyFileDependencyOrder();
         set.Process();
