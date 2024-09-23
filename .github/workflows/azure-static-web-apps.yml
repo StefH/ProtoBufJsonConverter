@@ -21,12 +21,12 @@ jobs:
           submodules: true
           lfs: false
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-           6.0.x
-           7.0.x
-           8.0.x
+      # - uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: |
+      #      6.0.x
+      #      7.0.x
+      #      8.0.x
 
       - name: Run Tests
         run: |
@@ -43,24 +43,36 @@ jobs:
           submodules: true
           lfs: false
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-           8.0.x
+      # - uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: |
+      #      8.0.x
+
+      - name: Build Blazor WASM App
+        run: dotnet publish ./Blazor/Client8/Client8.csproj -c Release -o ../../app
+      
+      - name: Build API
+        run: dotnet publish ./Blazor/Api/Api.csproj -c Release -o ../../api
+      
+      - name: Install SWA CLI
+        run: npm install -g @azure/static-web-apps-cli
+
+      - name: Deploy to Azure Static Web Apps
+        env:
+          SWA_CLI_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_DESERT_029B2F003 }}
+        run: swa deploy
           
-      - name: Build And Deploy
-        id: builddeploy
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_DESERT_029B2F003 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
-          action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "examples/Blazor/Client8" # App source code path
-          api_location: "examples/Blazor/Api" # Api source code path - optional
-          output_location: "wwwroot" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+      # - name: Build And Deploy
+      #   id: builddeploy
+      #   uses: Azure/static-web-apps-deploy@v1
+      #   with:
+      #     azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_DESERT_029B2F003 }}
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     action: "upload"
+      #     app_location: "examples/Blazor/Client8"
+      #     api_location: "examples/Blazor/Api"
+      #     output_location: "wwwroot"
+
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
