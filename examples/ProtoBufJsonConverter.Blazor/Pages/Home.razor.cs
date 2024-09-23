@@ -1,5 +1,4 @@
-﻿using GaelJ.BlazorCodeMirror6.Models;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using ProtoBufJsonConverter.Blazor.Enums;
 using ProtoBufJsonConverter.Models;
 
@@ -89,7 +88,7 @@ public partial class Home
         _protobufAsBase64 = Convert.ToBase64String(bytes);
         _protobufAsByteArray = ByteArrayToString(bytes);
     }
-    
+
     public static string ByteArrayToString(byte[] byteArray)
     {
         return string.Concat("new byte[] { ", string.Join(", ", byteArray.Select(b => $"0x{b:X2}")), " };");

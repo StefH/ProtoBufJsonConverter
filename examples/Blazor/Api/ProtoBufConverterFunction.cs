@@ -24,16 +24,14 @@ internal class ProtoBufConverterFunction(IConverter protoBufConverter)
     }
 
     [Function("ConvertToProtoBuf")]
-    public async Task<string> ConvertToProtoBufAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, CancellationToken cancellationToken)
+    public async Task<byte[]> ConvertToProtoBufAsync([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequestData req, CancellationToken cancellationToken)
     {
         var convertToProtoBufRequest = await GetRequestAsync<ConvertToProtoBufRequest>(req, cancellationToken);
 
-        var bytes = await _protoBufConverter.ConvertAsync(convertToProtoBufRequest, cancellationToken).ConfigureAwait(false);
-
-        return Convert.ToBase64String(bytes);
+        return await _protoBufConverter.ConvertAsync(convertToProtoBufRequest, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<T> GetRequestAsync<T>(HttpRequestData req, CancellationToken cancellationToken)
+    private static async Task<T> GetRequestAsync<T>(HttpRequestData req, CancellationToken cancellationToken)
     {
         // Read the request body as a string
         var requestBody = await new StreamReader(req.Body).ReadToEndAsync(cancellationToken);
