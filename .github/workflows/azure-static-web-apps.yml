@@ -49,10 +49,10 @@ jobs:
       #      8.0.x
 
       - name: Build Blazor WASM App
-        run: dotnet publish ./Blazor/Client8/Client8.csproj -c Release -o ../../app
+        run: dotnet publish ./examples/Blazor/Client8/Client8.csproj -c Release -o ../../app
       
       - name: Build API
-        run: dotnet publish ./Blazor/Api/Api.csproj -c Release -o ../../api
+        run: dotnet publish ./examples/Blazor/Api/Api.csproj -c Release -o ../../api
       
       - name: Install SWA CLI
         run: npm install -g @azure/static-web-apps-cli
@@ -96,10 +96,10 @@ jobs:
           submodules: true
           lfs: false
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-           8.0.x
+      # - uses: actions/setup-dotnet@v4
+      #   with:
+      #     dotnet-version: |
+      #      8.0.x
 
       - name: Build And Deploy WASM
         id: builddeploy
