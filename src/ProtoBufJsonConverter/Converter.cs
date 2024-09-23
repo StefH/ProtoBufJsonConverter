@@ -1,12 +1,14 @@
-﻿using System.Collections.Concurrent;
+﻿extern alias ProtobufNetReflectionAlias;
+
+using System.Collections.Concurrent;
 using System.Reflection;
-using Google.Protobuf.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Default;
-using ProtoBuf.Reflection;
 using ProtoBufJsonConverter.Extensions;
 using ProtoBufJsonConverter.Models;
 using ProtoBufJsonConverter.Utils;
+using GoogleProtobufReflection = ProtobufNetReflectionAlias::Google.Protobuf.Reflection;
+using ProtoBufReflection = ProtobufNetReflectionAlias::ProtoBuf.Reflection;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter;
@@ -79,7 +81,7 @@ public class Converter(IMetadataReferenceService metadataReferenceService) : ICo
             return data;
         }
         
-        var set = new FileDescriptorSet();
+        var set = new GoogleProtobufReflection.FileDescriptorSet();
         set.Add($"{protoDefinitionHashCode}.proto", true, new StringReader(protoDefinition));
         set.Process();
 
@@ -101,9 +103,9 @@ public class Converter(IMetadataReferenceService metadataReferenceService) : ICo
         return data;
     }
 
-    private static string GenerateCSharpCode(FileDescriptorSet set)
+    private static string GenerateCSharpCode(GoogleProtobufReflection.FileDescriptorSet set)
     {
-        var files = CSharpCodeGenerator.Default.Generate(set, NameNormalizer.Null, CodeGenerateOptions);
+        var files = ProtoBufReflection.CSharpCodeGenerator.Default.Generate(set, ProtoBufReflection.NameNormalizer.Null, CodeGenerateOptions);
 
         return string.Join(Environment.NewLine, files.Select(f => f.Text));
     }
