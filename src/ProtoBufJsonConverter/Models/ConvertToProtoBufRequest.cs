@@ -1,17 +1,9 @@
-﻿using JsonConverter.Abstractions;
-using JsonConverter.Newtonsoft.Json;
-using Newtonsoft.Json;
-using Stef.Validation;
+﻿using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Models;
 
 public class ConvertToProtoBufRequest : ConvertRequest
 {
-    [JsonIgnore]
-    public IJsonConverter? JsonConverter { get; private set; }
-
-    public JsonConverterOptions? JsonConverterOptions { get; set; }
-
     public object? Input { get; }
 
     public bool AddGrpcHeader { get; set; }
@@ -27,26 +19,6 @@ public class ConvertToProtoBufRequest : ConvertRequest
     {
         Input = Guard.NotNull(input);
         AddGrpcHeader = addGrpcHeader;
-    }
-
-    /// <summary>
-    /// Set the <see cref="IJsonConverter"/>. Default value is <see cref="NewtonsoftJsonConverter"/>.
-    /// </summary>
-    /// <param name="jsonConverter">The JsonConverter to use.</param>
-    public ConvertToProtoBufRequest WithJsonConverter(IJsonConverter jsonConverter)
-    {
-        JsonConverter = Guard.NotNull(jsonConverter);
-        return this;
-    }
-
-    /// <summary>
-    /// Set the <see cref="JsonConverterOptions"/>.
-    /// </summary>
-    /// <param name="jsonConverterOptions">The JsonConverterOptions to use when serializing an object to a JSON string.</param>
-    public ConvertToProtoBufRequest WithJsonConverterOptions(JsonConverterOptions jsonConverterOptions)
-    {
-        JsonConverterOptions = Guard.NotNull(jsonConverterOptions);
-        return this;
     }
 
     /// <summary>

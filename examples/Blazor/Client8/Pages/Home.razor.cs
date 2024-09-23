@@ -1,8 +1,6 @@
 ﻿using Blazorise.RichTextEdit;
 using Client8.Enums;
 using Client8.Services;
-using JsonConverter.Abstractions;
-using JsonConverter.Newtonsoft.Json;
 using Microsoft.AspNetCore.Components;
 using ProtoBufJsonConverter.Models;
 
@@ -109,7 +107,7 @@ public partial class Home
 
         var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
             .WithSkipGrpcHeader(_skipGrpcHeader)
-            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+            .WithWriteIndented(true);
 
         _json = await ProtoBufConverterApi.ConvertToJsonAsync(convertToJsonRequest);
     }

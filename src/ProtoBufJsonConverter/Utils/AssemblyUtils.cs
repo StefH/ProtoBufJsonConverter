@@ -1,9 +1,12 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
+using ProtoBuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -20,9 +23,34 @@ internal static class AssemblyUtils
         {
             Assembly.Load(assemblySystemRuntime),
             typeof(object).Assembly,
-            typeof(ProtoContractAttribute).Assembly
+            typeof(ProtoContractAttribute).Assembly,
+            typeof(AssemblyUtils).Assembly
         };
     });
+    private static readonly Lazy<ConcurrentDictionary<string, Type>> AllTypesWithProtoContractAttribute = new(() =>
+    {
+        var allTypes = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
+            .ToArray();
+        var allTypesWithAttribute = allTypes
+            .Select(t => new 
+            {
+                Type = t,
+                ProtoContractAttribute = t.GetCustomAttribute<ProtoContractAttribute>()
+            })
+            .Where(t => t.ProtoContractAttribute != null)
+            .ToArray();
+
+        var dict = new ConcurrentDictionary<string, Type>();
+        foreach (var t in allTypesWithAttribute)
+        {
+            Add(dict, t.Type, t.ProtoContractAttribute!.Name);
+        }
+
+        return dict;
+    });
+    private static readonly ConcurrentDictionary<string, Type> ExtraTypesFromCompiledCode = new();
+    // private static readonly ConcurrentDictionary<string, Type> ExtraTypesFromAllAssemblies = new();
 
     internal static async Task<Assembly> CompileCodeToAssemblyAsync(string code, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
@@ -35,8 +63,8 @@ internal static class AssemblyUtils
         // Create a compilation
         var compilation = CSharpCompilation.Create(
             assemblyName,
-            new[] { syntaxTree },
-            await CreateMetadataReferences(metadataReferenceService, cancellationToken).ConfigureAwait(false),
+            [syntaxTree],
+            await CreateMetadataReferencesAsync(metadataReferenceService, cancellationToken).ConfigureAwait(false),
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
         );
 
@@ -56,13 +84,53 @@ internal static class AssemblyUtils
         }
 
         // Load assembly
-        return Assembly.Load(stream.ToArray());
+        var assembly = Assembly.Load(stream.ToArray());
+        foreach (var type in assembly.GetTypes())
+        {
+            if (!ReflectionUtils.TryGetProtoContractAttribute(type, out var protoContractAttribute))
+            {
+                continue;
+            }
+
+            Add(ExtraTypesFromCompiledCode, type, protoContractAttribute.Name);
+        }
+
+        return assembly;
     }
 
-    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferences(IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
+    private static void Add(ConcurrentDictionary<string, Type> dict, Type type, string? name)
     {
+        if (!string.IsNullOrEmpty(name))
+        {
+            dict.TryAdd(name.TrimStart('.'), type);
+        }
+        else
+        {
+            dict.TryAdd(type.FullName!, type);
+        }
+    }
+
+    internal static bool TryGetType(string name, [NotNullWhen(true)] out Type? type)
+    {
+        if (ExtraTypesFromCompiledCode.TryGetValue(name, out type))
+        {
+            return true;
+        }
+
+        // Last resort, search all loaded assemblies for the type
+        if (AllTypesWithProtoContractAttribute.Value.TryGetValue(name, out type))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferencesAsync(IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
+    {
+        var requiredAssemblies = RequiredAssemblies.Value.ToList();
         var references = new List<MetadataReference>();
-        foreach (var requiredAssembly in RequiredAssemblies.Value)
+        foreach (var requiredAssembly in requiredAssemblies)
         {
             references.Add(await metadataReferenceService.CreateAsync(AssemblyDetails.FromAssembly(requiredAssembly), cancellationToken).ConfigureAwait(false));
         }
@@ -72,12 +140,12 @@ internal static class AssemblyUtils
 
     internal static Type GetType(Assembly assembly, string inputTypeFullName)
     {
-        var type = assembly.GetType(inputTypeFullName);
-        if (type == null)
+        return inputTypeFullName switch
         {
-            throw new ArgumentException($"The type '{type}' cannot be found in the assembly.");
-        }
-
-        return type;
+            "google.protobuf.Empty" => typeof(Empty),
+            "google.protobuf.Duration" => typeof(Duration),
+            "google.protobuf.Timestamp" => typeof(Timestamp),
+            _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
+        };
     }
 }

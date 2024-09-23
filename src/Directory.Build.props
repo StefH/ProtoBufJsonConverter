@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<Copyright>Copyright © 2023 Stef Heyenrath</Copyright>
+		<Copyright>Copyright © 2024 Stef Heyenrath</Copyright>
 		<Authors>Stef Heyenrath</Authors>
 		<PackageIcon>icon-128x128.png</PackageIcon>
 		<PackageReleaseNotes>See CHANGELOG.md</PackageReleaseNotes>

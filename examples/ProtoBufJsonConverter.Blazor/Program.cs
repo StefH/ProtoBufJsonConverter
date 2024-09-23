@@ -1,8 +1,6 @@
 using Blazorise;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
-using Blazorise.RichTextEdit;
-using HighlightBlazor;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.BlazorWasm;
 using Microsoft.AspNetCore.Components.Web;
@@ -19,14 +17,12 @@ public class Program
         builder.RootComponents.Add<HeadOutlet>("head::after");
 
         builder.Services
-            .AddHighlight()
             .AddBlazorise(options =>
             {
                 options.Immediate = true;
             })
             .AddBootstrap5Providers()
-            .AddFontAwesomeIcons()
-            .AddBlazoriseRichTextEdit();
+            .AddFontAwesomeIcons();
 
         builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
         builder.Services.AddSingleton<IMetadataReferenceService, BlazorWasmMetadataReferenceService>();

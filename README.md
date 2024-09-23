@@ -6,7 +6,7 @@
 - Convert a JSON string or an object to a protobuf message using the proto definition file.
 
 ## NuGet
-[![NuGet Badge](https://buildstats.info/nuget/ProtoBufJsonConverter)](https://www.nuget.org/packages/ProtoBufJsonConverter) 
+[![NuGet Badge](https://img.shields.io/nuget/v/ProtoBufJsonConverter)](https://www.nuget.org/packages/ProtoBufJsonConverter) 
 
 ## Usage
 
@@ -199,7 +199,7 @@ public partial class Home
 
         var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
             .WithSkipGrpcHeader(_skipGrpcHeader)
-            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+            .WithWriteIndented();
 
         _json = await Converter.ConvertAsync(convertToJsonRequest);
     }

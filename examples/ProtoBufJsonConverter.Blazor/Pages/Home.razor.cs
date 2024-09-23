@@ -1,5 +1,4 @@
-﻿using Blazorise;
-using JsonConverter.Abstractions;
+﻿using GaelJ.BlazorCodeMirror6.Models;
 using Microsoft.AspNetCore.Components;
 using ProtoBufJsonConverter.Blazor.Enums;
 using ProtoBufJsonConverter.Models;
@@ -20,7 +19,7 @@ public partial class Home
     private string _messageType = "greet.HelloRequest";
     private ConvertType _selectedConvertType = ConvertType.ToJson;
     private string _protobufAsBase64 = "CgRzdGVm";
-    private string _protobufAsByteArray = "new byte[] { 0x0a, 0x04, 0x73, 0x74, 0x65, 0x66 }";
+    private string _protobufAsByteArray = "new byte[] { 0x0A, 0x04, 0x73, 0x74, 0x65, 0x66 }";
     private bool _skipGrpcHeader = true;
     private bool _addGrpcHeader = true;
     private string _json = "{\r\n  \"name\": \"stef\"\r\n}";
@@ -71,7 +70,7 @@ public partial class Home
 
         var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
             .WithSkipGrpcHeader(_skipGrpcHeader)
-            .WithJsonConverterOptions(new JsonConverterOptions { WriteIndented = true });
+            .WithWriteIndented();
 
         _json = await Converter.ConvertAsync(convertToJsonRequest);
     }
@@ -90,7 +89,7 @@ public partial class Home
         _protobufAsBase64 = Convert.ToBase64String(bytes);
         _protobufAsByteArray = ByteArrayToString(bytes);
     }
-
+    
     public static string ByteArrayToString(byte[] byteArray)
     {
         return string.Concat("new byte[] { ", string.Join(", ", byteArray.Select(b => $"0x{b:X2}")), " };");
