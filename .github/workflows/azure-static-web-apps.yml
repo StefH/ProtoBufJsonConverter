@@ -21,13 +21,6 @@ jobs:
           submodules: true
           lfs: false
 
-      # - uses: actions/setup-dotnet@v4
-      #   with:
-      #     dotnet-version: |
-      #      6.0.x
-      #      7.0.x
-      #      8.0.x
-
       - name: Run Tests
         run: |
           dotnet test ./test/ProtoBufJsonConverterTests/ProtoBufJsonConverterTests.csproj -c Release
@@ -43,11 +36,6 @@ jobs:
           submodules: true
           lfs: false
 
-      # - uses: actions/setup-dotnet@v4
-      #   with:
-      #     dotnet-version: |
-      #      8.0.x
-
       - name: Build Blazor WASM App
         run: dotnet publish ./examples/Blazor/Client8/Client8.csproj -c Release -o ../../app
       
@@ -62,17 +50,6 @@ jobs:
           SWA_CLI_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_DESERT_029B2F003 }}
         run: swa deploy
           
-      # - name: Build And Deploy
-      #   id: builddeploy
-      #   uses: Azure/static-web-apps-deploy@v1
-      #   with:
-      #     azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_DESERT_029B2F003 }}
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     action: "upload"
-      #     app_location: "examples/Blazor/Client8"
-      #     api_location: "examples/Blazor/Api"
-      #     output_location: "wwwroot"
-
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -95,11 +72,6 @@ jobs:
         with:
           submodules: true
           lfs: false
-
-      # - uses: actions/setup-dotnet@v4
-      #   with:
-      #     dotnet-version: |
-      #      8.0.x
 
       - name: Build And Deploy WASM
         id: builddeploy
