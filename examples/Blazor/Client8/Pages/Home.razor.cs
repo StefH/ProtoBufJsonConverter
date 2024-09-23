@@ -1,5 +1,4 @@
-﻿using Blazorise.RichTextEdit;
-using Client8.Enums;
+﻿using Client8.Enums;
 using Client8.Services;
 using Microsoft.AspNetCore.Components;
 using ProtoBufJsonConverter.Models;
@@ -15,65 +14,28 @@ public partial class Home
     public required HttpClient Client { get; set; }
 
     private State _state = State.None;
-
-    private object ProtoDefinitionEditorConstructionOptions;
-    private object DestinationEditorConstructionOptions;
-
-    protected RichTextEdit richTextProtoDefinition;
-
+    private string _error = string.Empty;
     private string _protoDefinition = string.Empty;
     private string _messageType = "greet.HelloRequest";
     private ConvertType _selectedConvertType = ConvertType.ToJson;
     private string _protobufAsBase64 = "CgRzdGVm";
+    private string _protobufAsByteArray = "new byte[] { 0x0A, 0x04, 0x73, 0x74, 0x65, 0x66 }";
     private bool _skipGrpcHeader = true;
     private bool _addGrpcHeader = true;
-    private string _json = string.Empty;
+    private string _json = "{\r\n  \"name\": \"stef\"\r\n}";
 
-    private bool ProcessButtonDisabled => _state == State.Processing;
+    private bool IsProcessing => _state == State.Processing;
 
     protected override async Task OnInitializedAsync()
     {
         _protoDefinition = await Client.GetStringAsync("greet.proto");
 
-        ProtoDefinitionEditorConstructionOptions = new
-        {
-            value = _protoDefinition,
-            language = "protobuf",
-            automaticLayout = true
-        };
-
-        DestinationEditorConstructionOptions = new
-        {
-            value = _json,
-            language = "json",
-            automaticLayout = true
-        };
-
         await base.OnInitializedAsync();
     }
 
-    //private StandaloneEditorConstructionOptions ProtoDefinitionEditorConstructionOptions(StandaloneCodeEditor editor)
-    //{
-    //    return new StandaloneEditorConstructionOptions
-    //    {
-    //        AutomaticLayout = true,
-    //        Language = "protobuf",
-    //        Value = _protoDefinition
-    //    };
-    //}
-
-    //private StandaloneEditorConstructionOptions DestinationEditorConstructionOptions(StandaloneCodeEditor editor)
-    //{
-    //    return new StandaloneEditorConstructionOptions
-    //    {
-    //        AutomaticLayout = true,
-    //        Language = "json",
-    //        Value = _json
-    //    };
-    //}
-
     private async Task OnClick()
     {
+        _error = string.Empty;
         _state = State.Processing;
 
         try
@@ -91,6 +53,7 @@ public partial class Home
         }
         catch (Exception ex)
         {
+            _error = ex.Message;
             _state = State.Error;
         }
         finally
@@ -107,7 +70,7 @@ public partial class Home
 
         var convertToJsonRequest = new ConvertToJsonRequest(_protoDefinition, _messageType, bytes)
             .WithSkipGrpcHeader(_skipGrpcHeader)
-            .WithWriteIndented(true);
+            .WithWriteIndented();
 
         _json = await ProtoBufConverterApi.ConvertToJsonAsync(convertToJsonRequest);
     }
@@ -115,10 +78,20 @@ public partial class Home
     private async Task ConvertToProtoBufAsync()
     {
         _protobufAsBase64 = string.Empty;
+        _protobufAsByteArray = string.Empty;
+
+        StateHasChanged();
 
         var convertToProtoBufRequest = new ConvertToProtoBufRequest(_protoDefinition, _messageType, _json)
             .WithGrpcHeader(_addGrpcHeader);
 
-        _protobufAsBase64 = await ProtoBufConverterApi.ConvertToProtoBufAsync(convertToProtoBufRequest);
+        var bytes = await ProtoBufConverterApi.ConvertToProtoBufAsync(convertToProtoBufRequest);
+        _protobufAsBase64 = Convert.ToBase64String(bytes);
+        _protobufAsByteArray = ByteArrayToString(bytes);
+    }
+
+    public static string ByteArrayToString(byte[] byteArray)
+    {
+        return string.Concat("new byte[] { ", string.Join(", ", byteArray.Select(b => $"0x{b:X2}")), " };");
     }
 }

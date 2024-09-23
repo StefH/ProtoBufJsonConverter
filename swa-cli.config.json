@@ -1,0 +1,13 @@
+{
+  "configurations": {
+    "blazor.youtube-downloader": {
+      "appLocation": "../../app",
+      "apiLocation": "../../api",
+      "outputLocation": "wwwroot",
+      "apiLanguage": "dotnetisolated",
+      "apiVersion": "8.0",
+      "run": "dotnet watch run",
+      "appDevserverUrl": "http://localhost:8000"
+    }
+  }
+}

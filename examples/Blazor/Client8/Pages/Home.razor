@@ -1,5 +1,9 @@
 ﻿@page "/"
 
+@code {
+    private const ThemeMirrorTheme theme = ThemeMirrorTheme.Copilot;
+}
+
 <PageTitle>ProtoBuf Converter</PageTitle>
 
 <Card>
@@ -10,11 +14,18 @@
     <CardBody>
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is1">ProtoDefinition</FieldLabel>
-            <FieldBody ColumnSize="ColumnSize.Is11">
-                <MemoEdit @bind-Text="@_protoDefinition" Rows="30" />
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <CodeMirror6Wrapper IsWASM=true
+                                    @bind-Doc=@_protoDefinition
+                                    Theme=theme
+                                    Language=@CodeMirrorLanguage.ProtoBuf
+                                    AllowHorizontalResize=false
+                                    ScrollPastEnd=false
+                                    AllowVerticalResize=true />
             </FieldBody>
+
         </Field>
-        
+
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is1">Message Type</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is11">
@@ -55,7 +66,13 @@
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">Json</FieldLabel>
                 <FieldBody ColumnSize="ColumnSize.Is11">
-                    <MemoEdit @bind-Text="@_json" Rows="10" />
+                    <CodeMirror6Wrapper IsWASM=true
+                                        @bind-Doc=@_json
+                                        Theme=theme
+                                        Language=@CodeMirrorLanguage.Json
+                                        AllowHorizontalResize=false
+                                        ScrollPastEnd=false
+                                        AllowVerticalResize=true />
                 </FieldBody>
             </Field>
 
@@ -67,16 +84,37 @@
             </Field>
         }
 
-        <Field Horizontal="true" ColumnSize="ColumnSize.Is1">
-            <Button Clicked="@OnClick" Color="Color.Primary" Disabled="@ProcessButtonDisabled">Convert</Button>
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is1"></FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is1">
+                <Button Clicked="@OnClick" Color="Color.Primary" Disabled="@IsProcessing">Convert</Button>
+            </FieldBody>
         </Field>
-        
+
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1" TextColor="TextColor.Danger">Error</FieldLabel>
+                <Field Horizontal="true" ColumnSize="ColumnSize.Is11">
+                    <Text TextColor="TextColor.Danger">@_error</Text>
+                </Field>
+            </Field>
+        }
+
         @if (_selectedConvertType == ConvertType.ToJson)
         {
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">Json</FieldLabel>
-                <FieldBody ColumnSize="ColumnSize.Is11">
-                    <MemoEdit @bind-Text="@_json" Rows="10" ReadOnly="true"/>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <CodeMirror6Wrapper IsWASM=true
+                                        Editable=false
+                                        ReadOnly=true
+                                        @bind-Doc=@_json
+                                        Theme=theme
+                                        Language=@CodeMirrorLanguage.Json
+                                        AllowHorizontalResize=false
+                                        AllowVerticalResize=true
+                                        ScrollPastEnd=false />
                 </FieldBody>
             </Field>
         }
@@ -84,11 +122,24 @@
         {
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is1">ProtoBuf (Base64)</FieldLabel>
-                <FieldBody ColumnSize="ColumnSize.Is4">
-                    <TextEdit @bind-Text="@_protobufAsBase64" ReadOnly="true" />
+                <FieldBody ColumnSize="ColumnSize.Is11">
+                    <TextEdit @bind-Text="@_protobufAsBase64" ReadOnly="true" Disabled="@IsProcessing" />
+                </FieldBody>
+            </Field>
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is1">ProtoBuf (Byte Array)</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is11">
+                    <CodeMirror6Wrapper IsWASM=true
+                                        Editable=false
+                                        ReadOnly=true
+                                        @bind-Doc=@_protobufAsByteArray
+                                        Theme=theme
+                                        Language=@CodeMirrorLanguage.Csharp
+                                        AllowHorizontalResize=false
+                                        AllowVerticalResize=true
+                                        ScrollPastEnd=false />
                 </FieldBody>
             </Field>
         }
-
     </CardBody>
 </Card>
