@@ -100,10 +100,10 @@ public class Converter : IConverter
 
         var protoFileResolver = requestProtoFileResolver ?? _globalProtoFileResolver;
 
-        return DataDictionary.GetOrAddAsync(hashCode, key => GetValueAsync(key, protoDefinition, protoFileResolver, cancellationToken));
+        return DataDictionary.GetOrAddAsync(hashCode, key => GetDataAsync(key, protoDefinition, protoFileResolver, cancellationToken));
     }
 
-    private async Task<Data> GetValueAsync(int key, string protoDefinition, IProtoFileResolver? protoFileResolver, CancellationToken cancellationToken)
+    private async Task<Data> GetDataAsync(int key, string protoDefinition, IProtoFileResolver? protoFileResolver, CancellationToken cancellationToken)
     {
         var set = new FileDescriptorSet();
         set.Add($"{key}.proto", true, new StringReader(protoDefinition));
@@ -122,10 +122,11 @@ public class Converter : IConverter
         set.ApplyFileDependencyOrder();
         set.Process();
 
-        var errors = set.GetErrors();
+        var errorsAndWarnings = set.GetErrors();
+        var errors = errorsAndWarnings.Where(e => e.IsError).ToArray();
         if (errors.Any())
         {
-            throw new ArgumentException($"Error parsing proto definition. Errors: {string.Join(",", errors.Select(e => e.Message))}", nameof(protoDefinition));
+            throw new ArgumentException($"Error parsing proto definition. Error(s): {string.Join(",", errors.Select(e => e.Message))}", nameof(protoDefinition));
         }
 
         // For each file that is a dependency, include it in the output c# code file
