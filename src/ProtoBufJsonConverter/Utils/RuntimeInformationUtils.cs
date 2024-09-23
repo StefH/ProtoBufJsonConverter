@@ -4,7 +4,7 @@ namespace ProtoBufJsonConverter.Utils;
 
 internal static class RuntimeInformationUtils
 {
-    public static bool IsBlazorWASM;
+    public static bool IsBlazorWASM { get; }
 
     static RuntimeInformationUtils()
     {

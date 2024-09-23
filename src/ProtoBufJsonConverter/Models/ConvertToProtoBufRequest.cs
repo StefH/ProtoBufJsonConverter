@@ -15,7 +15,14 @@ public class ConvertToProtoBufRequest : ConvertRequest
     /// <param name="messageType">The full type of the protobuf (request/response) message object. Format is "{package-name}.{type-name}".</param>
     /// <param name="input">The JSON string or object to convert.</param>
     /// <param name="addGrpcHeader">Add the Grpc Header bytes [default is <c>false</c>].</param>
-    public ConvertToProtoBufRequest(string protoDefinition, string messageType, object input, bool addGrpcHeader = false) : base(protoDefinition, messageType)
+    /// <param name="protoFileResolver">Provides an optional virtual file system (used for resolving .proto files).</param>
+    public ConvertToProtoBufRequest(
+        string protoDefinition, 
+        string messageType, 
+        object input, 
+        bool addGrpcHeader = false,
+        IProtoFileResolver ? protoFileResolver = null
+    ) : base(protoDefinition, messageType, protoFileResolver)
     {
         Input = Guard.NotNull(input);
         AddGrpcHeader = addGrpcHeader;
@@ -28,6 +35,16 @@ public class ConvertToProtoBufRequest : ConvertRequest
     public ConvertToProtoBufRequest WithGrpcHeader(bool addHeader = false)
     {
         AddGrpcHeader = addHeader;
+        return this;
+    }
+
+    /// <summary>
+    /// Set the <see cref="IProtoFileResolver"/>.
+    /// </summary>
+    /// <param name="protoFileResolver">Provides an optional virtual file system (used for resolving .proto files).</param>
+    public ConvertToProtoBufRequest WithProtoFileResolver(IProtoFileResolver protoFileResolver)
+    {
+        ProtoFileResolver = protoFileResolver;
         return this;
     }
 }

@@ -20,16 +20,18 @@ internal static class FileDescriptorSetExtensions
             typeName = messageType.Substring(lastDotIndex + 1);
         }
 
-        var fileDescriptorProto = set.Files.Find(f => f.Package == packageName);
-        if (fileDescriptorProto == null)
+        var fileDescriptors = set.Files.Where(f => f.Package == packageName).ToArray();
+        if (fileDescriptors.Length == 0)
         {
-            throw new ArgumentException($"The package '{packageName}' is not found in the proto definition.");
+            throw new ArgumentException($"The package '{packageName}' is not found in the proto definition(s).");
         }
 
-        var descriptorProto = fileDescriptorProto.MessageTypes.Find(s => s.Name == typeName);
+        var descriptorProto = fileDescriptors
+            .SelectMany(f => f.MessageTypes)
+            .FirstOrDefault(proto => proto.Name == typeName);
         if (descriptorProto == null)
         {
-            throw new ArgumentException($"The message type '{typeName}' is not found in the proto definition.");
+            throw new ArgumentException($"The message type '{typeName}' is not found in the proto definition(s).");
         }
 
         return messageType;
