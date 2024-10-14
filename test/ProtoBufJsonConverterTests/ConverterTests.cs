@@ -134,6 +134,8 @@ message MyMessageValue {
     google.protobuf.Value val2 = 2;
     google.protobuf.Value val3 = 3;
     google.protobuf.Value val4 = 4;
+    google.protobuf.Value val5 = 5;
+    google.protobuf.Value val6 = 6;
 }
 
 message MyMessageStruct {
@@ -422,6 +424,28 @@ message MyMessage {
             val4 = new Value
             {
                 BoolValue = true
+            },
+            val5 = new Value
+            {
+                StructValue = new Struct
+                {
+                    Fields =
+                    {
+                        { "str", new Value("strValue") },
+                        { "bo", new Value(false) }
+                    }
+                }
+            },
+            val6 = new Value
+            {
+                ListValue = new ListValue
+                {
+                    Values =
+                    {
+                        new Value("test"),
+                        new Value(-42)
+                    }
+                }
             }
         };
         var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
@@ -430,14 +454,14 @@ message MyMessage {
         var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
 
         // Assert 1
-        Convert.ToBase64String(bytes).Should().Be("CgIIABIJEQAAAAAAAEVAGgYaBFN0ZWYiAiAB");
+        Convert.ToBase64String(bytes).Should().Be("CgIIABIJEQAAAAAAAEVAGgYaBFN0ZWYiAiABKh8qHQoRCgNzdHISChoIc3RyVmFsdWUKCAoCYm8SAiAAMhUyEwoGGgR0ZXN0CgkRAAAAAAAARcA=");
 
         // Act 2
         var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
         var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
 
         // Assert 2
-        json.Should().Be("""{"val1":0,"val2":42.0,"val3":"Stef","val4":true}""");
+        json.Should().Be("""{"val1":0,"val2":42.0,"val3":"Stef","val4":true,"val5":{"fields":{"str":"strValue","bo":false}},"val6":{"values":["test",-42.0]}}""");
     }
 
     [Fact]

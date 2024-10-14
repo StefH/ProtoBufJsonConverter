@@ -7,6 +7,13 @@ namespace Google.Protobuf.WellKnownTypes;
 [ProtoContract(Name = ".google.protobuf.Value", Origin = "google/protobuf/struct.proto")]
 public class Value : IWellKnownType
 {
+    public const string FieldNameNullValue = "null_value";
+    public const string FieldNameNumberValue = "number_value";
+    public const string FieldNameStringValue = "string_value";
+    public const string FieldNameBoolValue = "bool_value";
+    public const string FieldNameStructValue = "struct_value";
+    public const string FieldNameListValue = "list_value";
+
     private DiscriminatedUnion64Object _kind;
 
     public Value()
@@ -45,7 +52,7 @@ public class Value : IWellKnownType
 
     public DiscriminatedUnion64Object Kind => _kind;
 
-    [ProtoMember(1, Name = "null_value")]
+    [ProtoMember(1, Name = FieldNameNullValue)]
     public NullValue NullValue
     {
         get => _kind.Is(1) ? (NullValue)_kind.Int32 : default;
@@ -54,7 +61,7 @@ public class Value : IWellKnownType
     public bool ShouldSerializeNullValue() => _kind.Is(1);
     public void ResetNullValue() => DiscriminatedUnion64Object.Reset(ref _kind, 1);
 
-    [ProtoMember(2, Name = "number_value")]
+    [ProtoMember(2, Name = FieldNameNumberValue)]
     public double NumberValue
     {
         get => _kind.Is(2) ? _kind.Double : default;
@@ -63,7 +70,7 @@ public class Value : IWellKnownType
     public bool ShouldSerializeNumberValue() => _kind.Is(2);
     public void ResetNumberValue() => DiscriminatedUnion64Object.Reset(ref _kind, 2);
 
-    [ProtoMember(3, Name = "string_value")]
+    [ProtoMember(3, Name = FieldNameStringValue)]
     [DefaultValue("")]
     public string StringValue
     {
@@ -73,7 +80,7 @@ public class Value : IWellKnownType
     public bool ShouldSerializeStringValue() => _kind.Is(3);
     public void ResetStringValue() => DiscriminatedUnion64Object.Reset(ref _kind, 3);
 
-    [ProtoMember(4, Name = "bool_value")]
+    [ProtoMember(4, Name = FieldNameBoolValue)]
     public bool BoolValue
     {
         get => _kind.Is(4) ? _kind.Boolean : default;
@@ -82,7 +89,7 @@ public class Value : IWellKnownType
     public bool ShouldSerializeBoolValue() => _kind.Is(4);
     public void ResetBoolValue() => DiscriminatedUnion64Object.Reset(ref _kind, 4);
 
-    [ProtoMember(5, Name = "struct_value")]
+    [ProtoMember(5, Name = FieldNameStructValue)]
     public Struct StructValue
     {
         get => _kind.Is(5) ? (Struct)_kind.Object : new Struct();
@@ -91,7 +98,7 @@ public class Value : IWellKnownType
     public bool ShouldSerializeStructValue() => _kind.Is(5);
     public void ResetStructValue() => DiscriminatedUnion64Object.Reset(ref _kind, 5);
 
-    [ProtoMember(6, Name = "list_value")]
+    [ProtoMember(6, Name = FieldNameListValue)]
     public ListValue ListValue
     {
         get => _kind.Is(6) ? (ListValue)_kind.Object : new ListValue();

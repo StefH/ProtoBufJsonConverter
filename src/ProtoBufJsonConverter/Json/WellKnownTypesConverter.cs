@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -26,39 +25,19 @@ internal class WellKnownTypesConverter : JsonConverter
         if (typeof(Value) == objectType)
         {
             var value = _converter.ReadJson(reader, objectType, existingValue, serializer);
-
-            if (TryParseAsValue(value, out var parsedValue))
-            {
-                return parsedValue;
-            }
+            return ParseAsValue(value);
         }
 
         if (typeof(Struct) == objectType)
         {
             var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
-
-            var @struct = new Struct();
-            foreach (var field in (IDictionary<string, object?>)expandoObject[Struct.FieldName]!)
-            {
-                var value = TryParseAsValue(field.Value, out var parsedValue) ? parsedValue : new Value();
-                @struct.Fields.Add(field.Key, value);
-            }
-
-            return @struct;
+            return ParseAsStruct(expandoObject);
         }
 
         if (typeof(ListValue) == objectType)
         {
             var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
-
-            var listValue = new ListValue();
-            foreach (var item in (List<object>)expandoObject[ListValue.FieldName]!)
-            {
-                var value = TryParseAsValue(item, out var parsedValue) ? parsedValue : new Value();
-                listValue.Values.Add(value);
-            }
-
-            return listValue;
+            return ParseAsListValue(expandoObject);
         }
 
         if (typeof(Any) == objectType)
@@ -107,11 +86,11 @@ internal class WellKnownTypesConverter : JsonConverter
             }
             else if (val.Kind.Is(5))
             {
-                serializer.Serialize(writer, val.StructValue);
+                WriteJson(writer, val.StructValue, serializer);
             }
             else if (val.Kind.Is(6))
             {
-                serializer.Serialize(writer, val.ListValue);
+                WriteJson(writer, val.ListValue, serializer);
             }
             return;
         }
@@ -176,45 +155,63 @@ internal class WellKnownTypesConverter : JsonConverter
         return (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
     }
 
-    private static bool TryParseAsValue(object? value, [NotNullWhen(true)] out Value? parsedValue)
+    private static Value ParseAsValue(object? value)
     {
         if (value is long and 0)
         {
-            parsedValue = new Value { NullValue = NullValue.NullValue };
-            return true;
+            return new Value { NullValue = NullValue.NullValue };
         }
 
         if (value is double numberValue)
         {
-            parsedValue = new Value { NumberValue = numberValue };
-            return true;
+            return new Value { NumberValue = numberValue };
         }
 
         if (value is string stringValue)
         {
-            parsedValue = new Value { StringValue = stringValue };
-            return true;
+            return new Value { StringValue = stringValue };
         }
 
         if (value is bool boolValue)
         {
-            parsedValue = new Value { BoolValue = boolValue };
-            return true;
+            return new Value { BoolValue = boolValue };
         }
 
-        if (value is Struct structValue)
+        if (value is IDictionary<string, object?> expandObject)
         {
-            parsedValue = new Value { StructValue = structValue };
-            return true;
+            var fieldName = expandObject.Keys.FirstOrDefault();
+            switch (fieldName)
+            {
+                case Struct.FieldName:
+                    return new Value { StructValue = ParseAsStruct(expandObject) };
+
+                case ListValue.FieldName:
+                    return new Value { ListValue = ParseAsListValue(expandObject) };
+            }
         }
 
-        if (value is ListValue listValue)
+        return new Value();
+    }
+
+    private static Struct ParseAsStruct(IDictionary<string, object?> expandoObject)
+    {
+        var @struct = new Struct();
+        foreach (var field in (IDictionary<string, object?>)expandoObject[Struct.FieldName]!)
         {
-            parsedValue = new Value { ListValue = listValue };
-            return true;
+            @struct.Fields.Add(field.Key, ParseAsValue(field.Value));
         }
 
-        parsedValue = default;
-        return false;
+        return @struct;
+    }
+
+    private static ListValue ParseAsListValue(IDictionary<string, object?> expandoObject)
+    {
+        var listValue = new ListValue();
+        foreach (var item in (List<object>)expandoObject[ListValue.FieldName]!)
+        {
+            listValue.Values.Add(ParseAsValue(item));
+        }
+
+        return listValue;
     }
 }
