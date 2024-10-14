@@ -9,6 +9,40 @@ public class Value : IWellKnownType
 {
     private DiscriminatedUnion64Object _kind;
 
+    public Value()
+    {
+    }
+
+    public Value(NullValue value)
+    {
+        NullValue = value;
+    }
+
+    public Value(double value)
+    {
+        NumberValue = value;
+    }
+
+    public Value(string value)
+    {
+        StringValue = value;
+    }
+
+    public Value(bool value)
+    {
+        BoolValue = value;
+    }
+
+    public Value(Struct value)
+    {
+        StructValue = value;
+    }
+
+    public Value(ListValue value)
+    {
+        ListValue = value;
+    }
+
     public DiscriminatedUnion64Object Kind => _kind;
 
     [ProtoMember(1, Name = "null_value")]

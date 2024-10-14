@@ -436,33 +436,37 @@ message MyMessage {
         json.Should().Be("""{"val1":0,"val2":42.0,"val3":"Stef","val4":true}""");
     }
 
-    //[Fact]
-    //public async Task ConvertAsync_WellKnownTypesStruct_Struct_ConvertObjectToProtoBufRequest()
-    //{
-    //    // Arrange
-    //    const string messageType = "MyMessageStructValue";
-    //    var @object = new
-    //    {
-    //        new Struct
-    //        {
-    //            Fields = { { "a", new Value() } }
-    //        }
-    //    };
-    //    var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypes_Struct_Struct_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageStruct";
+        var @object = new
+        {
+            val = new Struct
+            {
+                Fields =
+                {
+                    { "str", new Value("strValue") },
+                    { "bo", new Value(false) }
+                }
+            }
+        };
+        var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
 
-    //    // Act 1
-    //    var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
+        // Act 1
+        var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
 
-    //    // Assert 1
-    //    Convert.ToBase64String(bytes).Should().Be("");
+        // Assert 1
+        Convert.ToBase64String(bytes).Should().Be("Ch0KEQoDc3RyEgoaCHN0clZhbHVlCggKAmJvEgIgAA==");
 
-    //    // Act 2
-    //    var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
-    //    var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
+        // Act 2
+        var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
+        var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
 
-    //    // Assert 2
-    //    json.Should().Be("""{"val":0}""");
-    //}
+        // Assert 2
+        json.Should().Be("""{"val":{"fields":{"str":"strValue","bo":false}}}""");
+    }
 
     [Fact]
     public async Task ConvertAsync_WellKnownTypesAny_ConvertObjectToProtoBufRequest()

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -26,35 +27,24 @@ internal class WellKnownTypesConverter : JsonConverter
         {
             var value = _converter.ReadJson(reader, objectType, existingValue, serializer);
 
-            if (value is long longValue && reader.TokenType == JsonToken.Integer && longValue == 0)
+            if (TryParseAsValue(value, out var parsedValue))
             {
-                return new Value { NullValue = NullValue.NullValue };
+                return parsedValue;
+            }
+        }
+
+        if (typeof(Struct) == objectType)
+        {
+            var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
+
+            var @struct = new Struct();
+            foreach (var field in (IDictionary<string, object?>)expandoObject[Struct.FieldName]!)
+            {
+                var value = TryParseAsValue(field.Value, out var parsedValue) ? parsedValue : new Value();
+                @struct.Fields.Add(field.Key, value);
             }
 
-            if (value is double numberValue)
-            {
-                return new Value { NumberValue = numberValue };
-            }
-
-            if (value is string stringValue)
-            {
-                return new Value { StringValue = stringValue };
-            }
-
-            if (value is bool boolValue)
-            {
-                return new Value { BoolValue = boolValue };
-            }
-
-            if (value is Struct structValue)
-            {
-                return new Value { StructValue = structValue };
-            }
-
-            if (value is ListValue listValue)
-            {
-                return new Value { ListValue = listValue };
-            }
+            return @struct;
         }
 
         if (typeof(Any) == objectType)
@@ -75,6 +65,48 @@ internal class WellKnownTypesConverter : JsonConverter
         return null;
     }
 
+    private static bool TryParseAsValue(object? value, [NotNullWhen(true)] out Value? parsedValue)
+    {
+        if (value is long and 0)
+        {
+            parsedValue = new Value { NullValue = NullValue.NullValue };
+            return true;
+        }
+
+        if (value is double numberValue)
+        {
+            parsedValue = new Value { NumberValue = numberValue };
+            return true;
+        }
+
+        if (value is string stringValue)
+        {
+            parsedValue = new Value { StringValue = stringValue };
+            return true;
+        }
+
+        if (value is bool boolValue)
+        {
+            parsedValue = new Value { BoolValue = boolValue };
+            return true;
+        }
+
+        if (value is Struct structValue)
+        {
+            parsedValue = new Value { StructValue = structValue };
+            return true;
+        }
+
+        if (value is ListValue listValue)
+        {
+            parsedValue = new Value { ListValue = listValue };
+            return true;
+        }
+
+        parsedValue = default;
+        return false;
+    }
+
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         if (value is NullValue nullValue)
@@ -82,7 +114,7 @@ internal class WellKnownTypesConverter : JsonConverter
             writer.WriteValue(nullValue);
             return;
         }
-        
+
         if (value is Value val)
         {
             if (val.Kind.Is(1))
@@ -111,7 +143,25 @@ internal class WellKnownTypesConverter : JsonConverter
             }
             return;
         }
-        
+
+        if (value is Struct @struct)
+        {
+            writer.WriteStartObject();
+
+            writer.WritePropertyName(Struct.FieldName);
+
+            writer.WriteStartObject();
+            foreach (var field in @struct.Fields)
+            {
+                writer.WritePropertyName(field.Key);
+                WriteJson(writer, field.Value, serializer);
+            }
+            writer.WriteEndObject();
+
+            writer.WriteEndObject();
+            return;
+        }
+
         if (value is Any any)
         {
             writer.WriteStartObject();
@@ -121,15 +171,15 @@ internal class WellKnownTypesConverter : JsonConverter
 
             writer.WritePropertyName(Any.ValuePropertyName);
 
-            var v = any.GetUnwrappedValue();
-            writer.WriteValue(v);
+            var unwrappedValue = any.GetUnwrappedValue();
+            writer.WriteValue(unwrappedValue);
 
             writer.WriteEndObject();
         }
     }
 
     /// <summary>
-    /// he only way to find where this json object begins and ends is by reading it in as a generic ExpandoObject.
+    /// The only way to find where this json object begins and ends is by reading it in as a generic ExpandoObject.
     /// Read an entire object from the reader.
     /// </summary>
     private IDictionary<string, object?> ReadAsExpandoObject(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
