@@ -101,7 +101,7 @@ internal static class AssemblyUtils
     {
         if (!string.IsNullOrEmpty(name))
         {
-            dict.TryAdd(name.TrimStart('.'), type);
+            dict.TryAdd(name!.TrimStart('.'), type);
         }
         else
         {

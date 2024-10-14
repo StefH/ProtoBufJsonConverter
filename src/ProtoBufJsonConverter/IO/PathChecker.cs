@@ -2,7 +2,7 @@ namespace ProtoBufJsonConverter.IO;
 
 internal static class PathChecker
 {
-    public static bool IncludeFile(string path)
+    public static bool IncludeFile(string? path)
     {
         if (path == null) 
         {

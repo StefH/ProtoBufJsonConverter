@@ -9,5 +9,5 @@ public class ListValue : IWellKnownType
     public const string FieldName = "values";
 
     [ProtoMember(1, Name = FieldName)]
-    public List<Value> Values { get; } = new();
+    public List<Value> Values { get; } = [];
 }
