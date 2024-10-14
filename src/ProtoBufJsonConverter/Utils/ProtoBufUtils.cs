@@ -9,11 +9,15 @@ internal static class ProtoBufUtils
 {
     private const int SizeOfUInt32 = 4;
     private const int HeaderSize = 1 + SizeOfUInt32; // 1 (Compression flag) + 4 (UInt32)
+
     internal static MemoryStream GetMemoryStreamFromBytes(byte[] buffer, bool skipGrpcHeader)
     {
         var offset = 0;
 
-        if (skipGrpcHeader && buffer[offset] == 0 && BytesLeftInBuffer(buffer, offset) >= HeaderSize)
+        if (skipGrpcHeader &&
+            buffer.Length > 0 &&
+            buffer[offset] == 0 &&
+            BytesLeftInBuffer(buffer, offset) >= HeaderSize)
         {
             offset++; // Compression flag
 

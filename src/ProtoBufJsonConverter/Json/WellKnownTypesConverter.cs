@@ -12,21 +12,54 @@ internal class WellKnownTypesConverter : JsonConverter
     public override bool CanConvert(Type objectType)
     {
         // Support Any and NullValue
-        return typeof(IWellKnownType).IsAssignableFrom(objectType);
+        return typeof(IWellKnownType).IsAssignableFrom(objectType) || objectType == typeof(NullValue);
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
-        if (reader.TokenType == JsonToken.Null)
+        if (typeof(NullValue) == objectType)
         {
-            return null;
+            return NullValue.NullValue;
+        }
+
+        if (typeof(Value) == objectType)
+        {
+            var value = _converter.ReadJson(reader, objectType, existingValue, serializer);
+
+            if (value is long longValue && reader.TokenType == JsonToken.Integer && longValue == 0)
+            {
+                return new Value { NullValue = NullValue.NullValue };
+            }
+
+            if (value is double numberValue)
+            {
+                return new Value { NumberValue = numberValue };
+            }
+
+            if (value is string stringValue)
+            {
+                return new Value { StringValue = stringValue };
+            }
+
+            if (value is bool boolValue)
+            {
+                return new Value { BoolValue = boolValue };
+            }
+
+            if (value is Struct structValue)
+            {
+                return new Value { StructValue = structValue };
+            }
+
+            if (value is ListValue listValue)
+            {
+                return new Value { ListValue = listValue };
+            }
         }
 
         if (typeof(Any) == objectType)
         {
-            // The only way to find where this json object begins and ends is by reading it in as a generic ExpandoObject.
-            // Read an entire object from the reader.
-            var expandoObject = (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
+            var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
 
             var typeUrl = (string)expandoObject[Any.TypeUrlPropertyName]!;
             var value = expandoObject[Any.ValuePropertyName];
@@ -44,6 +77,41 @@ internal class WellKnownTypesConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
+        if (value is NullValue nullValue)
+        {
+            writer.WriteValue(nullValue);
+            return;
+        }
+        
+        if (value is Value val)
+        {
+            if (val.Kind.Is(1))
+            {
+                writer.WriteValue(val.NullValue);
+            }
+            else if (val.Kind.Is(2))
+            {
+                writer.WriteValue(val.NumberValue);
+            }
+            else if (val.Kind.Is(3))
+            {
+                writer.WriteValue(val.StringValue);
+            }
+            else if (val.Kind.Is(4))
+            {
+                writer.WriteValue(val.BoolValue);
+            }
+            else if (val.Kind.Is(5))
+            {
+                serializer.Serialize(writer, val.StructValue);
+            }
+            else if (val.Kind.Is(6))
+            {
+                serializer.Serialize(writer, val.ListValue);
+            }
+            return;
+        }
+        
         if (value is Any any)
         {
             writer.WriteStartObject();
@@ -58,9 +126,14 @@ internal class WellKnownTypesConverter : JsonConverter
 
             writer.WriteEndObject();
         }
-        else if (value is NullValue)
-        {
-            writer.WriteNull();
-        }
+    }
+
+    /// <summary>
+    /// he only way to find where this json object begins and ends is by reading it in as a generic ExpandoObject.
+    /// Read an entire object from the reader.
+    /// </summary>
+    private IDictionary<string, object?> ReadAsExpandoObject(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    {
+        return (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
     }
 }

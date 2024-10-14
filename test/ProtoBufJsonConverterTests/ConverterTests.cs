@@ -121,12 +121,23 @@ message MyMessageInt32Value {
 }
 
 message MyMessageNullValue {
-    google.protobuf.NullValue val = 1; 
+    google.protobuf.NullValue val = 1;
 }
 
 message MyMessageAny {
     google.protobuf.Any val1 = 1;
     google.protobuf.Any val2 = 2;
+}
+
+message MyMessageValue {
+    google.protobuf.Value val1 = 1;
+    google.protobuf.Value val2 = 2;
+    google.protobuf.Value val3 = 3;
+    google.protobuf.Value val4 = 4;
+}
+
+message MyMessageStruct {
+    google.protobuf.Struct val = 1;
 }
 ";
 
@@ -340,7 +351,6 @@ message MyMessage {
     [InlineData("MyMessageStringValue", "stef", "CgYKBHN0ZWY=", """{"val":"stef"}""")]
     [InlineData("MyMessageInt64Value", long.MaxValue, "CgoI//////////9/", """{"val":9223372036854775807}""")]
     [InlineData("MyMessageInt32Value", int.MaxValue, "CgYI/////wc=", """{"val":2147483647}""")]
-    [InlineData("MyMessageNullValue", null, "CgA=", """{"val":null}""")]
     public async Task ConvertAsync_WellKnownTypes_ConvertObjectToProtoBufRequest(string messageType, object? val, string expectedBytes, string expectedJson)
     {
         // Arrange
@@ -360,6 +370,99 @@ message MyMessage {
         // Assert 2
         json.Should().Be(expectedJson);
     }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypes_Struct_NullValue_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageNullValue";
+        var @object = new
+        {
+            val = NullValue.NullValue
+        };
+        var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
+
+        // Act 1
+        var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
+
+        // Assert 1
+        Convert.ToBase64String(bytes).Should().Be("");
+
+        // Act 2
+        var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
+        var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
+
+        // Assert 2
+        json.Should().Be("""{"val":0}""");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypes_Struct_Value_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageValue";
+        var @object = new
+        { 
+            val1 = new Value
+            {
+                NullValue = NullValue.NullValue
+            },
+            val2 = new Value
+            {
+                NumberValue = 42
+            },
+            val3 = new Value
+            {
+                StringValue= "Stef"
+            },
+            val4 = new Value
+            {
+                BoolValue = true
+            }
+        };
+        var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
+
+        // Act 1
+        var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
+
+        // Assert 1
+        Convert.ToBase64String(bytes).Should().Be("CgIIABIJEQAAAAAAAEVAGgYaBFN0ZWYiAiAB");
+
+        // Act 2
+        var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
+        var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
+
+        // Assert 2
+        json.Should().Be("""{"val1":0,"val2":42.0,"val3":"Stef","val4":true}""");
+    }
+
+    //[Fact]
+    //public async Task ConvertAsync_WellKnownTypesStruct_Struct_ConvertObjectToProtoBufRequest()
+    //{
+    //    // Arrange
+    //    const string messageType = "MyMessageStructValue";
+    //    var @object = new
+    //    {
+    //        new Struct
+    //        {
+    //            Fields = { { "a", new Value() } }
+    //        }
+    //    };
+    //    var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
+
+    //    // Act 1
+    //    var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
+
+    //    // Assert 1
+    //    Convert.ToBase64String(bytes).Should().Be("");
+
+    //    // Act 2
+    //    var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
+    //    var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
+
+    //    // Assert 2
+    //    json.Should().Be("""{"val":0}""");
+    //}
 
     [Fact]
     public async Task ConvertAsync_WellKnownTypesAny_ConvertObjectToProtoBufRequest()
