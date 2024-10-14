@@ -47,6 +47,20 @@ internal class WellKnownTypesConverter : JsonConverter
             return @struct;
         }
 
+        if (typeof(ListValue) == objectType)
+        {
+            var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
+
+            var listValue = new ListValue();
+            foreach (var item in (List<object>)expandoObject[ListValue.FieldName]!)
+            {
+                var value = TryParseAsValue(item, out var parsedValue) ? parsedValue : new Value();
+                listValue.Values.Add(value);
+            }
+
+            return listValue;
+        }
+
         if (typeof(Any) == objectType)
         {
             var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
@@ -63,48 +77,6 @@ internal class WellKnownTypesConverter : JsonConverter
         }
 
         return null;
-    }
-
-    private static bool TryParseAsValue(object? value, [NotNullWhen(true)] out Value? parsedValue)
-    {
-        if (value is long and 0)
-        {
-            parsedValue = new Value { NullValue = NullValue.NullValue };
-            return true;
-        }
-
-        if (value is double numberValue)
-        {
-            parsedValue = new Value { NumberValue = numberValue };
-            return true;
-        }
-
-        if (value is string stringValue)
-        {
-            parsedValue = new Value { StringValue = stringValue };
-            return true;
-        }
-
-        if (value is bool boolValue)
-        {
-            parsedValue = new Value { BoolValue = boolValue };
-            return true;
-        }
-
-        if (value is Struct structValue)
-        {
-            parsedValue = new Value { StructValue = structValue };
-            return true;
-        }
-
-        if (value is ListValue listValue)
-        {
-            parsedValue = new Value { ListValue = listValue };
-            return true;
-        }
-
-        parsedValue = default;
-        return false;
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
@@ -162,6 +134,23 @@ internal class WellKnownTypesConverter : JsonConverter
             return;
         }
 
+        if (value is ListValue listValue)
+        {
+            writer.WriteStartObject();
+
+            writer.WritePropertyName(ListValue.FieldName);
+
+            writer.WriteStartArray();
+            foreach (var item in listValue.Values)
+            {
+                WriteJson(writer, item, serializer);
+            }
+            writer.WriteEndArray();
+
+            writer.WriteEndObject();
+            return;
+        }
+
         if (value is Any any)
         {
             writer.WriteStartObject();
@@ -185,5 +174,47 @@ internal class WellKnownTypesConverter : JsonConverter
     private IDictionary<string, object?> ReadAsExpandoObject(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         return (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
+    }
+
+    private static bool TryParseAsValue(object? value, [NotNullWhen(true)] out Value? parsedValue)
+    {
+        if (value is long and 0)
+        {
+            parsedValue = new Value { NullValue = NullValue.NullValue };
+            return true;
+        }
+
+        if (value is double numberValue)
+        {
+            parsedValue = new Value { NumberValue = numberValue };
+            return true;
+        }
+
+        if (value is string stringValue)
+        {
+            parsedValue = new Value { StringValue = stringValue };
+            return true;
+        }
+
+        if (value is bool boolValue)
+        {
+            parsedValue = new Value { BoolValue = boolValue };
+            return true;
+        }
+
+        if (value is Struct structValue)
+        {
+            parsedValue = new Value { StructValue = structValue };
+            return true;
+        }
+
+        if (value is ListValue listValue)
+        {
+            parsedValue = new Value { ListValue = listValue };
+            return true;
+        }
+
+        parsedValue = default;
+        return false;
     }
 }

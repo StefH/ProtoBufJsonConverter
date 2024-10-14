@@ -139,6 +139,10 @@ message MyMessageValue {
 message MyMessageStruct {
     google.protobuf.Struct val = 1;
 }
+
+message MyMessageListValue {
+    google.protobuf.ListValue val = 1;
+}
 ";
 
     private const string ProtoDefinitionWithEnum = @"
@@ -402,7 +406,7 @@ message MyMessage {
         // Arrange
         const string messageType = "MyMessageValue";
         var @object = new
-        { 
+        {
             val1 = new Value
             {
                 NullValue = NullValue.NullValue
@@ -413,7 +417,7 @@ message MyMessage {
             },
             val3 = new Value
             {
-                StringValue= "Stef"
+                StringValue = "Stef"
             },
             val4 = new Value
             {
@@ -466,6 +470,38 @@ message MyMessage {
 
         // Assert 2
         json.Should().Be("""{"val":{"fields":{"str":"strValue","bo":false}}}""");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypes_Struct_ListValue_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageListValue";
+        var @object = new
+        {
+            val = new ListValue
+            {
+                Values =
+                {
+                    new Value("strValue"),
+                    new Value(99)
+                }
+            }
+        };
+        var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
+
+        // Act 1
+        var bytes = await _sut.ConvertAsync(convertToProtoBufRequest).ConfigureAwait(false);
+
+        // Assert 1
+        Convert.ToBase64String(bytes).Should().Be("ChcKChoIc3RyVmFsdWUKCREAAAAAAMBYQA==");
+
+        // Act 2
+        var convertToJsonRequest = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, bytes);
+        var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
+
+        // Assert 2
+        json.Should().Be("""{"val":{"values":["strValue",99.0]}}""");
     }
 
     [Fact]
