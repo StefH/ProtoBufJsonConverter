@@ -9,7 +9,7 @@ public class TestMessage : IExtensible
 
     IExtension IExtensible.GetExtensionObject(bool createIfMissing) => Extensible.GetExtensionObject(ref _extensionData, createIfMissing);
 
-    [ProtoMember(1, Name = @"message")]
+    [ProtoMember(1, Name = "message")]
     [DefaultValue("")]
     public string Message { get; set; } = "";
 }
