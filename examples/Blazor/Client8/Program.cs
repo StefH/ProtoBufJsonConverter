@@ -1,7 +1,6 @@
 using Blazorise;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
-using Blazorise.RichTextEdit;
 using Client8;
 using Client8.Services;
 using Microsoft.AspNetCore.Components.Web;
@@ -18,16 +17,26 @@ builder.Services
         options.Immediate = true;
     })
     .AddBootstrap5Providers()
-    .AddFontAwesomeIcons()
-    .AddBlazoriseRichTextEdit();
-// .AddSemiDesignBlazorMonacoEditor();
+    .AddFontAwesomeIcons();
 
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+var baseAddress = builder.HostEnvironment.BaseAddress;
+Console.WriteLine("HostEnvironment.BaseAddress = " + baseAddress);
+
+var isLocalHost = baseAddress.Contains("localhost");
+Console.WriteLine("isLocalHost = " + isLocalHost);
+
+var isAzure = baseAddress.Contains("azurestaticapps.net");
+Console.WriteLine("isAzure = " + isAzure);
+
+var httpClientBaseAddress = isLocalHost ? "http://localhost:7071/" : baseAddress;
+Console.WriteLine("httpClientBaseAddress = " + httpClientBaseAddress);
+
+builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
 builder.Services.AddScoped(_ =>
 {
     var httpClient = new HttpClient
     {
-        BaseAddress = new Uri(builder.Configuration["API_Prefix"] ?? builder.HostEnvironment.BaseAddress)
+        BaseAddress = new Uri(builder.Configuration["API_Prefix"] ?? httpClientBaseAddress)
     };
     return new RestClient(httpClient).For<IProtoBufConverterApi>();
 });
