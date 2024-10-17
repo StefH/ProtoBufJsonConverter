@@ -461,7 +461,7 @@ message MyMessage {
         var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
 
         // Assert 2
-        json.Should().Be("""{"val1":0,"val2":42.0,"val3":"Stef","val4":true,"val5":{"fields":{"str":"strValue","bo":false}},"val6":{"values":["test",-42.0]}}""");
+        json.Should().Be("""{"val1":{"null_value":0},"val2":{"number_value":42.0},"val3":{"string_value":"Stef"},"val4":{"bool_value":true},"val5":{"struct_value":{"fields":{"str":{"string_value":"strValue"},"bo":{"bool_value":false}}}},"val6":{"list_value":{"values":[{"string_value":"test"},{"number_value":-42.0}]}}}""");
     }
 
     [Fact]
@@ -493,7 +493,7 @@ message MyMessage {
         var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
 
         // Assert 2
-        json.Should().Be("""{"val":{"fields":{"str":"strValue","bo":false}}}""");
+        json.Should().Be("{\"val\":{\"fields\":{\"str\":{\"string_value\":\"strValue\"},\"bo\":{\"bool_value\":false}}}}");
     }
 
     [Fact]
@@ -525,7 +525,7 @@ message MyMessage {
         var json = await _sut.ConvertAsync(convertToJsonRequest).ConfigureAwait(false);
 
         // Assert 2
-        json.Should().Be("""{"val":{"values":["strValue",99.0]}}""");
+        json.Should().Be("{\"val\":{\"values\":[{\"string_value\":\"strValue\"},{\"number_value\":99.0}]}}");
     }
 
     [Fact]

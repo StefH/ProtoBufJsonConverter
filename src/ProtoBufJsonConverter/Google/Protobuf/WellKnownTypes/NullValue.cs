@@ -7,5 +7,5 @@ namespace Google.Protobuf.WellKnownTypes;
 public enum NullValue
 {
     [ProtoEnum(Name = "NULL_VALUE")]
-    NullValue = 0,
+    NullValue = 0
 }
