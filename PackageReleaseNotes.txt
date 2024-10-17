@@ -1,7 +1,4 @@
-# 0.4.0 (15 October 2024)
-- #18 Add WellKnownTypes [enhancement]
-- #20 Fix logic for Any [bug]
-- #21 Support multiple proto files + add more WellKnownTypes from Google [enhancement]
-- #15 Support 'WellKnown' types like `google.protobuf.Empty` [enhancement]
+# 0.5.0 (17 October 2024)
+- #22 Fix Google.Protobuf.WellKnownTypes.Value [bug]
 
 The full release notes can be found here: https://github.com/StefH/ProtoBufJsonConverter/blob/main/ReleaseNotes.md

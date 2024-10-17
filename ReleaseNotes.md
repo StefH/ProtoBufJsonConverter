@@ -1,3 +1,6 @@
+# 0.5.0 (17 October 2024)
+- [#22](https://github.com/StefH/ProtoBufJsonConverter/pull/22) - Fix Google.Protobuf.WellKnownTypes.Value [bug] contributed by [StefH](https://github.com/StefH)
+
 # 0.4.0 (15 October 2024)
 - [#18](https://github.com/StefH/ProtoBufJsonConverter/pull/18) - Add WellKnownTypes [enhancement] contributed by [StefH](https://github.com/StefH)
 - [#20](https://github.com/StefH/ProtoBufJsonConverter/pull/20) - Fix logic for Any [bug] contributed by [StefH](https://github.com/StefH)
