@@ -90,6 +90,8 @@ import ""google/protobuf/duration.proto"";
 
 service Greeter {
     rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc SayTimestamp (MyMessageTimestamp) returns (MyMessageTimestamp);
+    rpc SayDuration (MyMessageDuration) returns (MyMessageDuration);
 }
 
 message MyMessageTimestamp {
@@ -195,6 +197,36 @@ message MyMessage {
 
         // Assert
         json.Should().Be("""{"name":"stef"}""");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_ConvertTimestampToJsonRequest()
+    {
+        // Arrange
+        var bytes = Convert.FromBase64String("CgkIi/egtQYQuWA=");
+
+        var request = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypes, "MyMessageTimestamp", bytes);
+
+        // Act
+        var json = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        json.Should().Be("""{"ts":{"seconds":1722301323,"nanos":12300}}""");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_NoNewerGoogleWellKnownTypes_ConvertTimestampToJsonRequest()
+    {
+        // Arrange
+        var bytes = Convert.FromBase64String("CgYI/orSuwY=");
+
+        var request = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypes, "MyMessageTimestamp", bytes, supportNewerGoogleWellKnownTypes: false);
+
+        // Act
+        var json = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        json.Should().Be("""{"ts":"2024-12-31T23:59:58Z"}""");
     }
 
     [Theory]
@@ -318,13 +350,19 @@ message MyMessage {
     }
 
     [Fact]
-    public async Task ConvertAsync_WellKnownTypesTimeStamp_ConvertObjectToProtoBufRequest()
+    public async Task ConvertAsync_WellKnownTypesTimestamp_ConvertObjectToProtoBufRequest()
     {
         // Arrange
         const string messageType = "MyMessageTimestamp";
 
-        var datetime = new DateTime(2024, 7, 30, 1, 2, 3);
-        var @object = new { ts = datetime };
+        var @object = new
+        {
+            ts = new
+            {
+                seconds = 1722301323,
+                nanos = 12345
+            }
+        };
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object);
 
@@ -332,7 +370,27 @@ message MyMessage {
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        Convert.ToBase64String(bytes).Should().Be("CgYIi/egtQY=");
+        Convert.ToBase64String(bytes).Should().Be("CgkIi/egtQYQjGA=");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesTimestamp_NoNewerGoogleWellKnownTypes_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageTimestamp";
+
+        var @object = new
+        {
+            ts = new DateTime(2024, 12, 31, 23, 59, 58, DateTimeKind.Utc)
+        };
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object, supportNewerGoogleWellKnownTypes: false);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CgYI/orSuwY=");
     }
 
     [Fact]

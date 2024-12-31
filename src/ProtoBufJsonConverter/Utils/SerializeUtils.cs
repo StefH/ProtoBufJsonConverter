@@ -8,11 +8,9 @@ namespace ProtoBufJsonConverter.Utils;
 
 internal static class SerializeUtils
 {
-    private static readonly WellKnownTypesConverter ProtoMessageConverter = new();
-
     internal static string ConvertObjectToJson(ConvertToProtoBufRequest request)
     {
-        return JsonConvert.SerializeObject(request.Input, ProtoMessageConverter);
+        return JsonConvert.SerializeObject(request.Input, GetWellKnownTypesConverter(request));
     }
 
     internal static string ConvertProtoBufToJson(Assembly assembly, string inputTypeFullName, ConvertToJsonRequest request)
@@ -22,7 +20,7 @@ internal static class SerializeUtils
         return JsonConvert.SerializeObject(value, new JsonSerializerSettings
         {
             Formatting = request.WriteIndented ? Formatting.Indented : Formatting.None,
-            Converters = [ProtoMessageConverter]
+            Converters = [GetWellKnownTypesConverter(request)]
         });
     }
 
@@ -39,17 +37,17 @@ internal static class SerializeUtils
         Assembly assembly,
         string inputTypeFullName,
         string json,
-        bool addGrpcHeader
+        ConvertToProtoBufRequest request
     )
     {
         var type = AssemblyUtils.GetType(assembly, inputTypeFullName);
 
         var instance = JsonConvert.DeserializeObject(json, type, new JsonSerializerSettings
         {
-            Converters = [ProtoMessageConverter]
+            Converters = [GetWellKnownTypesConverter(request)]
         });
 
-        return Serialize(instance, addGrpcHeader);
+        return Serialize(instance, request.AddGrpcHeader);
     }
 
     internal static byte[] Serialize(object? instance, bool addGrpcHeader = false)
@@ -58,5 +56,10 @@ internal static class SerializeUtils
         {
             Serializer.Serialize(memoryStream, instance);
         }, addGrpcHeader);
+    }
+
+    private static WellKnownTypesConverter GetWellKnownTypesConverter(ConvertRequest request)
+    {
+        return new WellKnownTypesConverter(request.SupportNewerGoogleWellKnownTypes);
     }
 }

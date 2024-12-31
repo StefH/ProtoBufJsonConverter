@@ -8,11 +8,41 @@ namespace ProtoBufJsonConverter.Json;
 internal class WellKnownTypesConverter : JsonConverter
 {
     private readonly ExpandoObjectConverter _converter = new();
+    private readonly Func<Type, bool> _isDateTime = t => t == typeof(DateTime) || t == typeof(DateTime?);
+    private readonly bool _supportNewerGoogleWellKnownTypes;
+
+    // Specify whether well-known types should be marked 
+    // with CompatibilityLevel instead of DataFormat.
+
+    /// <summary>
+    /// Constructor for WellKnownTypesConverter.
+    /// </summary>
+    /// <param name="supportNewerGoogleWellKnownTypes">
+    /// Specify whether the well-known types 'google.protobuf.Timestamp' and 'google.protobuf.TimestampDuration' should be serialized to the newer definition.
+    /// See also:
+    /// - https://protobuf.dev/reference/protobuf/google.protobuf/#timestamp
+    /// - https://protobuf.dev/reference/protobuf/google.protobuf/#duration
+    /// </param>
+    internal WellKnownTypesConverter(bool supportNewerGoogleWellKnownTypes)
+    {
+        _supportNewerGoogleWellKnownTypes = supportNewerGoogleWellKnownTypes;
+    }
 
     public override bool CanConvert(Type objectType)
     {
-        // Support Any and NullValue
-        return typeof(IWellKnownType).IsAssignableFrom(objectType) || objectType == typeof(NullValue);
+        // By default, support Any and NullValue
+        var list = new List<Func<Type, bool>>
+        {
+            t => typeof(IWellKnownType).IsAssignableFrom(t),
+            t => t == typeof(NullValue)
+        };
+
+        if (_supportNewerGoogleWellKnownTypes)
+        {
+            list.Add(_isDateTime);
+        }
+
+        return list.Any(f => f(objectType));
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
@@ -55,6 +85,12 @@ internal class WellKnownTypesConverter : JsonConverter
             };
         }
 
+        if (_supportNewerGoogleWellKnownTypes && _isDateTime(objectType))
+        {
+            var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
+            return ParseAsDateTime(expandoObject);
+        }
+
         return null;
     }
 
@@ -69,6 +105,7 @@ internal class WellKnownTypesConverter : JsonConverter
         if (value is Value val)
         {
             writer.WriteStartObject();
+
             if (val.Kind.Is(1))
             {
                 writer.WritePropertyName(Value.FieldNameNullValue);
@@ -150,6 +187,21 @@ internal class WellKnownTypesConverter : JsonConverter
 
             var unwrappedValue = any.GetUnwrappedValue();
             writer.WriteValue(unwrappedValue);
+
+            writer.WriteEndObject();
+        }
+
+        if (_supportNewerGoogleWellKnownTypes && value is DateTime dateTime)
+        {
+            var (seconds, nanos) = DateTimeUtils.ToTimestampValue(dateTime);
+
+            writer.WriteStartObject();
+
+            writer.WritePropertyName(TimestampValue.FieldNameSeconds);
+            writer.WriteValue(seconds);
+
+            writer.WritePropertyName(TimestampValue.FieldNameNanos);
+            writer.WriteValue(nanos);
 
             writer.WriteEndObject();
         }
@@ -241,5 +293,13 @@ internal class WellKnownTypesConverter : JsonConverter
         }
 
         return listValue;
+    }
+
+    private static DateTime ParseAsDateTime(IDictionary<string, object?> expandoObject)
+    {
+        var seconds = TypeUtils.ChangeType(expandoObject[TimestampValue.FieldNameSeconds], 0);
+        var nanos = TypeUtils.ChangeType(expandoObject[TimestampValue.FieldNameNanos], 0);
+
+        return DateTimeUtils.FromTimestampValue(seconds, nanos);
     }
 }

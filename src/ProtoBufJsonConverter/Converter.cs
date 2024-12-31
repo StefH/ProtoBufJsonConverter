@@ -25,7 +25,7 @@ public class Converter : IConverter
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
     private readonly IMetadataReferenceService _metadataReferenceService;
-    private readonly IProtoFileResolver? _globalProtoFileResolver;    
+    private readonly IProtoFileResolver? _globalProtoFileResolver;
 
     /// <summary>
     /// Create a new instance of the Converter.
@@ -82,7 +82,7 @@ public class Converter : IConverter
 
         var json = request.Input as string ?? SerializeUtils.ConvertObjectToJson(request);
 
-        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.AddGrpcHeader);
+        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request);
     }
 
     private async Task<(Assembly Assembly, string inputTypeFullName)> ParseAsync(ConvertRequest request, CancellationToken cancellationToken)
