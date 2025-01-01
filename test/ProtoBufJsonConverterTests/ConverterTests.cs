@@ -45,6 +45,30 @@ message HelloReply {
 }
 ";
 
+    private const string ProtoDefinitionWithCSharpNamespace = @"
+option csharp_namespace = ""Test"";
+
+syntax = ""proto3"";
+
+import ""google/protobuf/empty.proto"";
+
+package greet;
+
+service Greeter {
+    rpc SayHello (HelloRequest) returns(HelloReply);
+
+    rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloReply {
+    string message = 1;
+}
+";
+
     private const string ProtoDefinitionWithDotInPackage = @"
 syntax = ""proto3"";
 
@@ -195,6 +219,36 @@ message MyMessage {
 
         // Assert
         json.Should().Be("""{"name":"stef"}""");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_ConvertToJsonRequest_WithCSharpNamespace()
+    {
+        // Arrange
+        var bytes = Convert.FromBase64String("CgRzdGVm");
+
+        var request = new ConvertToJsonRequest(ProtoDefinitionWithCSharpNamespace, "Test.HelloRequest", bytes);
+
+        // Act
+        var json = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        json.Should().Be("""{"name":"stef"}""");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_ConvertJsonToProtoBufRequest_WithCSharpNamespace()
+    {
+        // Arrange
+        const string messageType = "Test.HelloRequest";
+        const string json = @"{""name"":""stef""}";
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithCSharpNamespace, messageType, json);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CgRzdGVm");
     }
 
     [Theory]
