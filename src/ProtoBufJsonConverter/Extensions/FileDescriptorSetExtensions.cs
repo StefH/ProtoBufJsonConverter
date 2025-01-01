@@ -20,7 +20,7 @@ internal static class FileDescriptorSetExtensions
             typeName = messageType.Substring(lastDotIndex + 1);
         }
 
-        var fileDescriptors = set.Files.Where(f => f.Package == packageName).ToArray();
+        var fileDescriptors = FilterOnPackageName(set.Files, packageName);
         if (fileDescriptors.Length == 0)
         {
             throw new ArgumentException($"The package '{packageName}' is not found in the proto definition(s).");
@@ -62,10 +62,10 @@ internal static class FileDescriptorSetExtensions
                 throw new ArgumentException($"The method '{method}' is not valid.");
         }
 
-        var fileDescriptorProto = set.Files.Find(f => f.Package == packageName);
+        var fileDescriptorProto = FilterOnPackageName(set.Files, packageName).FirstOrDefault();
         if (fileDescriptorProto == null)
         {
-            throw new ArgumentException($"The package '{packageName}' is not found in the proto definition.");
+            throw new ArgumentException($"The package '{packageName}' is not found in the proto definition(s).");
         }
 
         var serviceDescriptorProto = fileDescriptorProto.Services.Find(s => s.Name == serviceName);
@@ -81,5 +81,12 @@ internal static class FileDescriptorSetExtensions
         }
 
         return methodDescriptorProto.InputType.TrimStart('.');
+    }
+
+    private static FileDescriptorProto[] FilterOnPackageName(IReadOnlyList<FileDescriptorProto> files, string packageName)
+    {
+        return files
+            .Where(fd => fd.Package == packageName || fd.Options?.CsharpNamespace == packageName)
+            .ToArray();
     }
 }
