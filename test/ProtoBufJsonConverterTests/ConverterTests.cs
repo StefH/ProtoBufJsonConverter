@@ -253,34 +253,38 @@ message MyMessage {
         Convert.ToBase64String(bytes).Should().Be("CgRzdGVm");
     }
 
-    [Fact]
-    public async Task ConvertAsync_ConvertTimestampToJsonRequest()
+    [Theory]
+    [InlineData("MyMessageTimestamp", """{"ts":{"seconds":1722301323,"nanos":12300}}""")]
+    [InlineData("MyMessageDuration", """{"du":{"seconds":1722301323,"nanos":12300}}""")]
+    public async Task ConvertAsync_ConvertToJsonRequest_ConvertNewerGoogleWellKnownTypesToJsonRequest(string messageType, string expectedJson)
     {
         // Arrange
         var bytes = Convert.FromBase64String("CgkIi/egtQYQuWA=");
 
-        var request = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypes, "MyMessageTimestamp", bytes);
+        var request = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypes, messageType, bytes);
 
         // Act
         var json = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        json.Should().Be("""{"ts":{"seconds":1722301323,"nanos":12300}}""");
+        json.Should().Be(expectedJson);
     }
 
-    [Fact]
-    public async Task ConvertAsync_NoNewerGoogleWellKnownTypes_ConvertTimestampToJsonRequest()
+    [Theory]
+    [InlineData("MyMessageTimestamp", """{"ts":"2024-12-31T23:59:58Z"}""")]
+    [InlineData("MyMessageDuration", """{"du":"20088.23:59:58"}""")]
+    public async Task ConvertAsync_ConvertToJsonRequest_NoNewerGoogleWellKnownTypes_ConvertTimestampToJsonRequest(string messageType, string expectedJson)
     {
         // Arrange
         var bytes = Convert.FromBase64String("CgYI/orSuwY=");
 
-        var request = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypes, "MyMessageTimestamp", bytes, supportNewerGoogleWellKnownTypes: false);
+        var request = new ConvertToJsonRequest(ProtoDefinitionWithWellKnownTypes, messageType, bytes, supportNewerGoogleWellKnownTypes: false);
 
         // Act
         var json = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        json.Should().Be("""{"ts":"2024-12-31T23:59:58Z"}""");
+        json.Should().Be(expectedJson);
     }
 
     [Theory]
@@ -290,8 +294,7 @@ message MyMessage {
     {
         // Arrange
         const string messageType = "greet.HelloRequest";
-
-        const string json = @"{""name"":""stef""}";
+        const string json = """{"name":"stef"}""";
 
         var request = new ConvertToProtoBufRequest(ProtoDefinition, messageType, json, addGrpcHeader);
 
@@ -300,6 +303,21 @@ message MyMessage {
 
         // Assert
         Convert.ToBase64String(bytes).Should().Be(expectedBytes);
+    }
+
+    [Theory]
+    [InlineData("MyMessageTimestamp", """{"ts":{"seconds":1722301323,"nanos":12345}}""")]
+    [InlineData("MyMessageDuration", """{"du":{"seconds":1722301323,"nanos":12345}}""")]
+    public async Task ConvertAsync_ConvertJsonToProtoBufRequest_NewerGoogleWellKnownTypes(string messageType, string json)
+    {
+        // Arrange
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, json);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CgkIi/egtQYQjGA=");
     }
 
     [Theory]

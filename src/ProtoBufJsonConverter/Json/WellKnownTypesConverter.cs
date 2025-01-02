@@ -9,10 +9,8 @@ internal class WellKnownTypesConverter : JsonConverter
 {
     private readonly ExpandoObjectConverter _converter = new();
     private readonly Func<Type, bool> _isDateTime = t => t == typeof(DateTime) || t == typeof(DateTime?);
+    private readonly Func<Type, bool> _isTimeSpan = t => t == typeof(TimeSpan) || t == typeof(TimeSpan?);
     private readonly bool _supportNewerGoogleWellKnownTypes;
-
-    // Specify whether well-known types should be marked 
-    // with CompatibilityLevel instead of DataFormat.
 
     /// <summary>
     /// Constructor for WellKnownTypesConverter.
@@ -30,7 +28,6 @@ internal class WellKnownTypesConverter : JsonConverter
 
     public override bool CanConvert(Type objectType)
     {
-        // By default, support Any and NullValue
         var list = new List<Func<Type, bool>>
         {
             t => typeof(IWellKnownType).IsAssignableFrom(t),
@@ -40,6 +37,7 @@ internal class WellKnownTypesConverter : JsonConverter
         if (_supportNewerGoogleWellKnownTypes)
         {
             list.Add(_isDateTime);
+            list.Add(_isTimeSpan);
         }
 
         return list.Any(f => f(objectType));
@@ -85,10 +83,19 @@ internal class WellKnownTypesConverter : JsonConverter
             };
         }
 
-        if (_supportNewerGoogleWellKnownTypes && _isDateTime(objectType))
+        if (_supportNewerGoogleWellKnownTypes)
         {
-            var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
-            return ParseAsDateTime(expandoObject);
+            if (_isDateTime(objectType))
+            {
+                var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
+                return ParseAsDateTime(expandoObject);
+            }
+
+            if (_isTimeSpan(objectType))
+            {
+                var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
+                return ParseAsTimeSpan(expandoObject);
+            }
         }
 
         return null;
@@ -191,19 +198,37 @@ internal class WellKnownTypesConverter : JsonConverter
             writer.WriteEndObject();
         }
 
-        if (_supportNewerGoogleWellKnownTypes && value is DateTime dateTime)
+        if (_supportNewerGoogleWellKnownTypes)
         {
-            var (seconds, nanos) = DateTimeUtils.ToTimestampValue(dateTime);
+            if (value is DateTime dateTime)
+            {
+                var (seconds, nanos) = DateTimeUtils.ToTimestampValue(dateTime);
 
-            writer.WriteStartObject();
+                writer.WriteStartObject();
 
-            writer.WritePropertyName(TimestampValue.FieldNameSeconds);
-            writer.WriteValue(seconds);
+                writer.WritePropertyName(TimestampValue.FieldNameSeconds);
+                writer.WriteValue(seconds);
 
-            writer.WritePropertyName(TimestampValue.FieldNameNanos);
-            writer.WriteValue(nanos);
+                writer.WritePropertyName(TimestampValue.FieldNameNanos);
+                writer.WriteValue(nanos);
 
-            writer.WriteEndObject();
+                writer.WriteEndObject();
+            }
+
+            if (value is TimeSpan timespan)
+            {
+                var (seconds, nanos) = TimeSpanUtils.ToDurationValue(timespan);
+
+                writer.WriteStartObject();
+
+                writer.WritePropertyName(DurationValue.FieldNameSeconds);
+                writer.WriteValue(seconds);
+
+                writer.WritePropertyName(DurationValue.FieldNameNanos);
+                writer.WriteValue(nanos);
+
+                writer.WriteEndObject();
+            }
         }
     }
 
@@ -301,5 +326,13 @@ internal class WellKnownTypesConverter : JsonConverter
         var nanos = TypeUtils.ChangeType(expandoObject[TimestampValue.FieldNameNanos], 0);
 
         return DateTimeUtils.FromTimestampValue(seconds, nanos);
+    }
+
+    private static TimeSpan ParseAsTimeSpan(IDictionary<string, object?> expandoObject)
+    {
+        var seconds = TypeUtils.ChangeType(expandoObject[DurationValue.FieldNameSeconds], 0);
+        var nanos = TypeUtils.ChangeType(expandoObject[DurationValue.FieldNameNanos], 0);
+
+        return TimeSpanUtils.FromDurationValue(seconds, nanos);
     }
 }
