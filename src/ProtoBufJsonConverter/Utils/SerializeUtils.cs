@@ -52,10 +52,7 @@ internal static class SerializeUtils
 
     internal static byte[] Serialize(object? instance, bool addGrpcHeader = false)
     {
-        return ProtoBufUtils.Serialize(memoryStream =>
-        {
-            Serializer.Serialize(memoryStream, instance);
-        }, addGrpcHeader);
+        return ProtoBufUtils.Serialize(memoryStream => Serializer.Serialize(memoryStream, instance), addGrpcHeader);
     }
 
     private static WellKnownTypesConverter GetWellKnownTypesConverter(ConvertRequest request)
