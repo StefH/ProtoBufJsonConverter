@@ -4,7 +4,7 @@ namespace ProtoBufJsonConverter.Extensions;
 
 internal static class DictionaryExtensions
 {
-    public static async Task<TValue> GetOrAddAsync<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, Task<TValue>> valueFactory)
+    internal static async Task<TValue> GetOrAddAsync<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, Task<TValue>> valueFactory)
     {
         Guard.NotNull(dictionary);
         Guard.NotNull(key);

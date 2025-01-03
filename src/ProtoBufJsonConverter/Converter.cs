@@ -25,7 +25,7 @@ public class Converter : IConverter
     private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
 
     private readonly IMetadataReferenceService _metadataReferenceService;
-    private readonly IProtoFileResolver? _globalProtoFileResolver;    
+    private readonly IProtoFileResolver? _globalProtoFileResolver;
 
     /// <summary>
     /// Create a new instance of the Converter.
@@ -82,7 +82,7 @@ public class Converter : IConverter
 
         var json = request.Input as string ?? SerializeUtils.ConvertObjectToJson(request);
 
-        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request.AddGrpcHeader);
+        return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request);
     }
 
     private async Task<(Assembly Assembly, string inputTypeFullName)> ParseAsync(ConvertRequest request, CancellationToken cancellationToken)
@@ -151,6 +151,14 @@ public class Converter : IConverter
     {
         var files = CSharpCodeGenerator.Default.Generate(set, NameNormalizer.Null, CodeGenerateOptions);
 
-        return files.Select(f => f.Text).ToArray();
+        return files.Select(f => FixCode(f.Text)).ToArray();
+    }
+
+    /// <summary>
+    /// https://github.com/protobuf-net/protobuf-net/issues/1189
+    /// </summary>
+    private static string FixCode(string code)
+    {
+        return code.Replace("public global::ProtoBuf.Empty", "public global::ProtoBuf.WellKnownTypes.Empty");
     }
 }

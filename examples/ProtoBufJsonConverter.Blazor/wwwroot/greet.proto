@@ -3,12 +3,17 @@
 package greet;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/struct.proto";
 
 service Greeter {
-  rpc Nothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
   rpc SayHello (HelloRequest) returns (HelloReply);
+  rpc SayEmpty (MyMessageEmpty) returns (MyMessageEmpty);
+  rpc SayTimestamp (MyMessageTimestamp) returns (MyMessageTimestamp);
+  rpc SayDuration (MyMessageDuration) returns (MyMessageDuration);
   rpc SayOther (Other) returns (HelloReply);
 }
 
@@ -54,4 +59,16 @@ message MyMessageStruct {
 
 message MyMessageListValue {
 	google.protobuf.ListValue val = 1;
+}
+
+message MyMessageTimestamp {
+    google.protobuf.Timestamp ts = 1;
+}
+
+message MyMessageDuration {
+    google.protobuf.Duration du = 1;
+}
+
+message MyMessageEmpty {
+    google.protobuf.Empty e = 1;
 }

@@ -113,6 +113,4 @@ internal static class TypeUrlUtils
 
         return wellKnownTypes;
     }
-
-
 }

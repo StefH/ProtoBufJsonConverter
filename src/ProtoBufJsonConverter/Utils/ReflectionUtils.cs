@@ -7,7 +7,7 @@ namespace ProtoBufJsonConverter.Utils;
 
 internal static class ReflectionUtils
 {
-    internal static bool TryFindGenericType(Type type, out Type? genericType)
+    internal static bool TryFindGenericType(Type type, [NotNullWhen(true)] out Type? genericType)
     {
         var wellKnownTypeInterface = type
             .GetInterfaces()
