@@ -27,13 +27,14 @@ internal static class AssemblyUtils
             typeof(AssemblyUtils).Assembly
         };
     });
+
     private static readonly Lazy<ConcurrentDictionary<string, Type>> AllTypesWithProtoContractAttribute = new(() =>
     {
         var allTypes = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(a => a.GetTypes())
             .ToArray();
         var allTypesWithAttribute = allTypes
-            .Select(t => new 
+            .Select(t => new
             {
                 Type = t,
                 ProtoContractAttribute = t.GetCustomAttribute<ProtoContractAttribute>()
@@ -49,6 +50,7 @@ internal static class AssemblyUtils
 
         return dict;
     });
+
     private static readonly ConcurrentDictionary<string, Type> ExtraTypesFromCompiledCode = new();
 
     internal static async Task<Assembly> CompileCodeToAssemblyAsync(string[] codes, IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
