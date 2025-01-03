@@ -1,3 +1,7 @@
+# 0.6.0 (03 January 2025)
+- [#23](https://github.com/StefH/ProtoBufJsonConverter/pull/23) - Add support for &quot;option csharp_namespace&quot; [bug] contributed by [StefH](https://github.com/StefH)
+- [#24](https://github.com/StefH/ProtoBufJsonConverter/pull/24) - Fix support for newer GoogleWellKnownTypes (Empty, Duration and Timestamp) [bug] contributed by [StefH](https://github.com/StefH)
+
 # 0.5.0 (17 October 2024)
 - [#22](https://github.com/StefH/ProtoBufJsonConverter/pull/22) - Fix Google.Protobuf.WellKnownTypes.Value [bug] contributed by [StefH](https://github.com/StefH)
 
@@ -11,7 +15,7 @@
 - [#11](https://github.com/StefH/ProtoBufJsonConverter/pull/11) - Fix for when proto package name contains dot(s) [bug] contributed by [StefH](https://github.com/StefH)
 - [#10](https://github.com/StefH/ProtoBufJsonConverter/issues/10) - Error when proto package name contains dot(s) [bug]
 
-# 0.2.0 (03 February 2024)
+# 0.2.0 (09 February 2024)
 - [#9](https://github.com/StefH/ProtoBufJsonConverter/pull/9) - MetadataReferenceService.BlazorWasm - WebcilConverterUtil [enhancement] contributed by [StefH](https://github.com/StefH)
 
 # 0.1.0 (06 January 2024)
