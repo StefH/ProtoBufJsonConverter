@@ -151,6 +151,14 @@ public class Converter : IConverter
     {
         var files = CSharpCodeGenerator.Default.Generate(set, NameNormalizer.Null, CodeGenerateOptions);
 
-        return files.Select(f => f.Text).ToArray();
+        return files.Select(f => FixCode(f.Text)).ToArray();
+    }
+
+    /// <summary>
+    /// https://github.com/protobuf-net/protobuf-net/issues/1189
+    /// </summary>
+    private static string FixCode(string code)
+    {
+        return code.Replace("public global::ProtoBuf.Empty", "public global::ProtoBuf.WellKnownTypes.Empty");
     }
 }

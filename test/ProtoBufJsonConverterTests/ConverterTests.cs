@@ -114,6 +114,7 @@ import ""google/protobuf/duration.proto"";
 
 service Greeter {
     rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc SayEmpty (MyMessageEmpty) returns (MyMessageEmpty);
     rpc SayTimestamp (MyMessageTimestamp) returns (MyMessageTimestamp);
     rpc SayDuration (MyMessageDuration) returns (MyMessageDuration);
 }
@@ -124,6 +125,10 @@ message MyMessageTimestamp {
 
 message MyMessageDuration {
     google.protobuf.Duration du = 1;
+}
+
+message MyMessageEmpty {
+    google.protobuf.Empty e = 1;
 }
 ";
 
@@ -392,7 +397,6 @@ message MyMessage {
     {
         // Arrange
         const string messageType = "google.protobuf.Empty";
-
         const string json = "{}";
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, json);
@@ -402,6 +406,41 @@ message MyMessage {
 
         // Assert
         bytes.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesMessageWithEmpty_ConvertJsonToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageEmpty";
+        const string json = "{ \"e\": {} }";
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, json, addGrpcHeader: false);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CgA=");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesMessageWithEmpty_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageEmpty";
+        var @object = new
+        {
+            e = new { }
+        };
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object, addGrpcHeader: false);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CgA=");
     }
 
     [Fact]
