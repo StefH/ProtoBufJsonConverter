@@ -11,6 +11,7 @@ internal class WellKnownTypesConverter : JsonConverter
     private readonly Func<Type, bool> _isDateTime = t => t == typeof(DateTime) || t == typeof(DateTime?);
     private readonly Func<Type, bool> _isTimeSpan = t => t == typeof(TimeSpan) || t == typeof(TimeSpan?);
     private readonly bool _supportNewerGoogleWellKnownTypes;
+    private readonly IList<Func<Type, bool>> _supportedTypes;
 
     /// <summary>
     /// Constructor for WellKnownTypesConverter.
@@ -24,11 +25,8 @@ internal class WellKnownTypesConverter : JsonConverter
     internal WellKnownTypesConverter(bool supportNewerGoogleWellKnownTypes)
     {
         _supportNewerGoogleWellKnownTypes = supportNewerGoogleWellKnownTypes;
-    }
 
-    public override bool CanConvert(Type objectType)
-    {
-        var list = new List<Func<Type, bool>>
+        _supportedTypes = new List<Func<Type, bool>>
         {
             t => typeof(IWellKnownType).IsAssignableFrom(t),
             t => t == typeof(NullValue)
@@ -36,11 +34,14 @@ internal class WellKnownTypesConverter : JsonConverter
 
         if (_supportNewerGoogleWellKnownTypes)
         {
-            list.Add(_isDateTime);
-            list.Add(_isTimeSpan);
+            _supportedTypes.Add(_isDateTime);
+            _supportedTypes.Add(_isTimeSpan);
         }
+    }
 
-        return list.Any(f => f(objectType));
+    public override bool CanConvert(Type objectType)
+    {
+        return _supportedTypes.Any(f => f(objectType));
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
