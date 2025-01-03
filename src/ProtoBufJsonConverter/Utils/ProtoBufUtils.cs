@@ -50,10 +50,17 @@ internal static class ProtoBufUtils
 
         var bytes = memoryStream.ToArray();
 
-        if (bytes.Length > 0 && addGrpcHeader)
+        if (addGrpcHeader)
         {
             var length = bytes.Length - HeaderSize;
-            WriteHeader(bytes, length);
+            if (length > 0)
+            {
+                WriteHeader(bytes, length);
+                return bytes;
+            }
+
+            // Just return empty header
+            return new byte[HeaderSize];
         }
 
         return bytes;

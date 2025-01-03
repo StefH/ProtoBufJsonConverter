@@ -399,13 +399,13 @@ message MyMessage {
         const string messageType = "google.protobuf.Empty";
         const string json = "{}";
 
-        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, json);
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, json, addGrpcHeader: true);
 
         // Act
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        bytes.Should().BeEmpty();
+        Convert.ToBase64String(bytes).Should().Be("AAAAAAA=");
     }
 
     [Fact]
