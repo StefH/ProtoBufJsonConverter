@@ -209,7 +209,6 @@ public partial class Home
 
 For a full example, see [examples/ProtoBufJsonConverter.Blazor](https://github.com/StefH/ProtoBufJsonConverter/tree/main/examples/ProtoBufJsonConverter.Blazor).
 
-
 ### :six: Get information about the package names, message types and C# namespaces
 #### Code
 ``` csharp
