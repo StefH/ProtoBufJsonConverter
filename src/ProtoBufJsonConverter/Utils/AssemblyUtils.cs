@@ -1,12 +1,14 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Google.Protobuf.WellKnownTypes;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
 using ProtoBuf.WellKnownTypes;
+using ProtoBufJsonConverter.Extensions;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -30,14 +32,30 @@ internal static class AssemblyUtils
 
     private static readonly Lazy<ConcurrentDictionary<string, Type>> AllTypesWithProtoContractAttribute = new(() =>
     {
-        var allTypes = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(a => a.GetTypes())
-            .ToArray();
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+        var allTypes = new List<Type>();
+        foreach (var assembly in assemblies)
+        {
+            try
+            {
+                allTypes.AddRange(assembly.GetTypes());
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                allTypes.AddRange(ex.Types.Where(t => t != null));
+            }
+            catch (Exception)
+            {
+                // Ignore
+            }
+        }
+
         var allTypesWithAttribute = allTypes
             .Select(t => new
             {
                 Type = t,
-                ProtoContractAttribute = t.GetCustomAttribute<ProtoContractAttribute>()
+                ProtoContractAttribute = t.TryGetCustomAttribute<ProtoContractAttribute>(out var attribute) ? attribute : null
             })
             .Where(t => t.ProtoContractAttribute != null)
             .ToArray();
@@ -99,20 +117,13 @@ internal static class AssemblyUtils
         return assembly;
     }
 
-    private static void Add(ConcurrentDictionary<string, Type> dict, Type type, string? name)
-    {
-        if (!string.IsNullOrEmpty(name))
-        {
-            dict.TryAdd(name!.TrimStart('.'), type);
-        }
-        else
-        {
-            dict.TryAdd(type.FullName!, type);
-        }
-    }
-
     internal static bool TryGetType(string name, [NotNullWhen(true)] out Type? type)
     {
+        if (TryGetGoogleWellKnownType(name, out type))
+        {
+            return true;
+        }
+
         if (ExtraTypesFromCompiledCode.TryGetValue(name, out type))
         {
             return true;
@@ -127,6 +138,64 @@ internal static class AssemblyUtils
         return false;
     }
 
+    internal static bool TryGetType(Assembly assembly, string inputTypeFullName, [NotNullWhen(true)] out Type? type)
+    {
+        if (TryGetGoogleWellKnownType(inputTypeFullName, out type))
+        {
+            return true;
+        }
+
+        type = assembly.GetType(inputTypeFullName);
+        return type != null;
+    }
+
+    internal static Type GetType(Assembly assembly, string inputTypeFullName)
+    {
+        return TryGetType(assembly, inputTypeFullName, out var type) ? type : throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.");
+    }
+
+    internal static bool TryGetGoogleWellKnownType(string inputTypeFullName, [NotNullWhen(true)] out Type? type)
+    {
+        type = inputTypeFullName switch
+        {
+            "google.protobuf.Any" => typeof(Any),
+            "google.protobuf.BoolValue" => typeof(BoolValue),
+            "google.protobuf.ByteString" => typeof(ByteString),
+            "google.protobuf.BytesValue" => typeof(BytesValue),
+            "google.protobuf.DoubleValue" => typeof(DoubleValue),
+            "google.protobuf.Duration" => typeof(Duration),
+            "google.protobuf.DurationValue" => typeof(DurationValue),
+            "google.protobuf.Empty" => typeof(Empty),
+            "google.protobuf.FloatValue" => typeof(FloatValue),
+            "google.protobuf.Int32Value" => typeof(Int32Value),
+            "google.protobuf.Int64Value" => typeof(Int64Value),
+            "google.protobuf.ListValue" => typeof(ListValue),
+            "google.protobuf.NullValue" => typeof(NullValue),
+            "google.protobuf.StringValue" => typeof(StringValue),
+            "google.protobuf.Struct" => typeof(Struct),
+            "google.protobuf.Timestamp" => typeof(Timestamp),
+            "google.protobuf.TimestampValue" => typeof(TimestampValue),
+            "google.protobuf.UInt32Value" => typeof(UInt32Value),
+            "google.protobuf.UInt64Value" => typeof(UInt64Value),
+            "google.protobuf.Value" => typeof(Value),
+            _ => null
+        };
+
+        return type != null;
+    }
+
+    private static void Add(ConcurrentDictionary<string, Type> dict, Type type, string? name)
+    {
+        if (!string.IsNullOrEmpty(name))
+        {
+            dict.TryAdd(name!.TrimStart('.'), type);
+        }
+        else
+        {
+            dict.TryAdd(type.FullName!, type);
+        }
+    }
+
     private static async Task<IReadOnlyList<MetadataReference>> CreateMetadataReferencesAsync(IMetadataReferenceService metadataReferenceService, CancellationToken cancellationToken)
     {
         var requiredAssemblies = RequiredAssemblies.Value.ToList();
@@ -137,16 +206,5 @@ internal static class AssemblyUtils
         }
 
         return references;
-    }
-
-    internal static Type GetType(Assembly assembly, string inputTypeFullName)
-    {
-        return inputTypeFullName switch
-        {
-            "google.protobuf.Empty" => typeof(Empty),
-            "google.protobuf.Duration" => typeof(Duration),
-            "google.protobuf.Timestamp" => typeof(Timestamp),
-            _ => assembly.GetType(inputTypeFullName) ?? throw new ArgumentException($"The type '{inputTypeFullName}' is not found in the assembly.")
-        };
     }
 }

@@ -1,7 +1,7 @@
 using Google.Protobuf.WellKnownTypes;
-using Google.Protobuf.WellKnownTypes.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using ProtoBufJsonConverter.Extensions;
 using ProtoBufJsonConverter.Utils;
 
 namespace ProtoBufJsonConverter.Converters;
@@ -29,7 +29,7 @@ internal class WellKnownTypesConverter : JsonConverter
 
         _supportedTypes = new List<Func<Type, bool>>
         {
-            t => typeof(IWellKnownType).IsAssignableFrom(t),
+            t => t.IsWellKnownType(),
             t => t == typeof(NullValue)
         };
 

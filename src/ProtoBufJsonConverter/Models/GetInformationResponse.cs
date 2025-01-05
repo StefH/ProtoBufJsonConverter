@@ -6,5 +6,5 @@ public record GetInformationResponse
 
     public required string[] CSharpNamespaces { get; init; }
 
-    public required string[] MessageTypes { get; init; }
+    public required IReadOnlyDictionary<string, Type> MessageTypes { get; init; }
 }

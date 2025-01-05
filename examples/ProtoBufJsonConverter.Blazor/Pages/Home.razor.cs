@@ -1,5 +1,4 @@
-﻿using Blazorise;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using ProtoBufJsonConverter.Blazor.Enums;
 using ProtoBufJsonConverter.Models;
 
@@ -48,7 +47,7 @@ public partial class Home
             try
             {
                 var information = await Converter.GetInformationAsync(informationRequest);
-                _messageTypes = information.MessageTypes;
+                _messageTypes = information.MessageTypes.Keys.ToArray();
                 _messageType = _messageTypes.FirstOrDefault() ?? string.Empty;
 
                 _state = State.Done;

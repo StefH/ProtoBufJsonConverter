@@ -89,11 +89,22 @@ public class Converter : IConverter
     {
         var data = await GetCachedFileDescriptorSetAsync(request.ProtoDefinition, request.ProtoFileResolver, cancellationToken).ConfigureAwait(false);
 
+        var messageTypes = data.Set.GetMessageTypes()
+            .ToDictionary(messageType => messageType, messageType =>
+            {
+                if (AssemblyUtils.TryGetType(data.Assembly, messageType, out var type))
+                {
+                    return type;
+                }
+                
+                throw new InvalidOperationException($"The type '{messageType}' is not found in the assembly.");
+            });
+
         return new GetInformationResponse
         {
             PackageNames = data.Set.GetPackageNames(),
             CSharpNamespaces = data.Set.GetCSharpNamespaces(),
-            MessageTypes = data.Set.GetMessageTypes()
+            MessageTypes = messageTypes
         };
     }
 
