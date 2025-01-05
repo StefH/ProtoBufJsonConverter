@@ -102,7 +102,7 @@ internal static class TypeUrlUtils
     {
         var types = typeof(IWellKnownType).Assembly
             .GetTypes()
-            .Where(t => t.IsIWellKnownType());
+            .Where(t => t.IsWellKnownType());
 
         var wellKnownTypes = new Dictionary<string, Type>();
         foreach (var type in types)
