@@ -43,7 +43,7 @@ internal static class AssemblyUtils
             }
             catch (ReflectionTypeLoadException ex)
             {
-                allTypes.AddRange(ex.Types.Where(t => t != null));
+                allTypes.AddRange(ex.Types.OfType<Type>());
             }
             catch (Exception)
             {
@@ -158,13 +158,31 @@ internal static class AssemblyUtils
     {
         type = inputTypeFullName switch
         {
+            "Google.Protobuf.WellKnownTypes.Any" => typeof(Any),
+            "Google.Protobuf.WellKnownTypes.BoolValue" => typeof(BoolValue),
+            "Google.Protobuf.WellKnownTypes.ByteString" => typeof(ByteString),
+            "Google.Protobuf.WellKnownTypes.BytesValue" => typeof(BytesValue),
+            "Google.Protobuf.WellKnownTypes.DoubleValue" => typeof(DoubleValue),
+            "Google.Protobuf.WellKnownTypes.Duration" => typeof(Duration),
+            "Google.Protobuf.WellKnownTypes.Empty" => typeof(Empty),
+            "Google.Protobuf.WellKnownTypes.FloatValue" => typeof(FloatValue),
+            "Google.Protobuf.WellKnownTypes.Int32Value" => typeof(Int32Value),
+            "Google.Protobuf.WellKnownTypes.Int64Value" => typeof(Int64Value),
+            "Google.Protobuf.WellKnownTypes.ListValue" => typeof(ListValue),
+            "Google.Protobuf.WellKnownTypes.NullValue" => typeof(NullValue),
+            "Google.Protobuf.WellKnownTypes.StringValue" => typeof(StringValue),
+            "Google.Protobuf.WellKnownTypes.Struct" => typeof(Struct),
+            "Google.Protobuf.WellKnownTypes.Timestamp" => typeof(Timestamp),
+            "Google.Protobuf.WellKnownTypes.UInt32Value" => typeof(UInt32Value),
+            "Google.Protobuf.WellKnownTypes.UInt64Value" => typeof(UInt64Value),
+            "Google.Protobuf.WellKnownTypes.Value" => typeof(Value),
+
             "google.protobuf.Any" => typeof(Any),
             "google.protobuf.BoolValue" => typeof(BoolValue),
             "google.protobuf.ByteString" => typeof(ByteString),
             "google.protobuf.BytesValue" => typeof(BytesValue),
             "google.protobuf.DoubleValue" => typeof(DoubleValue),
             "google.protobuf.Duration" => typeof(Duration),
-            "google.protobuf.DurationValue" => typeof(DurationValue),
             "google.protobuf.Empty" => typeof(Empty),
             "google.protobuf.FloatValue" => typeof(FloatValue),
             "google.protobuf.Int32Value" => typeof(Int32Value),
@@ -174,10 +192,10 @@ internal static class AssemblyUtils
             "google.protobuf.StringValue" => typeof(StringValue),
             "google.protobuf.Struct" => typeof(Struct),
             "google.protobuf.Timestamp" => typeof(Timestamp),
-            "google.protobuf.TimestampValue" => typeof(TimestampValue),
             "google.protobuf.UInt32Value" => typeof(UInt32Value),
             "google.protobuf.UInt64Value" => typeof(UInt64Value),
             "google.protobuf.Value" => typeof(Value),
+
             _ => null
         };
 
@@ -188,7 +206,7 @@ internal static class AssemblyUtils
     {
         if (!string.IsNullOrEmpty(name))
         {
-            dict.TryAdd(name!.TrimStart('.'), type);
+            dict.TryAdd(name.TrimStart('.'), type);
         }
         else
         {

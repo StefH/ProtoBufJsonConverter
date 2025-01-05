@@ -85,6 +85,7 @@ public class Converter : IConverter
         return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request);
     }
 
+    /// <inheritdoc />
     public async Task<GetInformationResponse> GetInformationAsync(GetInformationRequest request, CancellationToken cancellationToken = default)
     {
         var data = await GetCachedFileDescriptorSetAsync(request.ProtoDefinition, request.ProtoFileResolver, cancellationToken).ConfigureAwait(false);

@@ -13,7 +13,7 @@ internal static class MemberInfoExtensions
             attribute = memberInfo.GetCustomAttribute<T>();
             return attribute != null;
         }
-        catch (Exception e)
+        catch
         {
             attribute = null;
             return false;

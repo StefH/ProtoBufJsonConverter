@@ -17,7 +17,7 @@ public partial class ConverterTests
         // Assert
         response.PackageNames.Should().Equal("google.protobuf", "greet");
         response.CSharpNamespaces.Should().Equal("Google.Protobuf.WellKnownTypes", "Test");
-        response.MessageTypes.Should().Equal("google.protobuf.Empty", "greet.HelloReply", "greet.HelloRequest", "greet.MyMessageEmpty");
+        response.MessageTypes.Keys.Should().Equal("Google.Protobuf.WellKnownTypes.Empty", "Test.HelloReply", "Test.HelloRequest", "Test.MyMessageEmpty");
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public partial class ConverterTests
         // Assert
         response.PackageNames.Should().Equal("google.protobuf");
         response.CSharpNamespaces.Should().Equal("Google.Protobuf.WellKnownTypes");
-        response.MessageTypes.Should().Equal("google.protobuf.Duration", "google.protobuf.Empty", "google.protobuf.Timestamp", "MyMessageDuration", "MyMessageEmpty", "MyMessageTimestamp");
+        response.MessageTypes.Keys.Should().Equal("Google.Protobuf.WellKnownTypes.Duration", "Google.Protobuf.WellKnownTypes.Empty", "Google.Protobuf.WellKnownTypes.Timestamp", "MyMessageDuration", "MyMessageEmpty", "MyMessageTimestamp");
     }
 
     [Fact]
@@ -48,20 +48,20 @@ public partial class ConverterTests
         response.PackageNames.Should().Equal("google.protobuf");
         response.CSharpNamespaces.Should().Equal("Google.Protobuf.WellKnownTypes");
 
-        response.MessageTypes.Should().Equal(
-            "google.protobuf.Any",
-            "google.protobuf.BoolValue", 
-            "google.protobuf.BytesValue", 
-            "google.protobuf.DoubleValue", 
-            "google.protobuf.FloatValue", 
-            "google.protobuf.Int32Value", 
-            "google.protobuf.Int64Value", 
-            "google.protobuf.ListValue",
-            "google.protobuf.StringValue",
-            "google.protobuf.Struct",
-            "google.protobuf.UInt32Value",
-            "google.protobuf.UInt64Value",
-            "google.protobuf.Value",
+        response.MessageTypes.Keys.Should().Equal(
+            "Google.Protobuf.WellKnownTypes.Any",
+            "Google.Protobuf.WellKnownTypes.BoolValue", 
+            "Google.Protobuf.WellKnownTypes.BytesValue", 
+            "Google.Protobuf.WellKnownTypes.DoubleValue", 
+            "Google.Protobuf.WellKnownTypes.FloatValue", 
+            "Google.Protobuf.WellKnownTypes.Int32Value", 
+            "Google.Protobuf.WellKnownTypes.Int64Value", 
+            "Google.Protobuf.WellKnownTypes.ListValue",
+            "Google.Protobuf.WellKnownTypes.StringValue",
+            "Google.Protobuf.WellKnownTypes.Struct",
+            "Google.Protobuf.WellKnownTypes.UInt32Value",
+            "Google.Protobuf.WellKnownTypes.UInt64Value",
+            "Google.Protobuf.WellKnownTypes.Value",
             "MyMessageAny", 
             "MyMessageInt32Value", 
             "MyMessageInt64Value", 

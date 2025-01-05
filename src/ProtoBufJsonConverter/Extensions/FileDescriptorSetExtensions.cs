@@ -61,10 +61,15 @@ internal static class FileDescriptorSetExtensions
     internal static string[] GetMessageTypes(this FileDescriptorSet set)
     {
         return set.Files
-            .SelectMany(fd => fd.MessageTypes.Select(mt => BuildFullMessageType(fd.Package, mt.Name)))
+            .SelectMany(fd => fd.MessageTypes.Select(mt => BuildFullMessageType(fd.GetPackageName(), mt.Name)))
             .Distinct()
             .OrderBy(x => x)
             .ToArray();
+    }
+
+    internal static string GetPackageName(this FileDescriptorProto fd)
+    {
+        return fd.Options?.CsharpNamespace ?? fd.Package;
     }
 
     internal static string GetInputTypeFromServiceMethod(this FileDescriptorSet set, string method)
