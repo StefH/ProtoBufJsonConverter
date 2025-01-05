@@ -17,7 +17,7 @@ public partial class ConverterTests
         // Assert
         response.PackageNames.Should().Equal("google.protobuf", "greet");
         response.CSharpNamespaces.Should().Equal("Google.Protobuf.WellKnownTypes", "Test");
-        response.MessageTypes.Should().Equal("Empty", "HelloReply", "HelloRequest", "MyMessageEmpty");
+        response.MessageTypes.Should().Equal("google.protobuf.Empty", "greet.HelloReply", "greet.HelloRequest", "greet.MyMessageEmpty");
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public partial class ConverterTests
         // Assert
         response.PackageNames.Should().Equal("google.protobuf");
         response.CSharpNamespaces.Should().Equal("Google.Protobuf.WellKnownTypes");
-        response.MessageTypes.Should().Equal("Duration", "Empty", "MyMessageDuration", "MyMessageEmpty", "MyMessageTimestamp", "Timestamp");
+        response.MessageTypes.Should().Equal("google.protobuf.Duration", "google.protobuf.Empty", "google.protobuf.Timestamp", "MyMessageDuration", "MyMessageEmpty", "MyMessageTimestamp");
     }
 
     [Fact]
@@ -49,14 +49,19 @@ public partial class ConverterTests
         response.CSharpNamespaces.Should().Equal("Google.Protobuf.WellKnownTypes");
 
         response.MessageTypes.Should().Equal(
-            "Any", 
-            "BoolValue", 
-            "BytesValue", 
-            "DoubleValue", 
-            "FloatValue", 
-            "Int32Value", 
-            "Int64Value", 
-            "ListValue", 
+            "google.protobuf.Any",
+            "google.protobuf.BoolValue", 
+            "google.protobuf.BytesValue", 
+            "google.protobuf.DoubleValue", 
+            "google.protobuf.FloatValue", 
+            "google.protobuf.Int32Value", 
+            "google.protobuf.Int64Value", 
+            "google.protobuf.ListValue",
+            "google.protobuf.StringValue",
+            "google.protobuf.Struct",
+            "google.protobuf.UInt32Value",
+            "google.protobuf.UInt64Value",
+            "google.protobuf.Value",
             "MyMessageAny", 
             "MyMessageInt32Value", 
             "MyMessageInt64Value", 
@@ -64,11 +69,6 @@ public partial class ConverterTests
             "MyMessageNullValue", 
             "MyMessageStringValue", 
             "MyMessageStruct", 
-            "MyMessageValue", 
-            "StringValue", 
-            "Struct", 
-            "UInt32Value", 
-            "UInt64Value", 
-            "Value");
+            "MyMessageValue");
     }
 }

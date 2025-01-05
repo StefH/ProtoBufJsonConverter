@@ -61,7 +61,7 @@ internal static class FileDescriptorSetExtensions
     internal static string[] GetMessageTypes(this FileDescriptorSet set)
     {
         return set.Files
-            .SelectMany(fd => fd.MessageTypes.Select(mt => mt.Name))
+            .SelectMany(fd => fd.MessageTypes.Select(mt => BuildFullMessageType(fd.Package, mt.Name)))
             .Distinct()
             .OrderBy(x => x)
             .ToArray();
@@ -111,6 +111,11 @@ internal static class FileDescriptorSetExtensions
         }
 
         return methodDescriptorProto.InputType.TrimStart('.');
+    }
+
+    private static string BuildFullMessageType(string? packageName, string typeName)
+    {
+        return string.IsNullOrEmpty(packageName) ? typeName : $"{packageName}.{typeName}";
     }
 
     private static FileDescriptorProto[] FilterOnPackageName(IReadOnlyList<FileDescriptorProto> files, string packageName)

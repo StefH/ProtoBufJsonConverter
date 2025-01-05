@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazorise;
+using Microsoft.AspNetCore.Components;
 using ProtoBufJsonConverter.Blazor.Enums;
 using ProtoBufJsonConverter.Models;
 
@@ -15,7 +16,8 @@ public partial class Home
     private State _state = State.None;
     private string _error = string.Empty;
     private string _protoDefinition = string.Empty;
-    private string _messageType = "greet.HelloRequest";
+    private string _messageType = string.Empty;
+    private string[] _messageTypes = [];
     private ConvertType _selectedConvertType = ConvertType.ToJson;
     private string _protobufAsBase64 = "CgRzdGVm";
     private string _protobufAsByteArray = "new byte[] { 0x0A, 0x04, 0x73, 0x74, 0x65, 0x66 }";
@@ -28,6 +30,11 @@ public partial class Home
     protected override async Task OnInitializedAsync()
     {
         _protoDefinition = await Client.GetStringAsync("greet.proto");
+
+        var informationRequest = new GetInformationRequest(_protoDefinition);
+
+        var information = await Converter.GetInformationAsync(informationRequest);
+        _messageTypes = information.MessageTypes;
 
         await base.OnInitializedAsync();
     }

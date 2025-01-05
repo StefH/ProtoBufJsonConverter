@@ -28,8 +28,13 @@
 
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is1">Message Type</FieldLabel>
-            <FieldBody ColumnSize="ColumnSize.Is11">
-                <TextEdit @bind-Text="@_messageType" />
+            <FieldBody ColumnSize="ColumnSize.Is2">
+                <Select @bind-SelectedValue="@_messageType">
+                    @foreach (var messageType in _messageTypes)
+                    {
+                        <SelectItem Value="@messageType">@messageType</SelectItem>
+                    }
+                </Select>
             </FieldBody>
         </Field>
 
