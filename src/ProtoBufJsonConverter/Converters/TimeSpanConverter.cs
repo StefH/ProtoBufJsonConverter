@@ -1,6 +1,6 @@
-namespace ProtoBufJsonConverter.Utils;
+namespace ProtoBufJsonConverter.Converters;
 
-internal static class TimeSpanUtils
+internal static class TimeSpanConverter
 {
     internal static (long Seconds, int Nanos) ToDurationValue(TimeSpan timeSpan)
     {

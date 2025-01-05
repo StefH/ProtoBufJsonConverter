@@ -5,7 +5,7 @@ using ProtoBufJsonConverter.Models;
 
 namespace ProtoBufJsonConverterTests;
 
-public class ConverterTests
+public partial class ConverterTests
 {
     private const string ProtoDefinitionNoPackage = @"
 syntax = ""proto3"";
@@ -56,7 +56,7 @@ package greet;
 
 service Greeter {
     rpc SayHello (HelloRequest) returns(HelloReply);
-
+    rpc SayEmpty (MyMessageEmpty) returns (MyMessageEmpty);
     rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
@@ -66,6 +66,10 @@ message HelloRequest {
 
 message HelloReply {
     string message = 1;
+}
+
+message MyMessageEmpty {
+    google.protobuf.Empty e = 1;
 }
 ";
 

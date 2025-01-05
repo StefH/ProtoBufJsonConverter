@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using Google.Protobuf.WellKnownTypes.Interfaces;
+using ProtoBuf;
 
 // ReSharper disable once CheckNamespace
 namespace Google.Protobuf.WellKnownTypes;

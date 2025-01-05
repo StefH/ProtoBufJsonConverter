@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Google.Protobuf.WellKnownTypes;
+using Google.Protobuf.WellKnownTypes.Interfaces;
 using ProtoBuf;
+using ProtoBufJsonConverter.Extensions;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Utils;
@@ -100,7 +102,7 @@ internal static class TypeUrlUtils
     {
         var types = typeof(IWellKnownType).Assembly
             .GetTypes()
-            .Where(type => typeof(IWellKnownType).IsAssignableFrom(type) || type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IWellKnownType<>)));
+            .Where(t => t.IsIWellKnownType());
 
         var wellKnownTypes = new Dictionary<string, Type>();
         foreach (var type in types)

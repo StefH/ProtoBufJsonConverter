@@ -1,6 +1,6 @@
-﻿namespace ProtoBufJsonConverter.Utils;
+﻿namespace ProtoBufJsonConverter.Converters;
 
-internal static class DateTimeUtils
+internal static class DateTimeConverter
 {
     internal static (long Seconds, int Nanos) ToTimestampValue(DateTime dateTime)
     {

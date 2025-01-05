@@ -27,4 +27,12 @@ public interface IConverter
     /// <param name="cancellationToken">(Optional) A token to monitor for cancellation requests.</param>
     /// <returns>A byte array representing the serialized object in ProtoBuf format.</returns>
     public Task<byte[]> ConvertAsync(ConvertToProtoBufRequest request, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the information about the .proto-definition.
+    /// </summary>
+    /// <param name="request">The request</param>
+    /// <param name="cancellationToken">(Optional) A token to monitor for cancellation requests.</param>
+    /// <returns><see cref="GetInformationResponse"/></returns>
+    public Task<GetInformationResponse> GetInformationAsync(GetInformationRequest request, CancellationToken cancellationToken = default);
 }

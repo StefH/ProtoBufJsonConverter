@@ -1,9 +1,10 @@
 using Google.Protobuf.WellKnownTypes;
+using Google.Protobuf.WellKnownTypes.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ProtoBufJsonConverter.Utils;
 
-namespace ProtoBufJsonConverter.Json;
+namespace ProtoBufJsonConverter.Converters;
 
 internal class WellKnownTypesConverter : JsonConverter
 {
@@ -203,7 +204,7 @@ internal class WellKnownTypesConverter : JsonConverter
         {
             if (value is DateTime dateTime)
             {
-                var (seconds, nanos) = DateTimeUtils.ToTimestampValue(dateTime);
+                var (seconds, nanos) = DateTimeConverter.ToTimestampValue(dateTime);
 
                 writer.WriteStartObject();
 
@@ -218,7 +219,7 @@ internal class WellKnownTypesConverter : JsonConverter
 
             if (value is TimeSpan timespan)
             {
-                var (seconds, nanos) = TimeSpanUtils.ToDurationValue(timespan);
+                var (seconds, nanos) = TimeSpanConverter.ToDurationValue(timespan);
 
                 writer.WriteStartObject();
 
@@ -326,7 +327,7 @@ internal class WellKnownTypesConverter : JsonConverter
         var seconds = TypeUtils.ChangeType(expandoObject[TimestampValue.FieldNameSeconds], 0);
         var nanos = TypeUtils.ChangeType(expandoObject[TimestampValue.FieldNameNanos], 0);
 
-        return DateTimeUtils.FromTimestampValue(seconds, nanos);
+        return DateTimeConverter.FromTimestampValue(seconds, nanos);
     }
 
     private static TimeSpan ParseAsTimeSpan(IDictionary<string, object?> expandoObject)
@@ -334,6 +335,6 @@ internal class WellKnownTypesConverter : JsonConverter
         var seconds = TypeUtils.ChangeType(expandoObject[DurationValue.FieldNameSeconds], 0);
         var nanos = TypeUtils.ChangeType(expandoObject[DurationValue.FieldNameNanos], 0);
 
-        return TimeSpanUtils.FromDurationValue(seconds, nanos);
+        return TimeSpanConverter.FromDurationValue(seconds, nanos);
     }
 }
