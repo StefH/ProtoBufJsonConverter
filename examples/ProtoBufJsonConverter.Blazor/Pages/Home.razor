@@ -16,7 +16,8 @@
             <FieldLabel ColumnSize="ColumnSize.Is1">ProtoDefinition</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is4">
                 <CodeMirror6Wrapper IsWASM=true
-                                    @bind-Doc=@_protoDefinition
+                                    Doc=@_protoDefinition
+                                    DocChanged=@OnProtoDefinitionChanged
                                     Theme=theme
                                     Language=@CodeMirrorLanguage.ProtoBuf
                                     AllowHorizontalResize=false
@@ -29,7 +30,7 @@
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is1">Message Type</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is2">
-                <Select @bind-SelectedValue="@_messageType">
+                <Select @bind-SelectedValue="@_messageType" Disabled="@IsProcessing">
                     @foreach (var messageType in _messageTypes)
                     {
                         <SelectItem Value="@messageType">@messageType</SelectItem>

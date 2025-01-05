@@ -31,12 +31,41 @@ public partial class Home
     {
         _protoDefinition = await Client.GetStringAsync("greet.proto");
 
-        var informationRequest = new GetInformationRequest(_protoDefinition);
-
-        var information = await Converter.GetInformationAsync(informationRequest);
-        _messageTypes = information.MessageTypes;
+        await OnProtoDefinitionChanged(_protoDefinition);
 
         await base.OnInitializedAsync();
+    }
+
+    private async Task OnProtoDefinitionChanged(string? document)
+    {
+        if (!string.IsNullOrEmpty(document))
+        {
+            var informationRequest = new GetInformationRequest(document);
+
+            _error = string.Empty;
+            _state = State.Processing;
+
+            try
+            {
+                var information = await Converter.GetInformationAsync(informationRequest);
+                _messageTypes = information.MessageTypes;
+                _messageType = _messageTypes.FirstOrDefault() ?? string.Empty;
+
+                _state = State.Done;
+            }
+            catch (Exception ex)
+            {
+                _messageTypes = [];
+                _messageType = string.Empty;
+
+                _error = ex.Message;
+                _state = State.Error;
+            }
+            finally
+            {
+                StateHasChanged();
+            }
+        }
     }
 
     private async Task OnClick()
