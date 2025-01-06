@@ -246,9 +246,9 @@ internal class WellKnownTypesConverter : JsonConverter
     private static void WriteTimestampOrDuration(JsonWriter writer, long seconds, int nanos)
     {
         writer.WriteStartObject();
-        writer.WritePropertyName("seconds");
+        writer.WritePropertyName("Seconds");
         writer.WriteValue(seconds);
-        writer.WritePropertyName("nanos");
+        writer.WritePropertyName("Nanos");
         writer.WriteValue(nanos);
         writer.WriteEndObject();
     }
@@ -334,8 +334,8 @@ internal class WellKnownTypesConverter : JsonConverter
 
     private static T ParseAsDateTimeOrTimespan<T>(IDictionary<string, object?> expandoObject, Func<long,int, T> func)
     {
-        var seconds = TypeUtils.ChangeType(expandoObject["seconds"], (long)0);
-        var nanos = TypeUtils.ChangeType(expandoObject["nanos"], 0);
+        var seconds = TypeUtils.ChangeType(expandoObject["Seconds"], (long)0);
+        var nanos = TypeUtils.ChangeType(expandoObject["Nanos"], 0);
 
         return func(seconds, nanos);
     }

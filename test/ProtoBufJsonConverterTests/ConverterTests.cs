@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Google.Protobuf.WellKnownTypes;
-using ProtoBuf.WellKnownTypes;
 using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
 
@@ -264,8 +263,8 @@ message MyMessage {
     }
 
     [Theory]
-    [InlineData("MyMessageTimestamp", """{"ts":{"seconds":1722301323,"nanos":12300}}""")]
-    [InlineData("MyMessageDuration", """{"du":{"seconds":1722301323,"nanos":12300}}""")]
+    [InlineData("MyMessageTimestamp", """{"ts":{"Seconds":1722301323,"Nanos":12300}}""")]
+    [InlineData("MyMessageDuration", """{"du":{"Seconds":1722301323,"Nanos":12300}}""")]
     public async Task ConvertAsync_ConvertToJsonRequest_ConvertNewerGoogleWellKnownTypesToJsonRequest(string messageType, string expectedJson)
     {
         // Arrange
@@ -316,8 +315,8 @@ message MyMessage {
     }
 
     [Theory]
-    [InlineData("MyMessageTimestamp", """{"ts":{"seconds":1722301323,"nanos":12345}}""")]
-    [InlineData("MyMessageDuration", """{"du":{"seconds":1722301323,"nanos":12345}}""")]
+    [InlineData("MyMessageTimestamp", """{"Ts":{"Seconds":1722301323,"Nanos":12345}}""")]
+    [InlineData("MyMessageDuration", """{"du":{"Seconds":1722301323,"Nanos":12345}}""")]
     public async Task ConvertAsync_ConvertJsonToProtoBufRequest_NewerGoogleWellKnownTypes(string messageType, string json)
     {
         // Arrange
@@ -473,7 +472,11 @@ message MyMessage {
 
         var @object = new
         {
-            ts = new Timestamp(1722301323, 12345)
+            ts = new
+            {
+                Seconds = 1722301323,
+                Nanos = 12345
+            }
         };
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object);
@@ -493,7 +496,7 @@ message MyMessage {
 
         var @object = new
         {
-            ts = new DateTime(2024, 12, 31, 23, 59, 58, DateTimeKind.Utc)
+            ts = "2024-12-31T23:59:58Z"
         };
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object, supportNewerGoogleWellKnownTypes: false);
@@ -511,8 +514,14 @@ message MyMessage {
         // Arrange
         const string messageType = "MyMessageDuration";
 
-        var timespan = new TimeSpan(1, 2, 3, 4, 5, 6);
-        var @object = new { du = timespan };
+        var @object = new
+        {
+            du = new
+            {
+                Seconds = 10000,
+                Nanos = 12345
+            }
+        };
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object);
 
@@ -520,7 +529,27 @@ message MyMessage {
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        Convert.ToBase64String(bytes).Should().Be("CgkI2NwFELDFsQI=");
+        Convert.ToBase64String(bytes).Should().Be("CgYIkE4QjGA=");
+    }
+
+    [Fact]
+    public async Task ConvertAsync_WellKnownTypesDuration_NoNewerGoogleWellKnownTypes_ConvertObjectToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "MyMessageDuration";
+
+        var @object = new
+        {
+            du = "20088.23:59:58"
+        };
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object, supportNewerGoogleWellKnownTypes: false);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CgYI/orSuwY=");
     }
 
     [Theory]
