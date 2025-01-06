@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Google.Protobuf.WellKnownTypes;
+using ProtoBuf.WellKnownTypes;
 using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Models;
 
@@ -472,11 +473,7 @@ message MyMessage {
 
         var @object = new
         {
-            ts = new
-            {
-                seconds = 1722301323,
-                nanos = 12345
-            }
+            ts = new Timestamp(1722301323, 12345)
         };
 
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, @object);
