@@ -319,7 +319,7 @@ internal class WellKnownTypesConverter : JsonConverter
 
     private static DateTime ParseAsDateTime(IDictionary<string, object?> expandoObject)
     {
-        var seconds = TypeUtils.ChangeType(expandoObject["seconds"], 0);
+        var seconds = TypeUtils.ChangeType(expandoObject["seconds"], (long)0);
         var nanos = TypeUtils.ChangeType(expandoObject["nanos"], 0);
 
         return new Timestamp(seconds, nanos);
@@ -327,7 +327,7 @@ internal class WellKnownTypesConverter : JsonConverter
 
     private static TimeSpan ParseAsTimeSpan(IDictionary<string, object?> expandoObject)
     {
-        var seconds = TypeUtils.ChangeType(expandoObject["seconds"], 0);
+        var seconds = TypeUtils.ChangeType(expandoObject["seconds"], (long)0);
         var nanos = TypeUtils.ChangeType(expandoObject["nanos"], 0);
 
         return new Duration(seconds, nanos);
