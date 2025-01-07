@@ -240,15 +240,16 @@ internal class WellKnownTypesConverter : JsonConverter
     /// </summary>
     private IDictionary<string, object?> ReadAsExpandoObject(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
-        return (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
+        var dictionary = (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
+        return new Dictionary<string, object?>(dictionary, StringComparer.OrdinalIgnoreCase);
     }
 
     private static void WriteTimestampOrDuration(JsonWriter writer, long seconds, int nanos)
     {
         writer.WriteStartObject();
-        writer.WritePropertyName("Seconds");
+        writer.WritePropertyName("seconds");
         writer.WriteValue(seconds);
-        writer.WritePropertyName("Nanos");
+        writer.WritePropertyName("nanos");
         writer.WriteValue(nanos);
         writer.WriteEndObject();
     }
@@ -334,8 +335,8 @@ internal class WellKnownTypesConverter : JsonConverter
 
     private static T ParseAsDateTimeOrTimespan<T>(IDictionary<string, object?> expandoObject, Func<long,int, T> func)
     {
-        var seconds = TypeUtils.ChangeType(expandoObject["Seconds"], (long)0);
-        var nanos = TypeUtils.ChangeType(expandoObject["Nanos"], 0);
+        var seconds = TypeUtils.ChangeType(expandoObject["seconds"], (long)0);
+        var nanos = TypeUtils.ChangeType(expandoObject["nanos"], 0);
 
         return func(seconds, nanos);
     }

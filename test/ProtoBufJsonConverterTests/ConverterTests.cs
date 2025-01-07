@@ -263,8 +263,8 @@ message MyMessage {
     }
 
     [Theory]
-    [InlineData("MyMessageTimestamp", """{"ts":{"Seconds":1722301323,"Nanos":12300}}""")]
-    [InlineData("MyMessageDuration", """{"du":{"Seconds":1722301323,"Nanos":12300}}""")]
+    [InlineData("MyMessageTimestamp", """{"ts":{"seconds":1722301323,"nanos":12300}}""")]
+    [InlineData("MyMessageDuration", """{"du":{"seconds":1722301323,"nanos":12300}}""")]
     public async Task ConvertAsync_ConvertToJsonRequest_ConvertNewerGoogleWellKnownTypesToJsonRequest(string messageType, string expectedJson)
     {
         // Arrange
@@ -316,7 +316,9 @@ message MyMessage {
 
     [Theory]
     [InlineData("MyMessageTimestamp", """{"Ts":{"Seconds":1722301323,"Nanos":12345}}""")]
-    [InlineData("MyMessageDuration", """{"du":{"Seconds":1722301323,"Nanos":12345}}""")]
+    [InlineData("MyMessageDuration", """{"Du":{"Seconds":1722301323,"Nanos":12345}}""")]
+    [InlineData("MyMessageTimestamp", """{"ts":{"seconds":1722301323,"nanos":12345}}""")]
+    [InlineData("MyMessageDuration", """{"du":{"seconds":1722301323,"nanos":12345}}""")]
     public async Task ConvertAsync_ConvertJsonToProtoBufRequest_NewerGoogleWellKnownTypes(string messageType, string json)
     {
         // Arrange
