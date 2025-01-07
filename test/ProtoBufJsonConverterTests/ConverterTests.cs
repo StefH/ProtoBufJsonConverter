@@ -398,20 +398,22 @@ message MyMessage {
         json.Should().Be(text);
     }
 
-    [Fact]
-    public async Task ConvertAsync_WellKnownTypesEmpty_ConvertJsonToProtoBufRequest()
+    [Theory]
+    [InlineData(true, "AAAAAAA=")]
+    [InlineData(false, "")]
+    public async Task ConvertAsync_WellKnownTypesEmpty_ConvertJsonToProtoBufRequest(bool addGrpcHeader, string expected)
     {
         // Arrange
         const string messageType = "google.protobuf.Empty";
         const string json = "{}";
 
-        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, json, addGrpcHeader: true);
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypes, messageType, json, addGrpcHeader: addGrpcHeader);
 
         // Act
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        Convert.ToBase64String(bytes).Should().Be("AAAAAAA=");
+        Convert.ToBase64String(bytes).Should().Be(expected);
     }
 
     [Fact]

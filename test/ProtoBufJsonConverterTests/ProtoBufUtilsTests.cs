@@ -1,5 +1,3 @@
-using System.Buffers.Binary;
-using System.Text;
 using FluentAssertions;
 using ProtoBufJsonConverter.Utils;
 
@@ -39,7 +37,7 @@ public class ProtoBufUtilsTests
         }, addGrpcHeader: true);
 
         // Assert
-        result.Should().ContainInOrder(0x00, 0x00, 0x00, 0x00, 0x03, 0x10, 0x20, 0x30);
+        result.Should().Equal(0x00, 0x00, 0x00, 0x00, 0x03, 0x10, 0x20, 0x30);
     }
 
     [Fact]
@@ -56,7 +54,7 @@ public class ProtoBufUtilsTests
 
         // Assert
         result.Length.Should().Be(data.Length);
-        result.Should().BeEquivalentTo(data);
+        result.Should().Equal(data);
     }
 
     [Fact]
@@ -76,6 +74,6 @@ public class ProtoBufUtilsTests
         var result = ProtoBufUtils.Serialize(_ => { }, addGrpcHeader: true);
 
         // Assert
-        result.Should().ContainInOrder(0x00, 0x00, 0x00, 0x00, 0x00);
+        result.Should().Equal(0x00, 0x00, 0x00, 0x00, 0x00);
     }
 }
