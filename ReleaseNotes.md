@@ -1,3 +1,6 @@
+# 0.7.0 (08 January 2025)
+- [#25](https://github.com/StefH/ProtoBufJsonConverter/pull/25) - Add GetInformation method + fix Timestamp and Duration [enhancement] contributed by [StefH](https://github.com/StefH)
+
 # 0.6.0 (03 January 2025)
 - [#23](https://github.com/StefH/ProtoBufJsonConverter/pull/23) - Add support for &quot;option csharp_namespace&quot; [bug] contributed by [StefH](https://github.com/StefH)
 - [#24](https://github.com/StefH/ProtoBufJsonConverter/pull/24) - Fix support for newer GoogleWellKnownTypes (Empty, Duration and Timestamp) [bug] contributed by [StefH](https://github.com/StefH)
