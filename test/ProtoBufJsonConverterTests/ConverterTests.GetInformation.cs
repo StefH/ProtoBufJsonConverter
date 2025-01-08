@@ -47,7 +47,6 @@ public partial class ConverterTests
         // Assert
         response.PackageNames.Should().Equal("google.protobuf");
         response.CSharpNamespaces.Should().Equal("Google.Protobuf.WellKnownTypes");
-
         response.MessageTypes.Keys.Should().Equal(
             "Google.Protobuf.WellKnownTypes.Any",
             "Google.Protobuf.WellKnownTypes.BoolValue",
