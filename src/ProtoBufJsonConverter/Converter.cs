@@ -85,6 +85,30 @@ public class Converter : IConverter
         return SerializeUtils.DeserializeJsonAndConvertToProtoBuf(assembly, inputTypeFullName, json, request);
     }
 
+    /// <inheritdoc />
+    public async Task<GetInformationResponse> GetInformationAsync(GetInformationRequest request, CancellationToken cancellationToken = default)
+    {
+        var data = await GetCachedFileDescriptorSetAsync(request.ProtoDefinition, request.ProtoFileResolver, cancellationToken).ConfigureAwait(false);
+
+        var messageTypes = data.Set.GetMessageTypes()
+            .ToDictionary(messageType => messageType, messageType =>
+            {
+                if (AssemblyUtils.TryGetType(data.Assembly, messageType, out var type))
+                {
+                    return type;
+                }
+                
+                throw new InvalidOperationException($"The type '{messageType}' is not found in the assembly.");
+            });
+
+        return new GetInformationResponse
+        {
+            PackageNames = data.Set.GetPackageNames(),
+            CSharpNamespaces = data.Set.GetCSharpNamespaces(),
+            MessageTypes = messageTypes
+        };
+    }
+
     private async Task<(Assembly Assembly, string inputTypeFullName)> ParseAsync(ConvertRequest request, CancellationToken cancellationToken)
     {
         var data = await GetCachedFileDescriptorSetAsync(request.ProtoDefinition, request.ProtoFileResolver, cancellationToken).ConfigureAwait(false);
@@ -106,7 +130,7 @@ public class Converter : IConverter
     private async Task<Data> GetDataAsync(int key, string protoDefinition, IProtoFileResolver? protoFileResolver, CancellationToken cancellationToken)
     {
         var set = new FileDescriptorSet();
-        set.Add($"{key}.proto", true, new StringReader(protoDefinition));
+        set.Add($"ProtoBufJsonConverter_{key}.proto", true, new StringReader(protoDefinition));
 
         IDependencyAwareFileSystem dependencyAwareFileSystem;
         if (protoFileResolver != null)

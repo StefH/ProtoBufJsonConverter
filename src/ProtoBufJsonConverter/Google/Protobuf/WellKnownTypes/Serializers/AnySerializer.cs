@@ -2,7 +2,7 @@
 using ProtoBuf.Serializers;
 
 // ReSharper disable once CheckNamespace
-namespace Google.Protobuf.WellKnownTypes;
+namespace Google.Protobuf.WellKnownTypes.Serializers;
 
 internal class AnySerializer : ISerializer<Any>
 {
@@ -31,7 +31,6 @@ internal class AnySerializer : ISerializer<Any>
 
         return any;
     }
-
 
     void ISerializer<Any>.Write(ref ProtoWriter.State state, Any any)
     {

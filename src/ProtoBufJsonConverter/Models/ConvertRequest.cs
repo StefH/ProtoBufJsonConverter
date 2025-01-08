@@ -2,13 +2,9 @@
 
 namespace ProtoBufJsonConverter.Models;
 
-public abstract class ConvertRequest
+public abstract class ConvertRequest : Request
 {
-    public string ProtoDefinition { get; }
-
     public string MessageType { get; }
-
-    public IProtoFileResolver? ProtoFileResolver { get; protected set; }
 
     /// <summary>
     /// Specifies whether the well-known types 'google.protobuf.Timestamp' and 'google.protobuf.TimestampDuration' should be serialized to the newer definition.
@@ -29,11 +25,9 @@ public abstract class ConvertRequest
     ///
     /// Default value is <c>true</c>.
     /// </param>
-    protected ConvertRequest(string protoDefinition, string messageType, IProtoFileResolver? protoFileResolver, bool supportNewerGoogleWellKnownTypes = true)
+    protected ConvertRequest(string protoDefinition, string messageType, IProtoFileResolver? protoFileResolver, bool supportNewerGoogleWellKnownTypes = true) : base(protoDefinition, protoFileResolver)
     {
-        ProtoDefinition = Guard.NotNullOrWhiteSpace(protoDefinition);
         MessageType = Guard.NotNullOrWhiteSpace(messageType);
-        ProtoFileResolver = protoFileResolver;
         SupportNewerGoogleWellKnownTypes = supportNewerGoogleWellKnownTypes;
     }
 }

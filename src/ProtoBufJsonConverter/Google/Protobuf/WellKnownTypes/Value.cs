@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Google.Protobuf.WellKnownTypes.Interfaces;
 using ProtoBuf;
 
 // ReSharper disable once CheckNamespace
@@ -64,7 +65,7 @@ public class Value : IWellKnownType
     [ProtoMember(2, Name = FieldNameNumberValue)]
     public double NumberValue
     {
-        get => _kind.Is(2) ? _kind.Double : default;
+        get => _kind.Is(2) ? _kind.Double : 0;
         set => _kind = new DiscriminatedUnion64Object(2, value);
     }
     public bool ShouldSerializeNumberValue() => _kind.Is(2);
@@ -83,7 +84,7 @@ public class Value : IWellKnownType
     [ProtoMember(4, Name = FieldNameBoolValue)]
     public bool BoolValue
     {
-        get => _kind.Is(4) ? _kind.Boolean : default;
+        get => _kind.Is(4) && _kind.Boolean;
         set => _kind = new DiscriminatedUnion64Object(4, value);
     }
     public bool ShouldSerializeBoolValue() => _kind.Is(4);

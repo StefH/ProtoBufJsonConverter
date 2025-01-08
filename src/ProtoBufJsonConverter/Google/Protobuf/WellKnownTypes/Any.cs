@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Google.Protobuf.WellKnownTypes.Interfaces;
+using Google.Protobuf.WellKnownTypes.Serializers;
 using ProtoBuf;
 using ProtoBufJsonConverter.Utils;
 using Stef.Validation;

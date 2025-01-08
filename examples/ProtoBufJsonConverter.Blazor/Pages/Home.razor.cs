@@ -15,7 +15,8 @@ public partial class Home
     private State _state = State.None;
     private string _error = string.Empty;
     private string _protoDefinition = string.Empty;
-    private string _messageType = "greet.HelloRequest";
+    private string _messageType = string.Empty;
+    private string[] _messageTypes = [];
     private ConvertType _selectedConvertType = ConvertType.ToJson;
     private string _protobufAsBase64 = "CgRzdGVm";
     private string _protobufAsByteArray = "new byte[] { 0x0A, 0x04, 0x73, 0x74, 0x65, 0x66 }";
@@ -29,7 +30,41 @@ public partial class Home
     {
         _protoDefinition = await Client.GetStringAsync("greet.proto");
 
+        await OnProtoDefinitionChanged(_protoDefinition);
+
         await base.OnInitializedAsync();
+    }
+
+    private async Task OnProtoDefinitionChanged(string? document)
+    {
+        if (!string.IsNullOrEmpty(document))
+        {
+            var informationRequest = new GetInformationRequest(document);
+
+            _error = string.Empty;
+            _state = State.Processing;
+
+            try
+            {
+                var information = await Converter.GetInformationAsync(informationRequest);
+                _messageTypes = information.MessageTypes.Keys.ToArray();
+                _messageType = _messageTypes.FirstOrDefault() ?? string.Empty;
+
+                _state = State.Done;
+            }
+            catch (Exception ex)
+            {
+                _messageTypes = [];
+                _messageType = string.Empty;
+
+                _error = ex.Message;
+                _state = State.Error;
+            }
+            finally
+            {
+                StateHasChanged();
+            }
+        }
     }
 
     private async Task OnClick()

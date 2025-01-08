@@ -37,6 +37,41 @@ internal static class FileDescriptorSetExtensions
         return messageType;
     }
 
+    internal static string[] GetPackageNames(this FileDescriptorSet set)
+    {
+        return set.Files
+            .Select(fd => fd.Package)
+            .Where(n => !string.IsNullOrEmpty(n))
+            .Distinct()
+            .OrderBy(x => x)
+            .ToArray();
+    }
+
+    internal static string[] GetCSharpNamespaces(this FileDescriptorSet set)
+    {
+        return set.Files
+            .Select(fd => fd.Options?.CsharpNamespace)
+            .Where(ns => !string.IsNullOrEmpty(ns))
+            .OfType<string>()
+            .Distinct()
+            .OrderBy(x => x)
+            .ToArray();
+    }
+
+    internal static string[] GetMessageTypes(this FileDescriptorSet set)
+    {
+        return set.Files
+            .SelectMany(fd => fd.MessageTypes.Select(mt => BuildFullMessageType(fd.GetPackageName(), mt.Name)))
+            .Distinct()
+            .OrderBy(x => x)
+            .ToArray();
+    }
+
+    internal static string GetPackageName(this FileDescriptorProto fd)
+    {
+        return fd.Options?.CsharpNamespace ?? fd.Package;
+    }
+
     internal static string GetInputTypeFromServiceMethod(this FileDescriptorSet set, string method)
     {
         var parts = method.Split('.');
@@ -81,6 +116,11 @@ internal static class FileDescriptorSetExtensions
         }
 
         return methodDescriptorProto.InputType.TrimStart('.');
+    }
+
+    private static string BuildFullMessageType(string? packageName, string typeName)
+    {
+        return string.IsNullOrEmpty(packageName) ? typeName : $"{packageName}.{typeName}";
     }
 
     private static FileDescriptorProto[] FilterOnPackageName(IReadOnlyList<FileDescriptorProto> files, string packageName)

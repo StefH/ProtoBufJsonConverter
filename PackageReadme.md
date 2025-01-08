@@ -4,6 +4,7 @@
 - Convert a protobuf message to a JSON string using the proto definition file.
 - Convert a protobuf message to an object using the proto definition file.
 - Convert a JSON string or an object to a protobuf message using the proto definition file.
+- Get information about the package names, message types and C# namespaces in the proto definition file.
 
 ## Usage
 
@@ -178,8 +179,27 @@ public partial class Home
 
 For a full example, see [examples/ProtoBufJsonConverter.Blazor](https://github.com/StefH/ProtoBufJsonConverter/tree/main/examples/ProtoBufJsonConverter.Blazor).
 
+### :six: Get information about the package names, message types and C# namespaces
+#### Code
+``` csharp
+var protoDefinition = "...". // See above
+
+var request = new GetInformationRequest(protoDefinition);
+
+var response = await _sut.GetInformationAsync(request);
+var packageNames = response.PackageNames;
+var messageTypes = response.MessageTypes;
+var namespaces = response.CSharpNamespaces;
+```
+
 ---
 
-## Examples
+## :computer: Examples
 - [Blazor WASM](https://protobuf.heyenrath.nl)
 - [Blazor Static Web App](https://zealous-desert-029b2f003.4.azurestaticapps.net/)
+
+
+## :books: Resources
+- [protogen](https://protogen.marcgravell.com)
+- [protobufpal](https://www.protobufpal.com)
+- [protobuf-decoder](https://protobuf-decoder.netlify.app)
