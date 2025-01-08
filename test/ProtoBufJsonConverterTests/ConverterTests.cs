@@ -66,6 +66,12 @@ message HelloRequest {
 
 message HelloReply {
     string message = 1;
+    enum Phone {
+		Unknown = 0;
+        Mobile = 1;
+        Home = 2;
+	}
+    Phone phone = 2;
 }
 
 message MyMessageEmpty {
@@ -251,15 +257,15 @@ message MyMessage {
     public async Task ConvertAsync_ConvertJsonToProtoBufRequest_WithCSharpNamespace()
     {
         // Arrange
-        const string messageType = "Test.HelloRequest";
-        const string json = @"{""name"":""stef""}";
+        const string messageType = "Test.HelloReply";
+        const string json = """{"message":"stef", "phone": 1}""";
         var request = new ConvertToProtoBufRequest(ProtoDefinitionWithCSharpNamespace, messageType, json);
 
         // Act
         var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
 
         // Assert
-        Convert.ToBase64String(bytes).Should().Be("CgRzdGVm");
+        Convert.ToBase64String(bytes).Should().Be("CgRzdGVmEAE=");
     }
 
     [Theory]
