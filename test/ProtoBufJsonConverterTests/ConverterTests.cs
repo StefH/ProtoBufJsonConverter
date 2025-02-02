@@ -149,6 +149,10 @@ import ""google/protobuf/wrappers.proto"";
 import ""google/protobuf/any.proto"";
 import ""google/protobuf/struct.proto"";
 
+message HelloRequest {
+    string name = 1;
+}
+
 message MyMessageStringValue {
     google.protobuf.StringValue val = 1;
 }
@@ -745,11 +749,13 @@ message MyMessage {
 
         var any1 = Any.Pack(new StringValue { Value = "stef" });
         var any2 = Any.Pack(new Int32Value { Value = int.MaxValue });
+        var any3 = Any.Pack(new HelloRequest { name = "my-name" });
 
         var @object = new
         {
             val1 = any1,
-            val2 = any2
+            val2 = any2,
+            val3 = any3
         };
         var convertToProtoBufRequest = new ConvertToProtoBufRequest(ProtoDefinitionWithWellKnownTypesFromGoogle, messageType, @object);
 

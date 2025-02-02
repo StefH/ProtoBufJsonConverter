@@ -61,6 +61,7 @@ public partial class ConverterTests
             "Google.Protobuf.WellKnownTypes.UInt32Value",
             "Google.Protobuf.WellKnownTypes.UInt64Value",
             "Google.Protobuf.WellKnownTypes.Value",
+            "HelloRequest",
             "MyMessageAny",
             "MyMessageInt32Value",
             "MyMessageInt64Value",
