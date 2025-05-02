@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Xml.Linq;
 using Google.Protobuf.WellKnownTypes;
 using Google.Protobuf.WellKnownTypes.Interfaces;
 using ProtoBuf;
@@ -60,42 +62,38 @@ internal static class TypeUrlUtils
 
             if (string.IsNullOrEmpty(name))
             {
-                name = type.FullName;
+                name = type.Name;
             }
 
-            return $"{TypeGoogleApisComPrefix}/{name!.TrimStart('.')}";
+            return !string.IsNullOrEmpty(type.Namespace) ? $"{type.Namespace}/{name}" : name;
         }
 
-        return $"{TypeGoogleApisComPrefix}/{type.FullName}";
+        return !string.IsNullOrEmpty(type.Namespace) ? $"{type.Namespace}/{type.Name}" : type.Name;
     }
 
     internal static bool TryGetTypeFromTypeUrl(string typeUrl, [NotNullWhen(true)] out Type? type)
     {
         Guard.NotNull(typeUrl);
 
-        if (typeUrl.StartsWith(TypeGoogleApisComPrefix) && typeUrl.Contains('/'))
+        //if (typeUrl.StartsWith(TypeGoogleApisComPrefix) && typeUrl.Contains('/'))
+
+        var typeName = typeUrl.Contains('/') ? typeUrl.Split('/').Last() : typeUrl;
+
+        // First try the WellKnownTypes
+        if (WellKnownTypes.Value.TryGetValue(typeName, out type))
         {
-            var typeName = typeUrl.Split('/').Last();
-
-            // First try the WellKnownTypes
-            if (WellKnownTypes.Value.TryGetValue(typeName, out type))
-            {
-                return true;
-            }
-
-            // Else try to find the type in the generated protobuf assemblies or if not found, search all types.
-            if (AssemblyUtils.TryGetType(typeName, out type))
-            {
-                return true;
-            }
-
-            // Try to get the type based on the fully qualified name
-            type = Type.GetType(typeName);
-            return type != null;
+            return true;
         }
 
-        type = null;
-        return false;
+        // Else try to find the type in the generated protobuf assemblies or if not found, search all types.
+        if (AssemblyUtils.TryGetType(typeName, out type))
+        {
+            return true;
+        }
+
+        // Try to get the type based on the fully qualified name
+        type = Type.GetType(typeName);
+        return type != null;
     }
 
     private static Dictionary<string, Type> InitializeWellKnownTypes()
