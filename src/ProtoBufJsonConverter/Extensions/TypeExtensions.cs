@@ -1,4 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes.Interfaces;
+﻿using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Interfaces;
 
 namespace ProtoBufJsonConverter.Extensions;
 

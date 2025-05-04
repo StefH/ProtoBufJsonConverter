@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.27.3" />
     <PackageReference Include="ProtoBufJsonConverter" Version="0.8.0-preview-01" />
+    <!--<PackageReference Include="ProtoBufJsonConverter" Version="0.8.0-preview-01" />-->
   </ItemGroup>
 
   <ItemGroup>

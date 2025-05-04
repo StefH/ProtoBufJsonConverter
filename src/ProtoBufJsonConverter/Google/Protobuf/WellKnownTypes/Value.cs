@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
-using Google.Protobuf.WellKnownTypes.Interfaces;
 using ProtoBuf;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Interfaces;
 
-// ReSharper disable once CheckNamespace
-namespace Google.Protobuf.WellKnownTypes;
+namespace ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
 
 [ProtoContract(Name = ".google.protobuf.Value", Origin = "google/protobuf/struct.proto")]
 public class Value : IWellKnownType

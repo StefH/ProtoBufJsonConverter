@@ -1,8 +1,8 @@
-using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ProtoBuf.WellKnownTypes;
 using ProtoBufJsonConverter.Extensions;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
 using ProtoBufJsonConverter.Utils;
 
 namespace ProtoBufJsonConverter.Converters;

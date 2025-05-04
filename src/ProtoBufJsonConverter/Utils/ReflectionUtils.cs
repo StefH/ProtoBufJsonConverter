@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Google.Protobuf.WellKnownTypes.Interfaces;
 using ProtoBuf;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Interfaces;
 
 namespace ProtoBufJsonConverter.Utils;
 

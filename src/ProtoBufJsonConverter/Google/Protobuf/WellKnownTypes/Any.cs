@@ -1,12 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Google.Protobuf.WellKnownTypes.Interfaces;
-using Google.Protobuf.WellKnownTypes.Serializers;
 using ProtoBuf;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Interfaces;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Serializers;
 using ProtoBufJsonConverter.Utils;
 using Stef.Validation;
 
-// ReSharper disable once CheckNamespace
-namespace Google.Protobuf.WellKnownTypes;
+namespace ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
 
 /// <summary>
 /// This Any class contains an arbitrary serialized protocol buffer message along with a URL that describes the type of the serialized message.

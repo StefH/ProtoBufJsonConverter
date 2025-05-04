@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Google.Protobuf.WellKnownTypes;
-using Google.Protobuf.WellKnownTypes.Interfaces;
 using ProtoBuf;
 using ProtoBufJsonConverter.Extensions;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Interfaces;
 using Stef.Validation;
 
 namespace ProtoBufJsonConverter.Utils;
