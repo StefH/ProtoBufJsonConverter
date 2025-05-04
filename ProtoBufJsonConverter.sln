@@ -65,6 +65,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub Actions", "GitHub Ac
 		.github\workflows\CreateRelease.yml = .github\workflows\CreateRelease.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppGoogleProtobufNuGet", "examples\ConsoleAppGoogleProtobufNuGet\ConsoleAppGoogleProtobufNuGet.csproj", "{732A4440-64DB-733E-2E5C-E3C1123C6227}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -149,6 +151,12 @@ Global
 		{EBA6EFF6-AC4B-4D78-A92C-5C9309D88B3A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EBA6EFF6-AC4B-4D78-A92C-5C9309D88B3A}.VS|Any CPU.ActiveCfg = Debug|Any CPU
 		{EBA6EFF6-AC4B-4D78-A92C-5C9309D88B3A}.VS|Any CPU.Build.0 = Debug|Any CPU
+		{732A4440-64DB-733E-2E5C-E3C1123C6227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{732A4440-64DB-733E-2E5C-E3C1123C6227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{732A4440-64DB-733E-2E5C-E3C1123C6227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{732A4440-64DB-733E-2E5C-E3C1123C6227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{732A4440-64DB-733E-2E5C-E3C1123C6227}.VS|Any CPU.ActiveCfg = Debug|Any CPU
+		{732A4440-64DB-733E-2E5C-E3C1123C6227}.VS|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,6 +176,7 @@ Global
 		{F873B159-D977-45BA-9CE4-882FB0B806CC} = {CEFF40B4-4435-408E-B0B9-F93903A8B470}
 		{EBA6EFF6-AC4B-4D78-A92C-5C9309D88B3A} = {6F341AD1-BB1C-4CCF-91B7-F55688619CEE}
 		{0A5EC1F9-7985-4428-B2C8-645FE2C28694} = {6A9880FB-CAF7-4373-8877-3EFA092736C0}
+		{732A4440-64DB-733E-2E5C-E3C1123C6227} = {6F341AD1-BB1C-4CCF-91B7-F55688619CEE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {45F31459-D6F5-441C-890A-F02A1328053D}
