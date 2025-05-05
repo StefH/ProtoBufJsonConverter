@@ -48,7 +48,7 @@ public partial class Home
             {
                 var information = await Converter.GetInformationAsync(informationRequest);
                 _messageTypes = information.MessageTypes.Keys.ToArray();
-                _messageType = _messageTypes.FirstOrDefault() ?? string.Empty;
+                _messageType = _messageTypes.FirstOrDefault(mt => mt == "greet.HelloRequest") ?? _messageTypes.FirstOrDefault() ?? string.Empty;
 
                 _state = State.Done;
             }

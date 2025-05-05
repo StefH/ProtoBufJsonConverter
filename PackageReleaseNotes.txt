@@ -1,4 +1,4 @@
-# 0.7.0 (08 January 2025)
-- #25 Add GetInformation method + fix Timestamp and Duration [enhancement]
+# 0.8.0 (05 May 2025)
+- #26 Use ILRepack to make protobuf-net.Reflection internal [enhancement]
 
 The full release notes can be found here: https://github.com/StefH/ProtoBufJsonConverter/blob/main/ReleaseNotes.md

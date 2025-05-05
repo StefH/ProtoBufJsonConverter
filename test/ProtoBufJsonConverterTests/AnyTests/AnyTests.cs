@@ -3,7 +3,7 @@ using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverterTests.AnyTests;
 
-public partial class AnyTests
+public class AnyTests
 {
     [Fact]
     public void PackAndUnpack_StringValue()
