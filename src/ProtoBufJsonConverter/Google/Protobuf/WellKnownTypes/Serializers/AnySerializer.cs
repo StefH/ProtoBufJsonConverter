@@ -1,8 +1,7 @@
 ﻿using ProtoBuf;
 using ProtoBuf.Serializers;
 
-// ReSharper disable once CheckNamespace
-namespace Google.Protobuf.WellKnownTypes.Serializers;
+namespace ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Serializers;
 
 internal class AnySerializer : ISerializer<Any>
 {

@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Google.Protobuf.WellKnownTypes;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverterTests.AnyTests;
 

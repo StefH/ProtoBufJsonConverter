@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Google.Protobuf.WellKnownTypes;
 using ProtoBufJsonConverter;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
 using ProtoBufJsonConverter.Models;
 
 namespace ProtoBufJsonConverterTests;

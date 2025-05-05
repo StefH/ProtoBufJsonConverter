@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Google.Protobuf.WellKnownTypes;
 using MetadataReferenceService.Abstractions;
 using MetadataReferenceService.Abstractions.Types;
 using Microsoft.CodeAnalysis;
@@ -9,6 +8,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using ProtoBuf;
 using ProtoBuf.WellKnownTypes;
 using ProtoBufJsonConverter.Extensions;
+using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
 
 namespace ProtoBufJsonConverter.Utils;
 
@@ -176,6 +176,25 @@ internal static class AssemblyUtils
             "Google.Protobuf.WellKnownTypes.UInt32Value" => typeof(UInt32Value),
             "Google.Protobuf.WellKnownTypes.UInt64Value" => typeof(UInt64Value),
             "Google.Protobuf.WellKnownTypes.Value" => typeof(Value),
+
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Any" => typeof(Any),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.BoolValue" => typeof(BoolValue),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.ByteString" => typeof(ByteString),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.BytesValue" => typeof(BytesValue),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.DoubleValue" => typeof(DoubleValue),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Duration" => typeof(Duration),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Empty" => typeof(Empty),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.FloatValue" => typeof(FloatValue),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Int32Value" => typeof(Int32Value),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Int64Value" => typeof(Int64Value),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.ListValue" => typeof(ListValue),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.NullValue" => typeof(NullValue),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.StringValue" => typeof(StringValue),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Struct" => typeof(Struct),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Timestamp" => typeof(Timestamp),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.UInt32Value" => typeof(UInt32Value),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.UInt64Value" => typeof(UInt64Value),
+            "ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.Value" => typeof(Value),
 
             "google.protobuf.Any" => typeof(Any),
             "google.protobuf.BoolValue" => typeof(BoolValue),

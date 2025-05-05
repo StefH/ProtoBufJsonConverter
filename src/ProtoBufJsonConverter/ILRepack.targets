@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<!-- See also https://github.com/ravibpatel/ILRepack.Lib.MSBuild.Task/issues/26 -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="ILRepacker" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <InputAssemblies Include="$(OutputPath)ProtoBufJsonConverter.dll" />
+      <InputAssemblies Include="@(ReferencePathWithRefAssemblies)" Condition="'%(filename)' == 'protobuf-net.Reflection'" />
+      <LibraryPath Include="%(ReferencePathWithRefAssemblies.RelativeDir)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <DoNotInternalizeAssemblies Include="ProtoBufJsonConverter" />
+    </ItemGroup>
+
+    <!--KeyFile="./ProtoBufJsonConverter.snk"-->
+    <ILRepack
+      Parallel="true"
+      Internalize="true"
+      RenameInternalized="true"
+      InternalizeExclude="@(DoNotInternalizeAssemblies)"
+      InputAssemblies="@(InputAssemblies)"
+      LibraryPath="@(LibraryPath)"
+      TargetKind="Dll"
+      OutputFile="$(OutputPath)$(AssemblyName).dll"
+    />
+  </Target>
+</Project>

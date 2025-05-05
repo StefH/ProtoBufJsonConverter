@@ -183,6 +183,8 @@ public class Converter : IConverter
     /// </summary>
     private static string FixCode(string code)
     {
-        return code.Replace("public global::ProtoBuf.Empty", "public global::ProtoBuf.WellKnownTypes.Empty");
+        return code
+            .Replace("global::ProtoBuf.Empty", "global::ProtoBuf.WellKnownTypes.Empty")
+            .Replace("global::Google.Protobuf.WellKnownTypes.", "global::ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes.");
     }
 }
