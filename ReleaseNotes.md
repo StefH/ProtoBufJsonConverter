@@ -1,3 +1,6 @@
+# 0.9.0 (10 May 2025)
+- [#27](https://github.com/StefH/ProtoBufJsonConverter/pull/27) - Fix parsing null value for google.protobuf.Timestamp [bug] contributed by [StefH](https://github.com/StefH)
+
 # 0.8.0 (05 May 2025)
 - [#26](https://github.com/StefH/ProtoBufJsonConverter/pull/26) - Use ILRepack to make protobuf-net.Reflection internal [enhancement] contributed by [StefH](https://github.com/StefH)
 - [#13](https://github.com/StefH/ProtoBufJsonConverter/issues/13) - Compilation Error due to 'MessageOptions' Type Conflict between 'Google.Protobuf' and 'protobuf-net' [bug]
