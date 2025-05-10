@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Newtonsoft.Json;
 using ProtoBufJsonConverter;
 using ProtoBufJsonConverter.Google.Protobuf.WellKnownTypes;
 using ProtoBufJsonConverter.Models;
@@ -7,211 +8,288 @@ namespace ProtoBufJsonConverterTests;
 
 public partial class ConverterTests
 {
-    private const string ProtoDefinitionNoPackage = @"
-syntax = ""proto3"";
+    private const string ProtoDefinitionNoPackage =
+        """
+        syntax = "proto3";
 
-service Greeter {
-    rpc SayHello (HelloRequest) returns(HelloReply);
-}
+        service Greeter {
+            rpc SayHello (HelloRequest) returns(HelloReply);
+        }
 
-message HelloRequest {
-    string name = 1;
-}
+        message HelloRequest {
+            string name = 1;
+        }
 
-message HelloReply {
-    string message = 1;
-}
-";
+        message HelloReply {
+            string message = 1;
+        }
+        """;
 
-    private const string ProtoDefinition = @"
-syntax = ""proto3"";
+    private const string ProtoDefinition =
+        """
+        syntax = "proto3";
 
-import ""google/protobuf/empty.proto"";
+        import "google/protobuf/empty.proto";
 
-package greet;
+        package greet;
 
-service Greeter {
-    rpc SayHello (HelloRequest) returns(HelloReply);
+        service Greeter {
+            rpc SayHello (HelloRequest) returns(HelloReply);
+        
+            rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+        }
 
-    rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
-}
+        message HelloRequest {
+            string name = 1;
+        }
 
-message HelloRequest {
-    string name = 1;
-}
+        message HelloReply {
+            string message = 1;
+        }
+        """;
 
-message HelloReply {
-    string message = 1;
-}
-";
+    private const string ProtoDefinitionWithCSharpNamespace =
+        """
+        option csharp_namespace = "Test";
 
-    private const string ProtoDefinitionWithCSharpNamespace = @"
-option csharp_namespace = ""Test"";
+        syntax = "proto3";
 
-syntax = ""proto3"";
+        import "google/protobuf/empty.proto";
 
-import ""google/protobuf/empty.proto"";
+        package greet;
 
-package greet;
+        service Greeter {
+            rpc SayHello (HelloRequest) returns(HelloReply);
+            rpc SayEmpty (MyMessageEmpty) returns (MyMessageEmpty);
+            rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+        }
 
-service Greeter {
-    rpc SayHello (HelloRequest) returns(HelloReply);
-    rpc SayEmpty (MyMessageEmpty) returns (MyMessageEmpty);
-    rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
-}
+        message HelloRequest {
+            string name = 1;
+        }
 
-message HelloRequest {
-    string name = 1;
-}
+        message HelloReply {
+            string message = 1;
+            enum Phone {
+        		Unknown = 0;
+                Mobile = 1;
+                Home = 2;
+        	}
+            Phone phone = 2;
+        }
 
-message HelloReply {
-    string message = 1;
-    enum Phone {
-		Unknown = 0;
-        Mobile = 1;
-        Home = 2;
-	}
-    Phone phone = 2;
-}
+        message MyMessageEmpty {
+            google.protobuf.Empty e = 1;
+        }
 
-message MyMessageEmpty {
-    google.protobuf.Empty e = 1;
-}
-";
+        """;
 
-    private const string ProtoDefinitionWithDotInPackage = @"
-syntax = ""proto3"";
+    private const string ProtoDefinitionWithDotInPackage =
+        """
+        syntax = "proto3";
 
-package greet.foo;
+        package greet.foo;
 
-service Greeter {
-    rpc SayHello (HelloRequest) returns(HelloReply);
-}
+        service Greeter {
+            rpc SayHello (HelloRequest) returns(HelloReply);
+        }
 
-message HelloRequest {
-    string name = 1;
-}
+        message HelloRequest {
+            string name = 1;
+        }
 
-message HelloReply {
-    string message = 1;
-}
-";
+        message HelloReply {
+            string message = 1;
+        }
+        """;
 
-    private const string ProtoDefinitionWithDotsInPackage = @"
-syntax = ""proto3"";
+    private const string ProtoDefinitionWithDotsInPackage =
+        """
+        syntax = "proto3";
 
-package greet.foo.bar;
+        package greet.foo.bar;
 
-service Greeter {
-    rpc SayHello (HelloRequest) returns(HelloReply);
-}
+        service Greeter {
+            rpc SayHello (HelloRequest) returns(HelloReply);
+        }
 
-message HelloRequest {
-    string name = 1;
-}
+        message HelloRequest {
+            string name = 1;
+        }
 
-message HelloReply {
-    string message = 1;
-}
-";
+        message HelloReply {
+            string message = 1;
+        }
+        """;
 
-    private const string ProtoDefinitionWithWellKnownTypes = @"
-syntax = ""proto3"";
+    private const string ProtoDefinitionWithWellKnownTypes =
+        """
+        syntax = "proto3";
 
-import ""google/protobuf/empty.proto"";
-import ""google/protobuf/timestamp.proto"";
-import ""google/protobuf/duration.proto"";
+        import "google/protobuf/empty.proto";
+        import "google/protobuf/timestamp.proto";
+        import "google/protobuf/duration.proto";
 
-service Greeter {
-    rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
-    rpc SayEmpty (MyMessageEmpty) returns (MyMessageEmpty);
-    rpc SayTimestamp (MyMessageTimestamp) returns (MyMessageTimestamp);
-    rpc SayDuration (MyMessageDuration) returns (MyMessageDuration);
-}
+        service Greeter {
+            rpc SayNothing (google.protobuf.Empty) returns (google.protobuf.Empty);
+            rpc SayEmpty (MyMessageEmpty) returns (MyMessageEmpty);
+            rpc SayTimestamp (MyMessageTimestamp) returns (MyMessageTimestamp);
+            rpc SayDuration (MyMessageDuration) returns (MyMessageDuration);
+        }
 
-message MyMessageTimestamp {
-    google.protobuf.Timestamp ts = 1;
-}
+        message MyMessageTimestamp {
+            google.protobuf.Timestamp ts = 1;
+        }
 
-message MyMessageDuration {
-    google.protobuf.Duration du = 1;
-}
+        message MyMessageDuration {
+            google.protobuf.Duration du = 1;
+        }
 
-message MyMessageEmpty {
-    google.protobuf.Empty e = 1;
-}
-";
+        message MyMessageEmpty {
+            google.protobuf.Empty e = 1;
+        }
+        """;
 
-    private const string ProtoDefinitionWithWellKnownTypesFromGoogle = @"
-syntax = ""proto3"";
+    private const string ProtoDefinitionWithWellKnownTypesFromGoogle =
+        """
+        syntax = "proto3";
 
-import ""google/protobuf/wrappers.proto"";
-import ""google/protobuf/any.proto"";
-import ""google/protobuf/struct.proto"";
+        import "google/protobuf/wrappers.proto";
+        import "google/protobuf/any.proto";
+        import "google/protobuf/struct.proto";
 
-message MyMessageStringValue {
-    google.protobuf.StringValue val = 1;
-}
+        message MyMessageStringValue {
+            google.protobuf.StringValue val = 1;
+        }
 
-message MyMessageInt64Value {
-    google.protobuf.Int64Value val = 1; 
-}
+        message MyMessageInt64Value {
+            google.protobuf.Int64Value val = 1; 
+        }
 
-message MyMessageInt32Value {
-    google.protobuf.Int32Value val = 1; 
-}
+        message MyMessageInt32Value {
+            google.protobuf.Int32Value val = 1; 
+        }
 
-message MyMessageNullValue {
-    google.protobuf.NullValue val = 1;
-}
+        message MyMessageNullValue {
+            google.protobuf.NullValue val = 1;
+        }
 
-message MyMessageAny {
-    google.protobuf.Any val1 = 1;
-    google.protobuf.Any val2 = 2;
-}
+        message MyMessageAny {
+            google.protobuf.Any val1 = 1;
+            google.protobuf.Any val2 = 2;
+        }
 
-message MyMessageValue {
-    google.protobuf.Value val1 = 1;
-    google.protobuf.Value val2 = 2;
-    google.protobuf.Value val3 = 3;
-    google.protobuf.Value val4 = 4;
-    google.protobuf.Value val5 = 5;
-    google.protobuf.Value val6 = 6;
-}
+        message MyMessageValue {
+            google.protobuf.Value val1 = 1;
+            google.protobuf.Value val2 = 2;
+            google.protobuf.Value val3 = 3;
+            google.protobuf.Value val4 = 4;
+            google.protobuf.Value val5 = 5;
+            google.protobuf.Value val6 = 6;
+        }
 
-message MyMessageStruct {
-    google.protobuf.Struct val = 1;
-}
+        message MyMessageStruct {
+            google.protobuf.Struct val = 1;
+        }
 
-message MyMessageListValue {
-    google.protobuf.ListValue val = 1;
-}
-";
+        message MyMessageListValue {
+            google.protobuf.ListValue val = 1;
+        }
+        """;
 
-    private const string ProtoDefinitionWithEnum = @"
-syntax = ""proto3"";
+    private const string ProtoDefinitionWithEnum =
+        """
+        syntax = "proto3";
 
-enum Enum {
-    A = 0;
-    B = 1;
-}
+        enum Enum {
+            A = 0;
+            B = 1;
+        }
 
-message MyMessage {
-    Enum e = 1;
-}
-";
+        message MyMessage {
+            Enum e = 1;
+        }
+        """;
 
-    private const string ProtoDefinitionWithOneOf = @"
-syntax = ""proto3"";
+    private const string ProtoDefinitionWithOneOf =
+        """
+        syntax = "proto3";
 
-message MyMessage {
-  oneof test
-  {
-    string name = 1;
-    int32 age = 2;
-  }
-}
-";
+        message MyMessage {
+          oneof test
+          {
+            string name = 1;
+            int32 age = 2;
+          }
+        }
+        """;
+
+    private const string ProtoDefinitionPolicy2 =
+        """
+        syntax = "proto3";
+        
+        import "google/protobuf/timestamp.proto";
+        
+        // option csharp_namespace = "NarrowIntegrationTest.Lookup";
+        
+        package Policy2;
+        
+        service PolicyService2 {	
+        	rpc GetCancellationDetail (GetCancellationDetailRequest) returns (GetCancellationDetailResponse);
+        }
+        
+        message GetCancellationDetailRequest {
+        	Client Client = 1;
+        	LegacyPolicyKey LegacyPolicyKey = 2;
+        }
+        
+        message GetCancellationDetailResponse {
+        	ResponseStatus Status = 1;
+        	string CancellationCode = 2;
+        	string CancellationName = 3;
+        	string CancellationDescription = 4;
+        	google.protobuf.Timestamp CancellationEffDate = 5;
+        	string NonRenewalCode = 6;
+        	string NonRenewalName = 7;
+        	string NonRenewalDescription = 8;
+        	google.protobuf.Timestamp NonRenewalEffDate = 9;
+        	google.protobuf.Timestamp LastReinstatementDate = 10; // Always send the last reinstatement date if present on the policy term.
+        }
+        
+        message LegacyPolicyKey {
+        	string Group = 1;
+        	int32 UnitNumber = 2;
+        	int32 Year = 3;
+        	string Suffix = 4;
+        }
+        
+        message ResponseStatus {
+        	bool HasErrors = 1;
+        	bool HasWarnings = 2;
+        	repeated string Errors = 3;
+        	repeated string Warnings = 4;
+        	string CorrelationId = 5;
+        }
+        
+        message Client {
+        	string CorrelationId = 1;
+        	enum Clients {
+        		Unknown = 0;
+                QMS = 1;
+                BillingCenter = 2;
+                PAS = 3;
+                Payroll = 4;
+                Portal = 5;
+                SFO = 6;
+                QuoteAndBind = 7;
+                LegacyConversion = 8;
+                BindNow = 9;
+        		PaymentPortal = 10 ;
+        		PricingEngine = 11;
+        	}
+        	Clients ClientName = 2;
+        }
+        """;
 
     private readonly Converter _sut = new();
 
@@ -354,6 +432,24 @@ message MyMessage {
 
         // Assert
         Convert.ToBase64String(bytes).Should().Be(expectedBytes);
+    }
+
+    [Fact]
+    public async Task ConvertAsync_ConvertObjectWithNullValueForTimestampToProtoBufRequest()
+    {
+        // Arrange
+        const string messageType = "Policy2.GetCancellationDetailResponse";
+        var @object = JsonConvert.DeserializeObject(
+            """{"Status":{"HasErrors":false,"HasWarnings":false,"Errors":[],"Warnings":[],"CorrelationId":"b8ad0d04-ed2f-42e1-ac85-339d91dc9855"},"CancellationCode":"","CancellationName":"","CancellationDescription":"","CancellationEffDate":null,"NonRenewalCode":"","NonRenewalName":"","NonRenewalDescription":"","NonRenewalEffDate":null,"LastReinstatementDate":null}"""
+        )!;
+
+        var request = new ConvertToProtoBufRequest(ProtoDefinitionPolicy2, messageType, @object, addGrpcHeader: false, supportNewerGoogleWellKnownTypes: true);
+
+        // Act
+        var bytes = await _sut.ConvertAsync(request).ConfigureAwait(false);
+
+        // Assert
+        Convert.ToBase64String(bytes).Should().Be("CioIABAAKiRiOGFkMGQwNC1lZDJmLTQyZTEtYWM4NS0zMzlkOTFkYzk4NTU=");
     }
 
     [Fact]

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ProtoBuf.WellKnownTypes;
@@ -57,28 +58,23 @@ internal class WellKnownTypesConverter : JsonConverter
             return NullValue.NullValue;
         }
 
-        if (typeof(Value) == objectType)
+        if (typeof(Value) == objectType && TryReadAsExpandoObject(reader, objectType, existingValue, serializer, out var expandoObject))
         {
-            var value = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
-            return ParseAsValue(value);
+            return ParseAsValue(expandoObject);
         }
 
-        if (typeof(Struct) == objectType)
+        if (typeof(Struct) == objectType && TryReadAsExpandoObject(reader, objectType, existingValue, serializer, out expandoObject))
         {
-            var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
             return ParseAsStruct(expandoObject);
         }
 
-        if (typeof(ListValue) == objectType)
+        if (typeof(ListValue) == objectType && TryReadAsExpandoObject(reader, objectType, existingValue, serializer, out expandoObject))
         {
-            var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
             return ParseAsListValue(expandoObject);
         }
 
-        if (typeof(Any) == objectType)
+        if (typeof(Any) == objectType && TryReadAsExpandoObject(reader, objectType, existingValue, serializer, out expandoObject))
         {
-            var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
-
             var typeUrl = (string)expandoObject[Any.TypeUrlPropertyName]!;
             var value = expandoObject[Any.ValuePropertyName];
             var bytes = SerializeUtils.Serialize(value);
@@ -92,15 +88,13 @@ internal class WellKnownTypesConverter : JsonConverter
 
         if (_supportNewerGoogleWellKnownTypes)
         {
-            if (_isDateTime(objectType))
+            if (_isDateTime(objectType) && TryReadAsExpandoObject(reader, objectType, existingValue, serializer, out expandoObject))
             {
-                var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
                 return ParseAsDateTimeOrTimespan(expandoObject, (seconds, nanos) => new Timestamp(seconds, nanos).AsDateTime());
             }
 
-            if (_isTimeSpan(objectType))
+            if (_isTimeSpan(objectType) && TryReadAsExpandoObject(reader, objectType, existingValue, serializer, out expandoObject))
             {
-                var expandoObject = ReadAsExpandoObject(reader, objectType, existingValue, serializer);
                 return ParseAsDateTimeOrTimespan(expandoObject, (seconds, nanos) => new Duration(seconds, nanos).AsTimeSpan());
             }
         }
@@ -238,10 +232,18 @@ internal class WellKnownTypesConverter : JsonConverter
     /// The only way to find where this json object begins and ends is by reading it in as a generic ExpandoObject.
     /// Read an entire object from the reader.
     /// </summary>
-    private IDictionary<string, object?> ReadAsExpandoObject(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    private bool TryReadAsExpandoObject(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer, [NotNullWhen(true)] out IDictionary<string, object?>? dictionary)
     {
-        var dictionary = (IDictionary<string, object?>)_converter.ReadJson(reader, objectType, existingValue, serializer)!;
-        return new Dictionary<string, object?>(dictionary, StringComparer.OrdinalIgnoreCase);
+        var value = _converter.ReadJson(reader, objectType, existingValue, serializer);
+
+        if (value is IDictionary<string, object?> valueAsDictionary)
+        {
+            dictionary = new Dictionary<string, object?>(valueAsDictionary, StringComparer.OrdinalIgnoreCase);
+            return true;
+        }
+
+        dictionary = null;
+        return false;
     }
 
     private static void WriteTimestampOrDuration(JsonWriter writer, long seconds, int nanos)
@@ -333,7 +335,7 @@ internal class WellKnownTypesConverter : JsonConverter
         return listValue;
     }
 
-    private static T ParseAsDateTimeOrTimespan<T>(IDictionary<string, object?> expandoObject, Func<long,int, T> func)
+    private static T ParseAsDateTimeOrTimespan<T>(IDictionary<string, object?> expandoObject, Func<long, int, T> func)
     {
         var seconds = TypeUtils.ChangeType(expandoObject["seconds"], (long)0);
         var nanos = TypeUtils.ChangeType(expandoObject["nanos"], 0);
