@@ -18,8 +18,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+  
+    - name: 'ProtoBufJsonConverterTests (Debug)'
+      run: dotnet test './test/ProtoBufJsonConverterTests/ProtoBufJsonConverterTests.csproj' -c Debug
 
-    - name: 'ProtoBufJsonConverterTests'
+    - name: 'ProtoBufJsonConverterTests (Release)'
       run: dotnet test './test/ProtoBufJsonConverterTests/ProtoBufJsonConverterTests.csproj' -c Release
 
     - name: 'MetadataReferenceServiceTests'
