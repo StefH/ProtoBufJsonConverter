@@ -1,18 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.9.0</Version>
+    <Version>0.10.0</Version>
     <TargetFrameworks>net462;netstandard2.0;netstandard2.1;net6.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <ApplicationIcon>../../resources/icon.ico</ApplicationIcon>
-    <!--<SignAssembly>True</SignAssembly>
-    <DelaySign>True</DelaySign>-->
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <!--<AssemblyOriginatorKeyFile>ProtoBufJsonConverter.snk</AssemblyOriginatorKeyFile>-->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../ProtoBufJsonConverter.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
@@ -50,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="ProtoBufJsonConverterTests" />
+    <InternalsVisibleTo Include="ProtoBufJsonConverterTests, PublicKey=002400000480000094000000060200000024000052534131000400000100010041e582e0b963430a6a7d5284209814ed0eae1dadaa7e801972a938c1f0714301af93f419e37a0c9293ac963f4e56640c17a48a115c1341bb02a86f0a7c19da91c33e646632c1f95678bd772fb23a444dac834cfcfad997a7c95b5c714c071a2cb2f1d3778675e24fdb0a87583967bba5ee0569b486d6cca203a761dba33af2b2" />
   </ItemGroup>
 
   <ItemGroup>
