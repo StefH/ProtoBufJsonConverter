@@ -1,3 +1,6 @@
+# 0.10.0 (18 May 2025)
+- [#28](https://github.com/StefH/ProtoBufJsonConverter/pull/28) - Fix .NET 6 [bug] contributed by [StefH](https://github.com/StefH)
+
 # 0.9.0 (10 May 2025)
 - [#27](https://github.com/StefH/ProtoBufJsonConverter/pull/27) - Fix parsing null value for google.protobuf.Timestamp [bug] contributed by [StefH](https://github.com/StefH)
 
