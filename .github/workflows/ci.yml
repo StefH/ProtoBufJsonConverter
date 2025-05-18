@@ -23,6 +23,11 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '6.0.x'
+
+    - name: Setup .NET 8
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
   
     - name: 'ProtoBufJsonConverterTests (Debug)'
       run: dotnet test './test/ProtoBufJsonConverterTests/ProtoBufJsonConverterTests.csproj' -c Debug
