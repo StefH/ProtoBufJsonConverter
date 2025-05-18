@@ -17,13 +17,15 @@ internal static class AssemblyUtils
     // Get and load all required assemblies to compile the SyntaxTree
     private static readonly Lazy<IReadOnlyList<Assembly>> RequiredAssemblies = new(() =>
     {
-        var assemblySystemRuntime = Assembly.GetEntryAssembly()!
-            .GetReferencedAssemblies()
-            .First(a => a.Name == "System.Runtime");
+        var assemblies = AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
+            .ToArray();
 
         return new List<Assembly>
         {
-            Assembly.Load(assemblySystemRuntime),
+            assemblies.First(a => a.GetName().Name == "System.Runtime"),
+            assemblies.First(a => a.GetName().Name == "netstandard"),
             typeof(object).Assembly,
             typeof(ProtoContractAttribute).Assembly,
             typeof(AssemblyUtils).Assembly
