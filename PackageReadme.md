@@ -1,14 +1,14 @@
-# ProtoBufJsonConverter
+## ProtoBufJsonConverter
 
-## This project uses [protobuf-net](https://github.com/protobuf-net/protobuf-net) to:
+### This project uses [protobuf-net](https://github.com/protobuf-net/protobuf-net) to:
 - Convert a protobuf message to a JSON string using the proto definition file.
 - Convert a protobuf message to an object using the proto definition file.
 - Convert a JSON string or an object to a protobuf message using the proto definition file.
 - Get information about the package names, message types and C# namespaces in the proto definition file.
 
-## Usage
+### Usage
 
-### Proto Definition
+#### Proto Definition
 ``` proto
 syntax = "proto3";
 
@@ -31,9 +31,9 @@ message HelloReply {
 }
 ```
 
-### :one: Convert ProtoBuf `byte[]` to a JSON `string`
+#### :one: Convert ProtoBuf `byte[]` to a JSON `string`
 
-#### Code
+##### Code
 ``` csharp
 var protoDefinition = "...". // See above
 
@@ -46,14 +46,14 @@ var converter = new Converter();
 var json = await converter.ConvertAsync(request);
 ```
 
-#### JSON
+##### JSON
 ``` json
 {"name":"stef"}
 ```
 
-### :one: Convert ProtoBuf `byte[]` to an object
+#### :two: Convert ProtoBuf `byte[]` to an object
 
-#### Code
+##### Code
 ``` csharp
 var protoDefinition = "...". // See above
 
@@ -66,8 +66,8 @@ var converter = new Converter();
 var @object = await converter.ConvertAsync(request);
 ```
 
-### :three: Convert JSON `string` to a ProtoBuf `byte[]`
-#### Code
+#### :three: Convert JSON `string` to a ProtoBuf `byte[]`
+##### Code
 ``` csharp
 var protoDefinition = "...". // See above
 
@@ -80,8 +80,8 @@ var converter = new Converter();
 var protobuf = await converter.ConvertAsync(request);
 ```
 
-### :four: Convert any `object` to a ProtoBuf `byte[]`
-#### Code
+#### :four: Convert any `object` to a ProtoBuf `byte[]`
+##### Code
 ``` csharp
 var protoDefinition = "...". // See above
 
@@ -97,8 +97,8 @@ var converter = new Converter();
 var protobuf = await converter.ConvertAsync(request);
 ```
 
-### :five: Convert any `object` to a ProtoBuf `byte[]` including the Grpc Header
-#### Code
+#### :five: Convert any `object` to a ProtoBuf `byte[]` including the Grpc Header
+##### Code
 ``` csharp
 var protoDefinition = "...". // See above
 
@@ -117,13 +117,13 @@ var protobufWithGrpcHeader = await ConvertAsync.Convert(request);
 
 ---
 
-## Using in Blazor WebAssembly
+### Using in Blazor WebAssembly
 In order to use this library in a Blazor WebAssembly application, you need to provide a specific Blazor implementation for the `IMetadataReferenceService`, the [BlazorWasmMetadataReferenceService](https://github.com/StefH/ProtoBufJsonConverter/blob/main/examples/ProtoBufJsonConverter.Blazor/BlazorWasmMetadataReferenceService.cs).
 
 
-### Convert ProtoBuf `byte[]` to a JSON `string`
+#### Convert ProtoBuf `byte[]` to a JSON `string`
 
-#### Dependency Injection
+##### Dependency Injection
 ``` csharp
 public class Program
 {
@@ -140,7 +140,7 @@ public class Program
 }
 ```
 
-#### Blazor Page
+##### Blazor Page
 ``` csharp
 public partial class Home
 {
@@ -179,8 +179,8 @@ public partial class Home
 
 For a full example, see [examples/ProtoBufJsonConverter.Blazor](https://github.com/StefH/ProtoBufJsonConverter/tree/main/examples/ProtoBufJsonConverter.Blazor).
 
-### :six: Get information about the package names, message types and C# namespaces
-#### Code
+#### :six: Get information about the package names, message types and C# namespaces
+##### Code
 ``` csharp
 var protoDefinition = "...". // See above
 
@@ -194,12 +194,21 @@ var namespaces = response.CSharpNamespaces;
 
 ---
 
-## :computer: Examples
+### :computer: Examples
 - [Blazor WASM](https://protobuf.heyenrath.nl)
 - [Blazor Static Web App](https://zealous-desert-029b2f003.4.azurestaticapps.net/)
 
 
-## :books: Resources
+### :books: Resources
 - [protogen](https://protogen.marcgravell.com)
 - [protobufpal](https://www.protobufpal.com)
 - [protobuf-decoder](https://protobuf-decoder.netlify.app)
+
+
+### Sponsors
+
+[Entity Framework Extensions](https://entityframework-extensions.net/?utm_source=StefH) and [Dapper Plus](https://dapper-plus.net/?utm_source=StefH) are major sponsors and proud to contribute to the development of **ProtoBufJsonConverter**.
+
+[![Entity Framework Extensions](https://raw.githubusercontent.com/StefH/resources/main/sponsor/entity-framework-extensions-sponsor.png)](https://entityframework-extensions.net/bulk-insert?utm_source=StefH)
+
+[![Dapper Plus](https://raw.githubusercontent.com/StefH/resources/main/sponsor/dapper-plus-sponsor.png)](https://dapper-plus.net/bulk-insert?utm_source=StefH)

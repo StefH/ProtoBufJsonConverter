@@ -1,4 +1,4 @@
-# ProtoBufJsonConverter
+# ![Icon](./resources/icon-32x32.png) ProtoBufJsonConverter
 
 ## This project uses [protobuf-net](https://github.com/protobuf-net/protobuf-net) to:
 - Convert a protobuf message to a JSON string using the proto definition file.
@@ -233,3 +233,12 @@ var namespaces = response.CSharpNamespaces;
 - [protogen](https://protogen.marcgravell.com)
 - [protobufpal](https://www.protobufpal.com)
 - [protobuf-decoder](https://protobuf-decoder.netlify.app)
+
+- 
+## Sponsors
+
+[Entity Framework Extensions](https://entityframework-extensions.net/?utm_source=StefH) and [Dapper Plus](https://dapper-plus.net/?utm_source=StefH) are major sponsors and proud to contribute to the development of **ProtoBufJsonConverter**.
+
+[![Entity Framework Extensions](https://raw.githubusercontent.com/StefH/resources/main/sponsor/entity-framework-extensions-sponsor.png)](https://entityframework-extensions.net/bulk-insert?utm_source=StefH)
+
+[![Dapper Plus](https://raw.githubusercontent.com/StefH/resources/main/sponsor/dapper-plus-sponsor.png)](https://dapper-plus.net/bulk-insert?utm_source=StefH)
