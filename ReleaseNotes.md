@@ -1,3 +1,7 @@
+# 0.11.0 (24 December 2025)
+- [#29](https://github.com/StefH/ProtoBufJsonConverter/pull/29) - Fix loading required assemblies to compile the SyntaxTree when running in Blazor WASM [bug] contributed by [StefH](https://github.com/StefH)
+- [#30](https://github.com/StefH/ProtoBufJsonConverter/pull/30) - Fix DictionaryExtensions GetOrAddAsync [bug] contributed by [StefH](https://github.com/StefH)
+
 # 0.10.0 (18 May 2025)
 - [#28](https://github.com/StefH/ProtoBufJsonConverter/pull/28) - Fix .NET 6 [bug] contributed by [StefH](https://github.com/StefH)
 
