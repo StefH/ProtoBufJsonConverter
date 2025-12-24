@@ -21,7 +21,10 @@ internal static class DictionaryExtensions
         catch
         {
             // Remove failed task so next call can retry
-            dictionary.TryRemove(key, out _);
+            // Use value comparison to ensure we only remove the specific failed lazyTask instance
+            // This prevents race condition where another thread might have already added a new task
+            ((ICollection<KeyValuePair<TKey, Lazy<Task<TValue>>>>)dictionary)
+                .Remove(new KeyValuePair<TKey, Lazy<Task<TValue>>>(key, lazyTask));
             throw;
         }
     }
