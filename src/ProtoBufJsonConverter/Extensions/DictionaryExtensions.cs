@@ -25,8 +25,7 @@ internal static class DictionaryExtensions
             // This prevents race condition where another thread might have already added a new task
             // Note: ConcurrentDictionary.TryRemove(KeyValuePair) is only available in .NET 5.0+,
             // but we need to support net462, net48, and netstandard2.1
-            ((ICollection<KeyValuePair<TKey, Lazy<Task<TValue>>>>)dictionary)
-                .Remove(new KeyValuePair<TKey, Lazy<Task<TValue>>>(key, lazyTask));
+            ((ICollection<KeyValuePair<TKey, Lazy<Task<TValue>>>>)dictionary).Remove(new KeyValuePair<TKey, Lazy<Task<TValue>>>(key, lazyTask));
             throw;
         }
     }
