@@ -22,7 +22,7 @@ public class Converter : IConverter
         { "nullablevaluetype", "true" }
     };
 
-    private static readonly ConcurrentDictionary<int, Data> DataDictionary = new();
+    private static readonly ConcurrentDictionary<int, Lazy<Task<Data>>> DataDictionary = new();
 
     private readonly IMetadataReferenceService _metadataReferenceService;
     private readonly IProtoFileResolver? _globalProtoFileResolver;
@@ -97,7 +97,7 @@ public class Converter : IConverter
                 {
                     return type;
                 }
-                
+
                 throw new InvalidOperationException($"The type '{messageType}' is not found in the assembly.");
             });
 

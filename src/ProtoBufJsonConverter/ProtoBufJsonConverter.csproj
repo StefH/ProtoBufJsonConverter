@@ -50,7 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="ProtoBufJsonConverterTests" />
+    <InternalsVisibleTo Include="$(MSBuildProjectName)Tests" />
   </ItemGroup>
 
   <ItemGroup>

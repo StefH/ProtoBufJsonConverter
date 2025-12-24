@@ -1,22 +1,28 @@
-using Stef.Validation;
+using System.Collections.Concurrent;
 
 namespace ProtoBufJsonConverter.Extensions;
 
 internal static class DictionaryExtensions
 {
-    internal static async Task<TValue> GetOrAddAsync<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, Task<TValue>> valueFactory)
+    internal static async Task<TValue> GetOrAddAsync<TKey, TValue>(
+        this ConcurrentDictionary<TKey, Lazy<Task<TValue>>> dictionary,
+        TKey key,
+        Func<TKey, Task<TValue>> valueFactory)
+        where TKey : notnull
     {
-        Guard.NotNull(dictionary);
-        Guard.NotNull(key);
+        var lazyTask = dictionary.GetOrAdd(
+            key,
+            k => new Lazy<Task<TValue>>(() => valueFactory(k), isThreadSafe: true));
 
-        if (dictionary.TryGetValue(key, out var value))
+        try
         {
-            return value;
+            return await lazyTask.Value.ConfigureAwait(false);
         }
-
-        value = await valueFactory(key);
-        dictionary.Add(key, value);
-
-        return value;
+        catch
+        {
+            // Remove failed task so next call can retry
+            dictionary.TryRemove(key, out _);
+            throw;
+        }
     }
 }
