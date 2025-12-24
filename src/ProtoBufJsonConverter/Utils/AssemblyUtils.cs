@@ -19,17 +19,17 @@ internal static class AssemblyUtils
     {
         var assemblies = AppDomain.CurrentDomain
             .GetAssemblies()
-            .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
+            .Where(a => !a.IsDynamic && (RuntimeInformationUtils.IsBlazorWASM || !string.IsNullOrEmpty(a.Location)))
             .ToArray();
 
-        return new List<Assembly>
-        {
+        return
+        [
             assemblies.First(a => a.GetName().Name == "System.Runtime"),
             assemblies.First(a => a.GetName().Name == "netstandard"),
             typeof(object).Assembly,
             typeof(ProtoContractAttribute).Assembly,
             typeof(AssemblyUtils).Assembly
-        };
+        ];
     });
 
     private static readonly Lazy<ConcurrentDictionary<string, Type>> AllTypesWithProtoContractAttribute = new(() =>
