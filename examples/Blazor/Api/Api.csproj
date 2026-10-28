@@ -19,7 +19,7 @@
 		<PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
 		<PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-		<PackageReference Include="Stef.Validation" Version="0.1.1" />
+		<PackageReference Include="Stef.Validation" Version="0.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>
