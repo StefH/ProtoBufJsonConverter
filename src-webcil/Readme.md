@@ -3,7 +3,7 @@
 ## Info
 Generate a valid MetadataReference based on a Wasm wrapped Webcil stream (`MetadataReferenceService.BlazorWasm`)
 
-This project uses a slightly modified version from the source code for [Microsoft.NET.WebAssembly.Webcil](https://github.com/dotnet/runtime/blob/main/src/tasks/Microsoft.NET.WebAssembly.Webcil) in addition to some own code to unwrap a Wasm Webcil stream into a Portable Executable (byte[]) which can be used to create a MetadataReferenceService.
+This project uses a slightly modified version from the source code for [Microsoft.NET.WebAssembly.Webcil](https://github.com/dotnet/runtime/blob/main/src/tasks/Microsoft.NET.WebAssembly.Webcil) in addition to some own code to unwrap a Wasm Webcil stream into a Portable Executable (`byte[]`) which can be used to create a MetadataReferenceService.
 The reason for this is that by default the `WasmEnableWebcil` is set to `true`:
 ``` xml
 <WasmEnableWebcil>true</WasmEnableWebcil>

@@ -70,7 +70,7 @@ public class BlazorWasmMetadataReferenceService : IMetadataReferenceService
 
     private async Task<DownloadFileResult> DownloadFileAsync(string assemblyName, CancellationToken cancellationToken)
     {
-#if NET8_0
+#if NET8_0_OR_GREATER
         // For .NET 8: First try to download the .wasm file ("<WasmEnableWebcil>true</WasmEnableWebcil>" --> default value)
         var wasm = await TryDownloadFileAsync(assemblyName, FileType.Wasm, cancellationToken);
         if (wasm.Success)
