@@ -39,4 +39,21 @@ jobs:
         user: ${{ secrets.NUGET_USER }}
 
     - name: Push to NuGet
-      run: dotnet nuget push "**/packages/*.nupkg" --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+      shell: pwsh
+      env:
+        NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+      run: |
+        $packages = Get-ChildItem ./packages -File -Filter *.nupkg |
+          Where-Object {
+            $_.Name -match '^(ProtoBufJsonConverter|MetadataReferenceService\.[^.]+)\..+\.nupkg$' -and
+            $_.Name -notlike '*.symbols.nupkg'
+          }
+
+        if (-not $packages) {
+          throw 'No ProtoBufJsonConverter or MetadataReferenceService packages were found to publish.'
+        }
+
+        $packages | ForEach-Object {
+          dotnet nuget push $_.FullName --api-key $env:NUGET_API_KEY --source 'https://api.nuget.org/v3/index.json' --skip-duplicate
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        }
